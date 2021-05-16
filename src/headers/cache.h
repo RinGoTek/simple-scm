@@ -33,4 +33,5 @@ const std::string DB_ENVIRONMENT = "SHA1_FILE_DIRECTORY";
 const std::string DEFAULT_DB_ENVIRONMENT = ".simple-scm/objects";
 
 
+//获取当前工作目录
 static std::string cwd = get_current_dir_name();
