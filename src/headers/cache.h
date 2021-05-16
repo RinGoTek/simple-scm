@@ -22,6 +22,7 @@
 
 #include<openssl/sha.h>
 #include<zlib.h>
+#include <unistd.h>
 
 /*
  * 这是文件夹缓存的基础数据结构
@@ -30,3 +31,6 @@
 
 const std::string DB_ENVIRONMENT = "SHA1_FILE_DIRECTORY";
 const std::string DEFAULT_DB_ENVIRONMENT = ".simple-scm/objects";
+
+
+static std::string cwd = get_current_dir_name();

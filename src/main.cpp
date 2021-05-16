@@ -1,6 +1,8 @@
 #include <iostream>
 #include<string>
 #include"headers/init-db.h"
+#include"headers/cache.h"
+
 
 using namespace std;
 
@@ -20,6 +22,9 @@ int main(int count, char *parameters[]) {
     {
         case 2:
             deal_with_two_arg(parameters);
+            break;
+        default:
+            usage();
             break;
 
     }
