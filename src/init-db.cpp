@@ -8,6 +8,8 @@
 #include<string>
 #include<stdlib.h>
 #include<cstring>
+#include<cstdio>
+#include<sqlite3.h>
 
 using namespace std;
 
@@ -69,6 +71,62 @@ void init_db::do_init() {
 
     clog<<"创建数据目录成功！"<<endl;
 
+}
+
+void database_init()
+{
+    sqlite3 *db;
+    char *zErrMsg=0;
+    int rc;
+    char *sql;
+
+    rc=sqlite3_open(".simple-scm/simple-scm.db",&db);
+
+    if(rc)
+    {
+        clog<<"数据库创建失败！"<<endl;
+        exit(1);
+    }
+    else
+    {
+        clog<<"数据库创建成功！"<<endl;
+    }
+
+    sql="CREATE TABLE Objects("\
+        "CompressedSHA CHAR(40) PRIMARY KEY,"\
+        "OriginSHA CHAR(40),"\
+        "OriginPath TEXT(500),"\
+        "CompressedPath TEXT(500),"\
+        "CreatedDateTime DATETIME,"\
+        "UpdatedDateTime DATETIME);";
+
+    rc = sqlite3_exec(db, sql, callback, 0, &zErrMsg);
+    if(rc != SQLITE_OK)
+    {
+        clog<<"数据表Object创建失败，原因是"<<zErrMsg<<endl;
+    }
+    else
+    {
+        clog<<"数据表Object创建成功！"<<endl;
+    }
+
+    sql="CREATE TABLE Node("\
+        "SHA CHAR(40) PRIMARY KEY,"\
+        "CreatedDateTime DATETIME,"\
+        "Parent ForeignKey,"\
+        "Message TEXT(1000);";
+
+    rc =  sqlite3_exec(db, sql, callback, 0, &zErrMsg);
+    if(rc != SQLITE_OK)
+    {
+        clog<<"数据表Node创建失败，原因是"<<zErrMsg<<endl;
+    }
+    else
+    {
+        clog<<"数据表Node创建成功！"<<endl;
+    }
+
 
 
 }
+

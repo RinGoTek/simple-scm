@@ -13,4 +13,5 @@ public:
     init_db ();
     //初始化数据仓库的函数
     void do_init();
+    void database_init();
 };

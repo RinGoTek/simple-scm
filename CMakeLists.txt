@@ -8,8 +8,14 @@ find_package(OpenSSL REQUIRED)
 
 add_executable(simple-scm src/main.cpp src/headers/cache.h src/init-db.cpp src/headers/init-db.h)
 
+
+link_libraries(sqlite3)
 target_link_libraries(${PROJECT_NAME} ZLIB::ZLIB)
 target_link_libraries(${PROJECT_NAME} OpenSSL::Crypto)
+
+add_compile_options(-l sqlite3)
+target_link_libraries(${PROJECT_NAME} sqlite3)
+
 
 set(CMAKE_INSTALL_PREFIX ./install)
 install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION ${PROJECT_NAME}/bin)
