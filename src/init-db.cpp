@@ -22,28 +22,28 @@ init_db::init_db()
 //初始化数据仓库的函数
 void init_db::do_init() {
 
-    clog << "正在初始化存储库" << endl;
+    clog << "[INFO]正在初始化存储库" << endl;
 
     if (mkdir(".simple-scm", 0700) < 0) {
         if(errno == EEXIST)
         {
-            clog<<"存储库已经存在"<<endl;
+            clog<<"[INFO]存储库已经存在"<<endl;
             exit(1);
         }
         else
         {
-            cerr << "创建存储库失败" << endl;
+            cerr << "[ERROR]创建存储库失败" << endl;
             exit(1);
         }
 
     }
 
     //创建根目录
-    clog<<"正在创建数据根目录..."<<endl;
+    clog<<"[INFO]正在创建数据根目录..."<<endl;
 
 
     string sha1_dir = DEFAULT_DB_ENVIRONMENT;
-    clog<<"正在创建数据目录..."<<endl;
+    clog<<"[INFO]正在创建数据目录..."<<endl;
 
     if(mkdir(sha1_dir.c_str(), 0700)<0)
     {
@@ -71,6 +71,12 @@ void init_db::do_init() {
 
     clog<<"创建数据目录成功！"<<endl;
 
+}
+
+static int callback(void *NotUsed,int argc, char **argv,char **azColName)
+{
+    for(int i=1;i<=argc;i++) cout<<azColName<<"="<<(argv[i] ? argv[i] : "NULL" )<< endl;
+    return 0;
 }
 
 void database_init()

@@ -8,8 +8,6 @@ find_package(OpenSSL REQUIRED)
 
 add_executable(simple-scm src/main.cpp src/headers/cache.h src/init-db.cpp src/headers/init-db.h)
 
-
-link_libraries(sqlite3)
 target_link_libraries(${PROJECT_NAME} ZLIB::ZLIB)
 target_link_libraries(${PROJECT_NAME} OpenSSL::Crypto)
 
