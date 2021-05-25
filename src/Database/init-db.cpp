@@ -53,9 +53,9 @@ void init_db::do_init() {
     }
 
 
-    if (mkdir((sha1_dir + "/objects").c_str(), 0700) < 0) {
+    if (mkdir((sha1_dir ).c_str(), 0700) < 0) {
         if (errno != EEXIST) {
-            cerr << "[ERROR]发生错误： " << sha1_dir + "/objects" << endl;
+            cerr << "[ERROR]发生错误： " << sha1_dir << endl;
             exit(1);
         }
     }
