@@ -195,7 +195,13 @@ void init_db::do_init() {
         clog << "[INFO]main分支创建成功！" << endl;
     }
 
-    //还没插入Node2Branch的记录
+    sprintf(tmp_sql,"INSERT INTO Node2Branch (ID,Node,Branch,CreatedDateTime) VALUES (NULL, (SELECT SHA FROM Node WHERE SHA = '000000'), (SELECT ID FROM Branch WHERE ID = 1),'%s')",tmp_time);
+    rc = sqlite3_exec(db, tmp_sql, callback, 0, &zErrMsg);
+    if (rc != SQLITE_OK) {
+        cerr << "[ERROR]根节点与主分支连接失败: " << zErrMsg << endl;
+    } else {
+        clog << "[INFO]根节点与主分支连接成功！" << endl;
+    }
 
     clog << "[INFO]simple-scm存储库初始化完毕！" << endl;
 }
