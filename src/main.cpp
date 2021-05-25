@@ -1,7 +1,8 @@
 #include <iostream>
 #include<string>
-#include"headers/init-db.h"
 #include"headers/cache.h"
+
+#include"Database/database.h"
 
 
 using namespace std;
@@ -34,11 +35,11 @@ int main(int count, char *parameters[]) {
 void deal_with_two_arg(char *parameters[])
 {
     string command = parameters[1];
-    if (command == "init-db")
+    if (command == "init")
     {
         //初始化存储库
-        init_db idb = init_db();
-        idb.do_init();
+        database db;
+        db.init();
     }
 
     else if(command == "--usage")
@@ -58,7 +59,6 @@ void deal_with_two_arg(char *parameters[])
 void usage()
 {
     cout<<"Usage:\n"
-        <<"init-db      初始化存储仓库\n"
-        <<"database-db      初始化数据库\n"
+        <<"init      初始化存储仓库\n"
         <<endl;
 }

@@ -19,11 +19,8 @@
 初始化存储库：
 
 ```
-./simple-scm init-db
+./simple-scm init
 ```
 
-初始化数据库：
 
-```
-./simple-scm database-db
-```
+
