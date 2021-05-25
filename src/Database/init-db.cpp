@@ -16,11 +16,13 @@
 
 using namespace std;
 
+static int callback(void *NotUsed, int argc, char **argv, char **azColName) {
+    for (int i = 1; i <= argc; i++) cout << azColName << "=" << (argv[i] ? argv[i] : "NULL") << endl;
+    return 0;
+}
 
-char cc[16] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
 
-
-//初始化数据仓库的函数
+//初始化数据仓库和数据库的函数
 void init_db::do_init() {
 
     clog << "[INFO]正在初始化存储库" << endl;
@@ -61,16 +63,7 @@ void init_db::do_init() {
 
     clog << "[INFO]创建数据目录成功！" << endl;
 
-    database_init();
 
-}
-
-static int callback(void *NotUsed, int argc, char **argv, char **azColName) {
-    for (int i = 1; i <= argc; i++) cout << azColName << "=" << (argv[i] ? argv[i] : "NULL") << endl;
-    return 0;
-}
-
-void init_db::database_init() {
     sqlite3 *db;
     char *zErrMsg = 0;
     int rc;
@@ -193,8 +186,7 @@ void init_db::database_init() {
     //创建主分支
     tmp_time = database::getCurrentTimeChar();
 
-    //这句sql执行失败了
-    sprintf(tmp_sql, "INSERT INTO Branch (Name, BranchRoot, CreatedDateTime, UpdatedDateTime) VALUES ('main', '(SELECT SHA FROM Node WHERE SHA = '000000')', %s, %s)", tmp_time, tmp_time);
+    sprintf(tmp_sql, "INSERT INTO Branch (ID,Name, BranchRoot, CreatedDateTime, UpdatedDateTime) VALUES ((NULL),'main', (SELECT SHA FROM Node WHERE SHA = '000000'), '%s', '%s')", tmp_time, tmp_time);
 
     rc = sqlite3_exec(db, tmp_sql, callback, 0, &zErrMsg);
     if (rc != SQLITE_OK) {
