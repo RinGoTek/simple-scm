@@ -13,6 +13,8 @@
 
 using namespace std;
 
+
+
 char cc[16] = {'0', '1', '2', '3', '4', '5','6','7','8','9','a','b','c','d','e','f'};
 
 init_db::init_db()
@@ -69,7 +71,10 @@ void init_db::do_init() {
         }
     }
 
+
     clog<<"[INFO]创建数据目录成功！"<<endl;
+
+    database_init();
 
 }
 
@@ -79,7 +84,7 @@ static int callback(void *NotUsed,int argc, char **argv,char **azColName)
     return 0;
 }
 
-void database_init()
+void init_db::database_init()
 {
     sqlite3 *db;
     char *zErrMsg=0;
@@ -120,8 +125,8 @@ void database_init()
         "SHA CHAR(40) PRIMARY KEY,"\
         "CreatedDateTime DATETIME,"\
         "Parent CHAR(40),"\
-        "Message TEXT(1000)"\
-        "FOREIGN KEY (Parent) REFERENCE Node(SHA);";
+        "Message TEXT(1000),"\
+        "FOREIGN KEY (Parent) REFERENCES Node(SHA));";
 
     rc =  sqlite3_exec(db, sql, callback, 0, &zErrMsg);
     if(rc != SQLITE_OK)
@@ -139,8 +144,8 @@ void database_init()
         "NODE CHAR(40),"\
         "Mode INTEGER,"\
         "CreatedDateTime DATETIME,"\
-        "FOREIGN KEY (File) REFERENCE Objects(CompressedSHA),"\
-        "FOREIGN KEY (NODE) REFERENCE Node(SHA);";
+        "FOREIGN KEY (File) REFERENCES Objects(CompressedSHA),"\
+        "FOREIGN KEY (NODE) REFERENCES Node(SHA));";
 
     rc =  sqlite3_exec(db, sql, callback, 0, &zErrMsg);
     if(rc != SQLITE_OK)
@@ -158,7 +163,7 @@ void database_init()
         "BranchRoot CHAR(40),"\
         "CreatedDateRTime DATETIME,"\
         "UpdatedDateTime DATETIME,"\
-        "FOREIGN KEY BranchRoot REFERENCE Node(SHA);";
+        "FOREIGN KEY (BranchRoot) REFERENCES Node(SHA));";
 
     rc =  sqlite3_exec(db, sql, callback, 0, &zErrMsg);
     if(rc != SQLITE_OK)
@@ -171,12 +176,12 @@ void database_init()
     }
 
     sql="CREATE TABLE Node2Branch("\
-        "ID INTEGER PRIMARY KEY("\
+        "ID INTEGER PRIMARY KEY,"\
         "Node CHAR(40),"\
         "Branch INTEGER,"\
         "CreatedDateTime DATETIME,"\
-        "FOREIGN KEY Node REFERENCE Node(SHA),"\
-        "FOREIGN KEY Branch REFERENCE Branch(ID);";
+        "FOREIGN KEY (Node) REFERENCES Node(SHA),"\
+        "FOREIGN KEY (Branch) REFERENCES Branch(ID));";
 
     rc =  sqlite3_exec(db, sql, callback, 0, &zErrMsg);
     if(rc != SQLITE_OK)
@@ -193,7 +198,7 @@ void database_init()
         "OriginSHA CHAR(40),"\
         "OriginPath TEXT(500),"\
         "CreatedDateTime DATETIME,"\
-        "UpdatedDateTime DATETIME;";
+        "UpdatedDateTime DATETIME);";
 
     rc =  sqlite3_exec(db, sql, callback, 0, &zErrMsg);
     if(rc != SQLITE_OK)

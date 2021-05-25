@@ -40,12 +40,7 @@ void deal_with_two_arg(char *parameters[])
         init_db idb = init_db();
         idb.do_init();
     }
-    else if(command == "database-db")
-    {
-        //初始化数据库
-        init_db idb = init_db();
-        idb.database_init();
-    }
+
     else if(command == "--usage")
     {
         //输出用法
