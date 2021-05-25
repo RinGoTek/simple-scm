@@ -15,7 +15,7 @@ int main(int count, char *parameters[]) {
     //用户的命令
     if(count == 1)
     {
-        cout<<"请使用 --usage 来查看用法"<<endl;
+        cout<<"请使用 --usage 来查看用法."<<endl;
         return 0;
     }
     switch(count)
