@@ -6,6 +6,7 @@
 #define SIMPLE_SCM_CACHE_H
 
 #endif //SIMPLE_SCM_CACHE_H
+
 #include<iostream>
 
 //stat.h用来获取文件的属性这些都很方便

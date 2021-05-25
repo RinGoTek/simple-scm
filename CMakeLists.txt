@@ -6,7 +6,7 @@ find_package(ZLIB)
 find_package(OpenSSL REQUIRED)
 
 
-add_executable(simple-scm src/main.cpp src/headers/cache.h src/init-db.cpp src/headers/init-db.h)
+add_executable(simple-scm src/main.cpp src/headers/cache.h src/Database/init-db.cpp src/Database/init-db.h src/Database/database.cpp src/Database/database.h)
 
 target_link_libraries(${PROJECT_NAME} ZLIB::ZLIB)
 target_link_libraries(${PROJECT_NAME} OpenSSL::Crypto)
