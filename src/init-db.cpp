@@ -49,7 +49,7 @@ void init_db::do_init() {
     {
         if(errno != EEXIST)
         {
-            cout<<"[ERROR]发生错误"<<endl;
+            cerr<<"[ERROR]发生错误"<<endl;
             exit(1);
         }
     }
@@ -90,7 +90,7 @@ void database_init()
 
     if(rc)
     {
-        clog<<"[ERROR]数据库创建失败！"<<endl;
+        cerr<<"[ERROR]数据库创建失败！"<<endl;
         exit(1);
     }
     else
@@ -109,7 +109,7 @@ void database_init()
     rc = sqlite3_exec(db, sql, callback, 0, &zErrMsg);
     if(rc != SQLITE_OK)
     {
-        clog<<"[ERROR]数据表Object创建失败，原因是"<<zErrMsg<<endl;
+        cerr<<"[ERROR]数据表Object创建失败，原因是"<<zErrMsg<<endl;
     }
     else
     {
@@ -126,7 +126,7 @@ void database_init()
     rc =  sqlite3_exec(db, sql, callback, 0, &zErrMsg);
     if(rc != SQLITE_OK)
     {
-        clog<<"[ERROR]数据表Node创建失败，原因是"<<zErrMsg<<endl;
+        cerr<<"[ERROR]数据表Node创建失败，原因是"<<zErrMsg<<endl;
     }
     else
     {
@@ -145,7 +145,7 @@ void database_init()
     rc =  sqlite3_exec(db, sql, callback, 0, &zErrMsg);
     if(rc != SQLITE_OK)
     {
-        clog<<"[ERROR]数据表Obj2Node创建失败，原因是"<<zErrMsg<<endl;
+        cerr<<"[ERROR]数据表Obj2Node创建失败，原因是"<<zErrMsg<<endl;
     }
     else
     {
@@ -163,7 +163,7 @@ void database_init()
     rc =  sqlite3_exec(db, sql, callback, 0, &zErrMsg);
     if(rc != SQLITE_OK)
     {
-        clog<<"[ERROR]数据表Branch创建失败，原因是"<<zErrMsg<<endl;
+        cerr<<"[ERROR]数据表Branch创建失败："<<zErrMsg<<endl;
     }
     else
     {
@@ -181,7 +181,7 @@ void database_init()
     rc =  sqlite3_exec(db, sql, callback, 0, &zErrMsg);
     if(rc != SQLITE_OK)
     {
-        clog<<"[ERROR]数据表Node2Branch创建失败，原因是"<<zErrMsg<<endl;
+        cerr<<"[ERROR]数据表Node2Branch创建失败，原因是"<<zErrMsg<<endl;
     }
     else
     {
@@ -198,11 +198,14 @@ void database_init()
     rc =  sqlite3_exec(db, sql, callback, 0, &zErrMsg);
     if(rc != SQLITE_OK)
     {
-        clog<<"[ERROR]数据表AddList创建失败，原因是"<<zErrMsg<<endl;
+        cerr<<"[ERROR]数据表AddList创建失败，原因是"<<zErrMsg<<endl;
     }
     else
     {
         clog<<"[INFO]数据表AddList创建成功！"<<endl;
     }
+
+
+    clog<<"[INFO]初始化完毕！"<<endl;
 }
 
