@@ -49,7 +49,7 @@ void init_db::do_init() {
     {
         if(errno != EEXIST)
         {
-            cout<<"[ERROR]发生错误"<<endl;
+            cerr<<"[ERROR]发生错误"<<endl;
             exit(1);
         }
     }
@@ -90,7 +90,7 @@ void database_init()
 
     if(rc)
     {
-        clog<<"[ERROR]数据库创建失败！"<<endl;
+        cerr<<"[ERROR]数据库创建失败！"<<endl;
         exit(1);
     }
     else
@@ -100,16 +100,16 @@ void database_init()
 
     sql="CREATE TABLE Objects("\
         "CompressedSHA CHAR(40) PRIMARY KEY,"\
-        "OriginSHA CHAR(40) NOT NULL,"\
-        "OriginPath TEXT(500) NOT NULL,"\
+        "OriginSHA CHAR(40),"\
+        "OriginPath TEXT(500),"\
         "CompressedPath TEXT(500),"\
-        "CreatedDateTime DATETIME NOT NULL,"\
-        "UpdatedDateTime DATETIME) NOT NULL;";
+        "CreatedDateTime DATETIME,"\
+        "UpdatedDateTime DATETIME);";
 
     rc = sqlite3_exec(db, sql, callback, 0, &zErrMsg);
     if(rc != SQLITE_OK)
     {
-        clog<<"[ERROR]数据表Object创建失败，原因是"<<zErrMsg<<endl;
+        cerr<<"[ERROR]数据表Object创建失败，原因是"<<zErrMsg<<endl;
     }
     else
     {
@@ -118,15 +118,15 @@ void database_init()
 
     sql="CREATE TABLE Node("\
         "SHA CHAR(40) PRIMARY KEY,"\
-        "CreatedDateTime DATETIME NOT NULL,"\
+        "CreatedDateTime DATETIME,"\
         "Parent CHAR(40),"\
         "Message TEXT(1000)"\
-        "FOREIGN KEY (Parent) REFERENCE Node(SHA) ON DELETE CASCADE;";
+        "FOREIGN KEY (Parent) REFERENCE Node(SHA);";
 
     rc =  sqlite3_exec(db, sql, callback, 0, &zErrMsg);
     if(rc != SQLITE_OK)
     {
-        clog<<"[ERROR]数据表Node创建失败，原因是"<<zErrMsg<<endl;
+        cerr<<"[ERROR]数据表Node创建失败，原因是"<<zErrMsg<<endl;
     }
     else
     {
@@ -134,18 +134,18 @@ void database_init()
     }
 
     sql="CREATE TABLE Obj2Node("\
-        "ID INTEGER PRIMARY KEY AUTOINCREMENT,"\
+        "ID INTEGER PRIMARY KEY,"\
         "File CHAR(40),"\
         "NODE CHAR(40),"\
-        "Mode INTEGER NOT NULL,"\
-        "CreatedDateTime DATETIME NOT NULL,"\
-        "FOREIGN KEY (File) REFERENCE Objects(CompressedSHA) ON DELETE CASCADE,"\
-        "FOREIGN KEY (NODE) REFERENCE Node(SHA) ON DELETE CASCADE;";
+        "Mode INTEGER,"\
+        "CreatedDateTime DATETIME,"\
+        "FOREIGN KEY (File) REFERENCE Objects(CompressedSHA),"\
+        "FOREIGN KEY (NODE) REFERENCE Node(SHA);";
 
     rc =  sqlite3_exec(db, sql, callback, 0, &zErrMsg);
     if(rc != SQLITE_OK)
     {
-        clog<<"[ERROR]数据表Obj2Node创建失败，原因是"<<zErrMsg<<endl;
+        cerr<<"[ERROR]数据表Obj2Node创建失败，原因是"<<zErrMsg<<endl;
     }
     else
     {
@@ -153,17 +153,17 @@ void database_init()
     }
 
     sql="CREATE TABLE Branch("\
-        "ID INTEGER PRIMARY KEY AUTOINCREMENT,"\
-        "Name TEXT(40) NOT NULL,"\
-        "BranchRoot CHAR(40) NOT NULL,"\
-        "CreatedDateRTime DATETIME NOT NULL,"\
-        "UpdatedDateTime DATETIME  NOT NULL,"\
-        "FOREIGN KEY BranchRoot REFERENCE Node(SHA) ON DELETE CASCADE;";
+        "ID INTEGER PRIMARY KEY,"\
+        "Name TEXT(40),"\
+        "BranchRoot CHAR(40),"\
+        "CreatedDateRTime DATETIME,"\
+        "UpdatedDateTime DATETIME,"\
+        "FOREIGN KEY BranchRoot REFERENCE Node(SHA);";
 
     rc =  sqlite3_exec(db, sql, callback, 0, &zErrMsg);
     if(rc != SQLITE_OK)
     {
-        clog<<"[ERROR]数据表Branch创建失败，原因是"<<zErrMsg<<endl;
+        cerr<<"[ERROR]数据表Branch创建失败："<<zErrMsg<<endl;
     }
     else
     {
@@ -171,17 +171,17 @@ void database_init()
     }
 
     sql="CREATE TABLE Node2Branch("\
-        "ID INTEGER PRIMARY KEY AUTOINCREMENT"\
+        "ID INTEGER PRIMARY KEY("\
         "Node CHAR(40),"\
         "Branch INTEGER,"\
-        "CreatedDateTime DATETIME NOT NULL,"\
-        "FOREIGN KEY Node REFERENCE Node(SHA) ON DELETE CASCADE,"\
-        "FOREIGN KEY Branch REFERENCE Branch(ID) ON DELETE CASCADE;";
+        "CreatedDateTime DATETIME,"\
+        "FOREIGN KEY Node REFERENCE Node(SHA),"\
+        "FOREIGN KEY Branch REFERENCE Branch(ID);";
 
     rc =  sqlite3_exec(db, sql, callback, 0, &zErrMsg);
     if(rc != SQLITE_OK)
     {
-        clog<<"[ERROR]数据表Node2Branch创建失败，原因是"<<zErrMsg<<endl;
+        cerr<<"[ERROR]数据表Node2Branch创建失败，原因是"<<zErrMsg<<endl;
     }
     else
     {
@@ -189,22 +189,23 @@ void database_init()
     }
 
     sql="CREATE TABLE AddList("\
-        "ID INTEGER PRIMARY KEY AUTOINCREMENT,"\
-        "OriginSHA CHAR(40) NOT NULL,"\
-        "OriginPath TEXT(500) NOT NULL,"\
-        "CreatedDateTime DATETIME NOT NULL,"\
-        "UpdatedDateTime DATETIME NOT NULL;";
+        "ID INTEGER PRIMARY KEY,"\
+        "OriginSHA CHAR(40),"\
+        "OriginPath TEXT(500),"\
+        "CreatedDateTime DATETIME,"\
+        "UpdatedDateTime DATETIME;";
 
     rc =  sqlite3_exec(db, sql, callback, 0, &zErrMsg);
     if(rc != SQLITE_OK)
     {
-        clog<<"[ERROR]数据表AddList创建失败，原因是"<<zErrMsg<<endl;
+        cerr<<"[ERROR]数据表AddList创建失败，原因是"<<zErrMsg<<endl;
     }
     else
     {
         clog<<"[INFO]数据表AddList创建成功！"<<endl;
     }
 
-    clog<<"[INFO]数据库和数据表创建成功！"<<endl;
+
+    clog<<"[INFO]初始化完毕！"<<endl;
 }
 
