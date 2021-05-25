@@ -6,4 +6,5 @@
 
 3、zlib
 
-4、sqlite3
+4、libsqlite3-dev
+
