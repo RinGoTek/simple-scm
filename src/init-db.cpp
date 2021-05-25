@@ -105,16 +105,16 @@ void init_db::database_init()
 
     sql="CREATE TABLE Objects("\
         "CompressedSHA CHAR(40) PRIMARY KEY,"\
-        "OriginSHA CHAR(40),"\
-        "OriginPath TEXT(500),"\
-        "CompressedPath TEXT(500),"\
-        "CreatedDateTime DATETIME,"\
-        "UpdatedDateTime DATETIME);";
+        "OriginSHA CHAR(40) NOT NULL,"\
+        "OriginPath TEXT(500) NOT NULL,"\
+        "CompressedPath TEXT(500) NOT NULL,"\
+        "CreatedDateTime DATETIME NOT NULL,"\
+        "UpdatedDateTime DATETIME NOT NULL);";
 
     rc = sqlite3_exec(db, sql, callback, 0, &zErrMsg);
     if(rc != SQLITE_OK)
     {
-        cerr<<"[ERROR]数据表Object创建失败，原因是"<<zErrMsg<<endl;
+        cerr<<"[ERROR]数据表Object创建失败: "<<zErrMsg<<endl;
     }
     else
     {
@@ -123,15 +123,15 @@ void init_db::database_init()
 
     sql="CREATE TABLE Node("\
         "SHA CHAR(40) PRIMARY KEY,"\
-        "CreatedDateTime DATETIME,"\
+        "CreatedDateTime DATETIME NOT NULL,"\
         "Parent CHAR(40),"\
         "Message TEXT(1000),"\
-        "FOREIGN KEY (Parent) REFERENCES Node(SHA));";
+        "FOREIGN KEY (Parent) REFERENCES Node(SHA) ON DELETE CASCADE);";
 
     rc =  sqlite3_exec(db, sql, callback, 0, &zErrMsg);
     if(rc != SQLITE_OK)
     {
-        cerr<<"[ERROR]数据表Node创建失败，原因是"<<zErrMsg<<endl;
+        cerr<<"[ERROR]数据表Node创建失败: "<<zErrMsg<<endl;
     }
     else
     {
@@ -139,18 +139,18 @@ void init_db::database_init()
     }
 
     sql="CREATE TABLE Obj2Node("\
-        "ID INTEGER PRIMARY KEY,"\
-        "File CHAR(40),"\
-        "NODE CHAR(40),"\
-        "Mode INTEGER,"\
-        "CreatedDateTime DATETIME,"\
-        "FOREIGN KEY (File) REFERENCES Objects(CompressedSHA),"\
-        "FOREIGN KEY (NODE) REFERENCES Node(SHA));";
+        "ID INTEGER PRIMARY KEY AUTOINCREMENT,"\
+        "File CHAR(40) NOT NULL,"\
+        "NODE CHAR(40) NOT NULL,"\
+        "Mode INTEGER NOT NULL,"\
+        "CreatedDateTime DATETIME NOT NULL,"\
+        "FOREIGN KEY (File) REFERENCES Objects(CompressedSHA) ON DELETE CASCADE,"\
+        "FOREIGN KEY (NODE) REFERENCES Node(SHA) ON DELETE CASCADE);";
 
     rc =  sqlite3_exec(db, sql, callback, 0, &zErrMsg);
     if(rc != SQLITE_OK)
     {
-        cerr<<"[ERROR]数据表Obj2Node创建失败，原因是"<<zErrMsg<<endl;
+        cerr<<"[ERROR]数据表Obj2Node创建失败: "<<zErrMsg<<endl;
     }
     else
     {
@@ -158,12 +158,12 @@ void init_db::database_init()
     }
 
     sql="CREATE TABLE Branch("\
-        "ID INTEGER PRIMARY KEY,"\
-        "Name TEXT(40),"\
-        "BranchRoot CHAR(40),"\
-        "CreatedDateRTime DATETIME,"\
-        "UpdatedDateTime DATETIME,"\
-        "FOREIGN KEY (BranchRoot) REFERENCES Node(SHA));";
+        "ID INTEGER PRIMARY KEY AUTOINCREMENT,"\
+        "Name TEXT(40) NOT NULL,"\
+        "BranchRoot CHAR(40) NOT NULL,"\
+        "CreatedDateRTime DATETIME NOT NULL,"\
+        "UpdatedDateTime DATETIME NOT NULL,"\
+        "FOREIGN KEY (BranchRoot) REFERENCES Node(SHA) ON DELETE CASCADE);";
 
     rc =  sqlite3_exec(db, sql, callback, 0, &zErrMsg);
     if(rc != SQLITE_OK)
@@ -176,17 +176,17 @@ void init_db::database_init()
     }
 
     sql="CREATE TABLE Node2Branch("\
-        "ID INTEGER PRIMARY KEY,"\
-        "Node CHAR(40),"\
-        "Branch INTEGER,"\
-        "CreatedDateTime DATETIME,"\
-        "FOREIGN KEY (Node) REFERENCES Node(SHA),"\
-        "FOREIGN KEY (Branch) REFERENCES Branch(ID));";
+        "ID INTEGER PRIMARY KEY AUTOINCREMENT, "\
+        "Node CHAR(40) NOT NULL,"\
+        "Branch INTEGER NOT NULL,"\
+        "CreatedDateTime DATETIME NOT NULL,"\
+        "FOREIGN KEY (Node) REFERENCES Node(SHA) ON DELETE CASCADE,"\
+        "FOREIGN KEY (Branch) REFERENCES Branch(ID) ON DELETE CASCADE);";
 
     rc =  sqlite3_exec(db, sql, callback, 0, &zErrMsg);
     if(rc != SQLITE_OK)
     {
-        cerr<<"[ERROR]数据表Node2Branch创建失败，原因是"<<zErrMsg<<endl;
+        cerr<<"[ERROR]数据表Node2Branch创建失败: "<<zErrMsg<<endl;
     }
     else
     {
@@ -194,16 +194,16 @@ void init_db::database_init()
     }
 
     sql="CREATE TABLE AddList("\
-        "ID INTEGER PRIMARY KEY,"\
-        "OriginSHA CHAR(40),"\
-        "OriginPath TEXT(500),"\
-        "CreatedDateTime DATETIME,"\
-        "UpdatedDateTime DATETIME);";
+        "ID INTEGER PRIMARY KEY AUTOINCREMENT,"\
+        "OriginSHA CHAR(40) NOT NULL,"\
+        "OriginPath TEXT(500) NOT NULL,"\
+        "CreatedDateTime DATETIME NOT NULL,"\
+        "UpdatedDateTime DATETIME NOT NULL);";
 
     rc =  sqlite3_exec(db, sql, callback, 0, &zErrMsg);
     if(rc != SQLITE_OK)
     {
-        cerr<<"[ERROR]数据表AddList创建失败，原因是"<<zErrMsg<<endl;
+        cerr<<"[ERROR]数据表AddList创建失败: "<<zErrMsg<<endl;
     }
     else
     {
@@ -211,6 +211,6 @@ void init_db::database_init()
     }
 
 
-    clog<<"[INFO]初始化完毕！"<<endl;
+    clog<<"[INFO]simple-scm存储库初始化完毕！"<<endl;
 }
 
