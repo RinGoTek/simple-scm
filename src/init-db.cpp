@@ -100,11 +100,11 @@ void database_init()
 
     sql="CREATE TABLE Objects("\
         "CompressedSHA CHAR(40) PRIMARY KEY,"\
-        "OriginSHA CHAR(40),"\
-        "OriginPath TEXT(500),"\
+        "OriginSHA CHAR(40) NOT NULL,"\
+        "OriginPath TEXT(500) NOT NULL,"\
         "CompressedPath TEXT(500),"\
-        "CreatedDateTime DATETIME,"\
-        "UpdatedDateTime DATETIME);";
+        "CreatedDateTime DATETIME NOT NULL,"\
+        "UpdatedDateTime DATETIME) NOT NULL;";
 
     rc = sqlite3_exec(db, sql, callback, 0, &zErrMsg);
     if(rc != SQLITE_OK)
@@ -118,10 +118,10 @@ void database_init()
 
     sql="CREATE TABLE Node("\
         "SHA CHAR(40) PRIMARY KEY,"\
-        "CreatedDateTime DATETIME,"\
+        "CreatedDateTime DATETIME NOT NULL,"\
         "Parent CHAR(40),"\
         "Message TEXT(1000)"\
-        "FOREIGN KEY (Parent) REFERENCE Node(SHA);";
+        "FOREIGN KEY (Parent) REFERENCE Node(SHA) ON DELETE CASCADE;";
 
     rc =  sqlite3_exec(db, sql, callback, 0, &zErrMsg);
     if(rc != SQLITE_OK)
@@ -134,13 +134,13 @@ void database_init()
     }
 
     sql="CREATE TABLE Obj2Node("\
-        "ID INTEGER PRIMARY KEY,"\
+        "ID INTEGER PRIMARY KEY AUTOINCREMENT,"\
         "File CHAR(40),"\
         "NODE CHAR(40),"\
-        "Mode INTEGER,"\
-        "CreatedDateTime DATETIME,"\
-        "FOREIGN KEY (File) REFERENCE Objects(CompressedSHA),"\
-        "FOREIGN KEY (NODE) REFERENCE Node(SHA);";
+        "Mode INTEGER NOT NULL,"\
+        "CreatedDateTime DATETIME NOT NULL,"\
+        "FOREIGN KEY (File) REFERENCE Objects(CompressedSHA) ON DELETE CASCADE,"\
+        "FOREIGN KEY (NODE) REFERENCE Node(SHA) ON DELETE CASCADE;";
 
     rc =  sqlite3_exec(db, sql, callback, 0, &zErrMsg);
     if(rc != SQLITE_OK)
@@ -153,12 +153,12 @@ void database_init()
     }
 
     sql="CREATE TABLE Branch("\
-        "ID INTEGER PRIMARY KEY,"\
-        "Name TEXT(40),"\
-        "BranchRoot CHAR(40),"\
-        "CreatedDateRTime DATETIME,"\
-        "UpdatedDateTime DATETIME,"\
-        "FOREIGN KEY BranchRoot REFERENCE Node(SHA);";
+        "ID INTEGER PRIMARY KEY AUTOINCREMENT,"\
+        "Name TEXT(40) NOT NULL,"\
+        "BranchRoot CHAR(40) NOT NULL,"\
+        "CreatedDateRTime DATETIME NOT NULL,"\
+        "UpdatedDateTime DATETIME  NOT NULL,"\
+        "FOREIGN KEY BranchRoot REFERENCE Node(SHA) ON DELETE CASCADE;";
 
     rc =  sqlite3_exec(db, sql, callback, 0, &zErrMsg);
     if(rc != SQLITE_OK)
@@ -171,12 +171,12 @@ void database_init()
     }
 
     sql="CREATE TABLE Node2Branch("\
-        "ID INTEGER PRIMARY KEY("\
+        "ID INTEGER PRIMARY KEY AUTOINCREMENT"\
         "Node CHAR(40),"\
         "Branch INTEGER,"\
-        "CreatedDateTime DATETIME,"\
-        "FOREIGN KEY Node REFERENCE Node(SHA),"\
-        "FOREIGN KEY Branch REFERENCE Branch(ID);";
+        "CreatedDateTime DATETIME NOT NULL,"\
+        "FOREIGN KEY Node REFERENCE Node(SHA) ON DELETE CASCADE,"\
+        "FOREIGN KEY Branch REFERENCE Branch(ID) ON DELETE CASCADE;";
 
     rc =  sqlite3_exec(db, sql, callback, 0, &zErrMsg);
     if(rc != SQLITE_OK)
@@ -189,11 +189,11 @@ void database_init()
     }
 
     sql="CREATE TABLE AddList("\
-        "ID INTEGER PRIMARY KEY,"\
-        "OriginSHA CHAR(40),"\
-        "OriginPath TEXT(500),"\
-        "CreatedDateTime DATETIME,"\
-        "UpdatedDateTime DATETIME;";
+        "ID INTEGER PRIMARY KEY AUTOINCREMENT,"\
+        "OriginSHA CHAR(40) NOT NULL,"\
+        "OriginPath TEXT(500) NOT NULL,"\
+        "CreatedDateTime DATETIME NOT NULL,"\
+        "UpdatedDateTime DATETIME NOT NULL;";
 
     rc =  sqlite3_exec(db, sql, callback, 0, &zErrMsg);
     if(rc != SQLITE_OK)
@@ -204,5 +204,7 @@ void database_init()
     {
         clog<<"[INFO]数据表AddList创建成功！"<<endl;
     }
+
+    clog<<"[INFO]数据库和数据表创建成功！"<<endl;
 }
 

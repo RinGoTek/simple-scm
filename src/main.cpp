@@ -34,10 +34,17 @@ int main(int count, char *parameters[]) {
 void deal_with_two_arg(char *parameters[])
 {
     string command = parameters[1];
-    if (command == "init-db") {
+    if (command == "init-db")
+    {
         //初始化存储库
         init_db idb = init_db();
         idb.do_init();
+    }
+    else if(command == "database-db")
+    {
+        //初始化数据库
+        init_db idb = init_db();
+        idb.database_init();
     }
     else if(command == "--usage")
     {
@@ -57,5 +64,6 @@ void usage()
 {
     cout<<"Usage:\n"
         <<"init-db      初始化存储仓库\n"
+        <<"database-db      初始化数据库\n"
         <<endl;
 }

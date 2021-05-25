@@ -22,3 +22,8 @@
 ./simple-scm init-db
 ```
 
+初始化数据库：
+
+```
+./simple-scm database-db
+```
