@@ -127,8 +127,10 @@ void init_db::do_init() {
         "ID INTEGER PRIMARY KEY AUTOINCREMENT,"\
         "Name CHAR(40) NOT NULL,"\
         "BranchRoot CHAR(40) NOT NULL,"\
+        "BranchHead CHAR(40) NOT NULL,"\
         "CreatedDateTime DATETIME NOT NULL,"\
         "UpdatedDateTime DATETIME NOT NULL,"\
+        "FOREIGN KEY (BranchHead) REFERENCES Node(SHA) ON DELETE CASCADE,"\
         "FOREIGN KEY (BranchRoot) REFERENCES Node(SHA) ON DELETE CASCADE);";
 
     rc = sqlite3_exec(db, sql, callback, 0, &zErrMsg);
@@ -167,9 +169,7 @@ void init_db::do_init() {
         clog << "[INFO]数据表AddList创建成功！" << endl;
     }
 
-
     //创建根节点
-
     char* tmp_time = database::getCurrentTimeChar();
     char tmp_sql[1000];
 
@@ -186,7 +186,7 @@ void init_db::do_init() {
     //创建主分支
     tmp_time = database::getCurrentTimeChar();
 
-    sprintf(tmp_sql, "INSERT INTO Branch (ID,Name, BranchRoot, CreatedDateTime, UpdatedDateTime) VALUES ((NULL),'main', (SELECT SHA FROM Node WHERE SHA = '000000'), '%s', '%s')", tmp_time, tmp_time);
+    sprintf(tmp_sql, "INSERT INTO Branch (ID,Name, BranchRoot, BranchHead, CreatedDateTime, UpdatedDateTime) VALUES ((NULL),'main', (SELECT SHA FROM Node WHERE SHA = '000000'), '(SELECT SHA FROM Node WHERE SHA = '000000'),%s', '%s')", tmp_time, tmp_time);
 
     rc = sqlite3_exec(db, tmp_sql, callback, 0, &zErrMsg);
     if (rc != SQLITE_OK) {
@@ -195,6 +195,7 @@ void init_db::do_init() {
         clog << "[INFO]main分支创建成功！" << endl;
     }
 
+    //连接主分支和根节点
     sprintf(tmp_sql,"INSERT INTO Node2Branch (ID,Node,Branch,CreatedDateTime) VALUES (NULL, (SELECT SHA FROM Node WHERE SHA = '000000'), (SELECT ID FROM Branch WHERE ID = 1),'%s')",tmp_time);
     rc = sqlite3_exec(db, tmp_sql, callback, 0, &zErrMsg);
     if (rc != SQLITE_OK) {
@@ -204,5 +205,7 @@ void init_db::do_init() {
     }
 
     clog << "[INFO]simple-scm存储库初始化完毕！" << endl;
+
+
 }
 
