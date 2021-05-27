@@ -186,7 +186,7 @@ void init_db::do_init() {
     //创建主分支
     tmp_time = database::getCurrentTimeChar();
 
-    sprintf(tmp_sql, "INSERT INTO Branch (ID,Name, BranchRoot, BranchHead, CreatedDateTime, UpdatedDateTime) VALUES ((NULL),'main', (SELECT SHA FROM Node WHERE SHA = '000000'), '(SELECT SHA FROM Node WHERE SHA = '000000'),%s', '%s')", tmp_time, tmp_time);
+    sprintf(tmp_sql, "INSERT INTO Branch (ID,Name, BranchRoot, BranchHead, CreatedDateTime, UpdatedDateTime) VALUES ((NULL),'main', (SELECT SHA FROM Node WHERE SHA = '000000'), (SELECT SHA FROM Node WHERE SHA = '000000'),'%s', '%s')", tmp_time, tmp_time);
 
     rc = sqlite3_exec(db, tmp_sql, callback, 0, &zErrMsg);
     if (rc != SQLITE_OK) {
