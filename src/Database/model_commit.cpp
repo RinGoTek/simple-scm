@@ -9,5 +9,5 @@ using namespace std;
 
 void commit()
 {
-    //detect_changes();
+    model_detect_changes::detect_changes();
 }

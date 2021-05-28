@@ -3,7 +3,8 @@
 #include"headers/cache.h"
 
 #include"Database/database.h"
-
+#include"Database/model_commit.h"
+#include"Database/model_detect_changes.h"
 
 using namespace std;
 
