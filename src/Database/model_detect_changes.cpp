@@ -3,6 +3,7 @@
 //
 
 #include "model_detect_changes.h"
+#include "model_commit.h"
 #include<sqlite3.h>
 #include<string>
 #include<iostream>

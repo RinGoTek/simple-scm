@@ -4,14 +4,17 @@
 
 #ifndef SIMPLE_SCM_MODEL_DETECT_CHANGES_H
 #define SIMPLE_SCM_MODEL_DETECT_CHANGES_H
+#include"model_commit.h"
 #include<map>
 using namespace std;
 
 class model_detect_changes {
-    public:
-        void detect_changes();
+    friend class model_commit;
 
-        pair <string,char*> table_info;
+    public:
+        static void detect_changes();
+
+        static pair <string,char*> table_info;
 };
 
 
