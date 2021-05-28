@@ -11,13 +11,14 @@
 #include<cstring>
 #include<cstdio>
 #include<sqlite3.h>
+#include<fstream>
 
 #include "database.h"
 
 using namespace std;
 
-static int callback(void *NotUsed, int argc, char **argv, char **azColName) {
-    for (int i = 1; i <= argc; i++) cout << azColName << "=" << (argv[i] ? argv[i] : "NULL") << endl;
+static int callback(void *NotUsed, int cnt, char **pValue, char **pName) {
+    for (int i = 1; i <= cnt; i++) cout << pName << "=" << (pValue[i] ? pValue[i] : "NULL") << endl;
     return 0;
 }
 
@@ -206,8 +207,8 @@ void init_db::do_init() {
 
     clog << "[INFO]simple-scm存储库初始化完毕！" << endl;
 
-    extern int current_head;
-    current_head=1;
-
+    ofstream file("current_branch.txt");
+    file<<1;
+    file.close();
 }
 

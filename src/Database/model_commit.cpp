@@ -7,7 +7,8 @@
 #include<iostream>
 using namespace std;
 
-void commit()
+void model_commit::commit()
 {
-    model_detect_changes::detect_changes();
+    model_detect_changes tmp;
+    tmp.detect_changes();
 }

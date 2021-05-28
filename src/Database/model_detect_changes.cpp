@@ -3,26 +3,59 @@
 //
 
 #include "model_detect_changes.h"
-#include "model_commit.h"
 #include<sqlite3.h>
-#include<string>
 #include<iostream>
+#include<cstdlib>
+#include<fstream>
 using namespace std;
 
+string head_node,root_node,node;
 
-void detect_changes()
+
+model_detect_changes::model_detect_changes()
 {
-    extern int current_head;
-    string head_node="null";
+    vis.clear();
+    object_info.clear();
+    object.clear();
+}
+model_detect_changes tmp;
+
+static int get_node(void *NotUsed, int cnt, char **pValue, char **pName)
+{
+    head_node=pValue[0];
+    root_node=pValue[1];
+    return 0;
+}
+
+static int update_node(void *NotUsed, int cnt, char **pValue, char **pName)
+{
+    node=pValue[0];
+    return 0;
+}
+
+static int get_object(void *NotUsed, int cnt, char **pValue, char **pName)
+{
+    if(tmp.vis[pValue[0]]) return 0;
+    tmp.vis[pValue[0]]=1;
+    if(atoi(pValue[1]) != -1) tmp.object.push_back(pValue[1]);
+    return 0;
+}
+
+void model_detect_changes::detect_changes()
+{
 
     sqlite3 *db;
     char *zErrMsg = 0;
     int rc;
-    char **result;
-    int row, column;
+    char *sql;
+
+    ifstream file("current_branch.txt");
+    int current_branch;
+    file>>current_branch;
+    clog<<current_branch<<endl;
 
     rc = sqlite3_open(".simple-scm/simple-scm.db", &db);
-    if( rc )
+    if(rc)
     {
         clog<<"[ERROR]数据库打开失败："<<endl;
         exit(1);
@@ -32,24 +65,37 @@ void detect_changes()
         clog<<"[INFO]数据库打开成功！"<<endl;
     }
 
-    rc = sqlite3_get_table(db, "SELECT * FROM Branch", &result, &row, &column, &zErrMsg);
-
+    sql = "SELECT BranchRoot,BranchHead FROM Branch WHERE ID=a";
+    rc = sqlite3_exec(db, sql, get_node, NULL, &zErrMsg);
     if(rc != SQLITE_OK)
     {
-        clog<<"[ERROR]数据表信息获取失败："<<zErrMsg<<endl;
+        clog<<"[ERROR]节点信息获取失败："<<zErrMsg<<endl;
     }
     else
     {
-        for(int i=1;i<=row;i++)
+        clog<<"[INFO]节点信息获取成功！"<<endl;
+    }
+
+    node=head_node;
+    while(node != root_node)
+    {
+        sql = "SELECT File,Mode FROM Obj2Node WHERE Node=node";
+        rc = sqlite3_exec(db, sql, get_object, NULL, &zErrMsg);
+        if(rc != SQLITE_OK)
         {
-            if(result[i*column][0] == current_head)
-            {
-                head_node = result[i*column][3];
-                clog<<"[INFO]头节点获取成功！"<<endl;
-                cout<<head_node<<endl;
-                break;
-            }
+            clog<<"[ERROR]发生错误："<<zErrMsg<<endl;
+            exit(1);
+        }
+
+
+        sql = "SELECT Parent FROM Node WHERE SHA=node";
+        rc = sqlite3_exec(db, sql, update_node, NULL, &zErrMsg);
+        if(rc != SQLITE_OK)
+        {
+            clog << "[ERROR]发生错误：" << zErrMsg << endl;
+            exit(1);
         }
     }
-    if(head_node == "null") clog<<"[ERROR]找不到头节点"<<endl;
+    //cout<<tmp.object.size()<<endl;
+
 }
