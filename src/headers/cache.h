@@ -5,8 +5,6 @@
 #ifndef SIMPLE_SCM_CACHE_H
 #define SIMPLE_SCM_CACHE_H
 
-#endif //SIMPLE_SCM_CACHE_H
-
 #include<iostream>
 
 //stat.h用来获取文件的属性这些都很方便
@@ -36,3 +34,6 @@ const std::string DEFAULT_DB_ENVIRONMENT = ".simple-scm/objects";
 
 //获取当前工作目录
 static std::string cwd = get_current_dir_name();
+
+
+#endif //SIMPLE_SCM_CACHE_H

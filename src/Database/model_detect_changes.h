@@ -8,10 +8,10 @@
 using namespace std;
 
 class model_detect_changes {
-    private:
+    public:
         void detect_changes();
 
-        pair <string,char*> file_info;
+        pair <string,char*> table_info;
 };
 
 
