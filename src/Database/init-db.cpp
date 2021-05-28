@@ -206,6 +206,8 @@ void init_db::do_init() {
 
     clog << "[INFO]simple-scm存储库初始化完毕！" << endl;
 
+    extern int current_head;
+    current_head=1;
 
 }
 

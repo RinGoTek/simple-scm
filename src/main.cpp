@@ -11,6 +11,8 @@ void deal_with_two_arg(char *parameters[]);//处理有两个参数的函数
 
 void usage();//输出用法的函数
 
+int current_head;//指向当前分支
+
 //入口函数
 int main(int count, char *parameters[]) {
     //用户的命令
