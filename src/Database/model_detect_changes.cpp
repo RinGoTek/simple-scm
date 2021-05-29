@@ -7,29 +7,31 @@
 #include<iostream>
 #include<cstdlib>
 #include<fstream>
+#include<cstring>
 using namespace std;
 
-string head_node,root_node,node;
+static char head_node[100],root_node[100],node[100];
 
 
 model_detect_changes::model_detect_changes()
 {
     vis.clear();
-    object_info.clear();
+    //object_info.clear();
     object.clear();
 }
+
 model_detect_changes tmp;
 
 static int get_node(void *NotUsed, int cnt, char **pValue, char **pName)
 {
-    head_node=pValue[0];
-    root_node=pValue[1];
+    strcpy(root_node,pValue[0]);
+    strcpy(head_node,pValue[1]);
     return 0;
 }
 
 static int update_node(void *NotUsed, int cnt, char **pValue, char **pName)
 {
-    node=pValue[0];
+    strcpy(node,pValue[0]);
     return 0;
 }
 
@@ -52,7 +54,7 @@ void model_detect_changes::detect_changes()
     ifstream file("current_branch.txt");
     int current_branch;
     file>>current_branch;
-    clog<<current_branch<<endl;
+    file.close();
 
     rc = sqlite3_open(".simple-scm/simple-scm.db", &db);
     if(rc)
@@ -65,21 +67,22 @@ void model_detect_changes::detect_changes()
         clog<<"[INFO]数据库打开成功！"<<endl;
     }
 
-    sql = "SELECT BranchRoot,BranchHead FROM Branch WHERE ID=a";
+    sprintf(sql, "SELECT BranchRoot,BranchHead FROM Branch WHERE ID='%d'",current_branch);
     rc = sqlite3_exec(db, sql, get_node, NULL, &zErrMsg);
     if(rc != SQLITE_OK)
     {
         clog<<"[ERROR]节点信息获取失败："<<zErrMsg<<endl;
+        exit(1);
     }
     else
     {
         clog<<"[INFO]节点信息获取成功！"<<endl;
     }
 
-    node=head_node;
-    while(node != root_node)
+    strcpy(node,head_node);
+    while(!strcmp(node,root_node))
     {
-        sql = "SELECT File,Mode FROM Obj2Node WHERE Node=node";
+        sprintf(sql,"SELECT File,Mode FROM Obj2Node WHERE Node='%s'",node);
         rc = sqlite3_exec(db, sql, get_object, NULL, &zErrMsg);
         if(rc != SQLITE_OK)
         {
@@ -88,7 +91,7 @@ void model_detect_changes::detect_changes()
         }
 
 
-        sql = "SELECT Parent FROM Node WHERE SHA=node";
+        sprintf(sql, "SELECT Parent FROM Node WHERE SHA='%s'",node);
         rc = sqlite3_exec(db, sql, update_node, NULL, &zErrMsg);
         if(rc != SQLITE_OK)
         {
@@ -96,6 +99,5 @@ void model_detect_changes::detect_changes()
             exit(1);
         }
     }
-    //cout<<tmp.object.size()<<endl;
 
 }

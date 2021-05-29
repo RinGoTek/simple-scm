@@ -196,8 +196,12 @@ void init_db::do_init() {
         clog << "[INFO]main分支创建成功！" << endl;
     }
 
+
     //连接主分支和根节点
+    tmp_time = database::getCurrentTimeChar();
+
     sprintf(tmp_sql,"INSERT INTO Node2Branch (ID,Node,Branch,CreatedDateTime) VALUES (NULL, (SELECT SHA FROM Node WHERE SHA = '000000'), (SELECT ID FROM Branch WHERE ID = 1),'%s')",tmp_time);
+
     rc = sqlite3_exec(db, tmp_sql, callback, 0, &zErrMsg);
     if (rc != SQLITE_OK) {
         cerr << "[ERROR]根节点与主分支连接失败: " << zErrMsg << endl;

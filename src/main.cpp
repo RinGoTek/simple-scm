@@ -5,6 +5,7 @@
 #include"Database/database.h"
 #include"Database/model_commit.h"
 #include"Database/model_detect_changes.h"
+#include"Database/model_new_branch.h"
 
 using namespace std;
 
@@ -42,7 +43,6 @@ void deal_with_two_arg(char *parameters[])
         database db;
         db.init();
     }
-
     else if(command == "--usage")
     {
         //输出用法
@@ -53,6 +53,14 @@ void deal_with_two_arg(char *parameters[])
     {
         model_commit tmp;
         tmp.commit();
+    }
+    else if(command == "new-branch")
+    {
+        cout<< "请输出分支名称"<<endl;
+        char branch_name[100];
+        cin>>branch_name;
+        model_new_branch tmp;
+        tmp.creat_branch(branch_name);
     }
     else {
 
