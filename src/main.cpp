@@ -5,14 +5,13 @@
 #include"Database/database.h"
 #include"Database/model_commit.h"
 #include"Database/model_detect_changes.h"
+#include"Database/model_new_branch.h"
 
 using namespace std;
 
 void deal_with_two_arg(char *parameters[]);//处理有两个参数的函数
 
 void usage();//输出用法的函数
-
-int current_head;//指向当前分支
 
 //入口函数
 int main(int count, char *parameters[]) {
@@ -44,12 +43,24 @@ void deal_with_two_arg(char *parameters[])
         database db;
         db.init();
     }
-
     else if(command == "--usage")
     {
         //输出用法
         usage();
 
+    }
+    else if(command == "commit")
+    {
+        model_commit tmp;
+        tmp.commit();
+    }
+    else if(command == "new-branch")
+    {
+        cout<< "请输出分支名称"<<endl;
+        char branch_name[100];
+        cin>>branch_name;
+        model_new_branch tmp;
+        tmp.creat_branch(branch_name);
     }
     else {
 

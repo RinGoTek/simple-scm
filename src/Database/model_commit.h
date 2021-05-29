@@ -4,12 +4,9 @@
 
 #ifndef SIMPLE_SCM_MODEL_COMMIT_H
 #define SIMPLE_SCM_MODEL_COMMIT_H
-#include"model_detect_changes.h"
 
 
 class model_commit {
-    friend class model_detect_changes;
-
     public:
         void commit();
 };
