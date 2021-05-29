@@ -22,5 +22,17 @@
 ./simple-scm init
 ```
 
+添加新分支：
+
+```
+./simple-scm new-branch
+```
+
+显示分支列表：
+
+```
+./simple-scm list
+```
+
 
 

@@ -171,7 +171,10 @@ void init_db::do_init() {
     }
 
     //创建根节点
-    char* tmp_time = database::getCurrentTimeChar();
+    char tmp_time[100];
+
+    strcpy(tmp_time, database::getCurrentTimeChar());
+
     char tmp_sql[1000];
 
     sprintf(tmp_sql, "INSERT INTO Node (SHA, CreatedDateTime, Message) VALUES ('000000', '%s','Initialize');", tmp_time);
@@ -185,7 +188,7 @@ void init_db::do_init() {
     }
 
     //创建主分支
-    tmp_time = database::getCurrentTimeChar();
+    strcpy(tmp_time, database::getCurrentTimeChar());
 
     sprintf(tmp_sql, "INSERT INTO Branch (ID,Name, BranchRoot, BranchHead, CreatedDateTime, UpdatedDateTime) VALUES ((NULL),'main', (SELECT SHA FROM Node WHERE SHA = '000000'), (SELECT SHA FROM Node WHERE SHA = '000000'),'%s', '%s')", tmp_time, tmp_time);
 
@@ -198,7 +201,7 @@ void init_db::do_init() {
 
 
     //连接主分支和根节点
-    tmp_time = database::getCurrentTimeChar();
+    strcpy(tmp_time, database::getCurrentTimeChar());
 
     sprintf(tmp_sql,"INSERT INTO Node2Branch (ID,Node,Branch,CreatedDateTime) VALUES (NULL, (SELECT SHA FROM Node WHERE SHA = '000000'), (SELECT ID FROM Branch WHERE ID = 1),'%s')",tmp_time);
 

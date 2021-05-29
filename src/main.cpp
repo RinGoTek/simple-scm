@@ -6,6 +6,7 @@
 #include"Database/model_commit.h"
 #include"Database/model_detect_changes.h"
 #include"Database/model_new_branch.h"
+#include"Database/model_list.h"
 
 using namespace std;
 
@@ -56,11 +57,16 @@ void deal_with_two_arg(char *parameters[])
     }
     else if(command == "new-branch")
     {
-        cout<< "请输出分支名称"<<endl;
+        cout<< "请输入分支名称"<<endl;
         char branch_name[100];
         cin>>branch_name;
         model_new_branch tmp;
         tmp.creat_branch(branch_name);
+    }
+    else if(command == "list")
+    {
+        model_list tmp;
+        tmp.list();
     }
     else {
 
