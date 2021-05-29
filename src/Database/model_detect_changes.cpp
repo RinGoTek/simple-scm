@@ -57,7 +57,7 @@ void model_detect_changes::detect_changes()
     file.close();
 
     rc = sqlite3_open(".simple-scm/simple-scm.db", &db);
-    if(rc)
+    if(rc != SQLITE_OK)
     {
         clog<<"[ERROR]数据库打开失败："<<endl;
         exit(1);

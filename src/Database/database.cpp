@@ -9,6 +9,7 @@
 #include<iostream>
 #include<sstream>
 #include<iomanip>
+#include<cstring>
 using namespace std;
 
 //初始化存储仓库
@@ -26,6 +27,7 @@ tm* database::getCurrentTime() {
     tt = tt + 8*3600;  // transform the time zone
     tm* t= gmtime( &tt );
 
+    /*
     printf("%d-%02d-%02d %02d:%02d:%02d\n",
            t->tm_year + 1900,
            t->tm_mon + 1,
@@ -33,7 +35,7 @@ tm* database::getCurrentTime() {
            t->tm_hour,
            t->tm_min,
            t->tm_sec);
-
+    */
     return t;
 }
 
@@ -43,10 +45,11 @@ char* database::getCurrentTimeChar() {
 
     stringstream fmt;
 
-    fmt<<t->tm_year + 1900<<'-'<<setw(2)<<setfill('0')<<t->tm_mon + 1<<setw(2)<<setfill('0')<<t->tm_mday
+    fmt<<t->tm_year + 1900<<'-'<<setw(2)<<setfill('0')<<t->tm_mon + 1<<'-'<<setw(2)<<setfill('0')<<t->tm_mday
             <<' '<<setw(2)<<setfill('0')<<t->tm_hour<<':'<<setw(2)<<setfill('0')<<t->tm_min<<':'<<setw(2)<<setfill('0')<<t->tm_sec;
     string str = fmt.str();
 
-    char* res = const_cast<char *>(str.c_str());
+    char* res = new char[str.size()+1];
+    strcpy(res,str.c_str());
     return res;
 }
