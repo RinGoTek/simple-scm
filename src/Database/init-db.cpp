@@ -210,6 +210,7 @@ void init_db::do_init() {
     }
 
     clog << "[INFO]simple-scm存储库初始化完毕！" << endl;
+    sqlite3_close(db);
 
     ofstream file("current_branch.txt");
     file<<1;

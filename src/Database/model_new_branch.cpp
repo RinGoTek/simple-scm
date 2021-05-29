@@ -40,7 +40,7 @@ void model_new_branch::creat_branch(char branch_name[])
     int current_branch;
     file>>current_branch;
     file.close();
-    clog<<"current_branch="<<current_branch<<endl;
+    //clog<<"current_branch="<<current_branch<<endl;
 
     rc = sqlite3_open(".simple-scm/simple-scm.db", &db);
     if(rc)
@@ -64,7 +64,7 @@ void model_new_branch::creat_branch(char branch_name[])
     {
         clog<<"[INFO]节点信息获取成功！"<<endl;
     }
-    clog<<"current_head="<<head_node<<endl;
+    clog<<"head_node="<<head_node<<endl;
     char* tmp_time = database::getCurrentTimeChar();
 
     sprintf(sql,  "INSERT INTO Branch (ID,Name,BranchRoot,BranchHead,CreatedDateTime,UpdatedDateTime) VALUES (NULL,'%s', (SELECT SHA FROM Node WHERE SHA='%s'), (SELECT SHA FROM Node WHERE SHA='%s'),'%s','%s')",branch_name,head_node,head_node,tmp_time,tmp_time);
@@ -84,7 +84,7 @@ void model_new_branch::creat_branch(char branch_name[])
     } else {
         clog << "[INFO]id获取成功！" << endl;
     }
-    clog<<"id="<<id<<endl;
+    //clog<<"id="<<id<<endl;
     tmp_time = database::getCurrentTimeChar();
 
     sprintf(sql,  "INSERT INTO Node2Branch (ID,Node,Branch,CreatedDateTime) VALUES (NULL, (SELECT SHA FROM Node WHERE SHA='%s'), (SELECT ID FROM Branch WHERE ID='%d'), '%s')",head_node,id,tmp_time);
@@ -96,4 +96,5 @@ void model_new_branch::creat_branch(char branch_name[])
         clog << "[INFO]新分支与根节点连接成功！" << endl;
     }
 
+    sqlite3_close(db);
 }
