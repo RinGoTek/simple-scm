@@ -7,7 +7,7 @@
 #include<iostream>
 using namespace std;
 
-static int callback(void *NotUsed, int cnt, char **pValue, char **pName)
+static int callback(void *NotUsed, int cnt, char **pValue, char **pName)//用于输出branch表所有信息的回调函数
 {
     for(int i=0;i<cnt;i++)
     {
@@ -24,10 +24,11 @@ void model_list::list()
     int rc;
     char *sql;
 
+    //打开数据库
     rc = sqlite3_open(".simple-scm/simple-scm.db", &db);
     if(rc != SQLITE_OK)
     {
-        clog<<"[ERROR]数据库打开失败："<<zErrMsg<<endl;
+        cerr<<"[ERROR]数据库打开失败："<<zErrMsg<<endl;
         exit(1);
     }
     else
@@ -35,13 +36,16 @@ void model_list::list()
         clog<<"[INFO]数据库打开成功！"<<endl;
     }
 
+
     //sprintf(sql,"SELECT * FROM Branch"); 错误，原因未知
+    //获得branch表中所有信息并输出
     sql="SELECT * FROM Branch";
     rc = sqlite3_exec(db, sql, callback, NULL, &zErrMsg);
 
     if(rc != SQLITE_OK)
     {
-        clog<<"[ERROR]发生错误："<<zErrMsg<<endl;
+        cerr<<"[ERROR]发生错误："<<zErrMsg<<endl;
+        exit(1);
     }
     sqlite3_close(db);
 }

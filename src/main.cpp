@@ -52,11 +52,13 @@ void deal_with_two_arg(char *parameters[])
     }
     else if(command == "commit")
     {
+        //commit模块
         model_commit tmp;
         tmp.commit();
     }
     else if(command == "new-branch")
     {
+        //new_branch模块
         cout<< "请输入分支名称"<<endl;
         char branch_name[100];
         cin>>branch_name;
@@ -65,6 +67,7 @@ void deal_with_two_arg(char *parameters[])
     }
     else if(command == "list")
     {
+        //list模块
         model_list tmp;
         tmp.list();
     }

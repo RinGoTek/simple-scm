@@ -215,6 +215,7 @@ void init_db::do_init() {
     clog << "[INFO]simple-scm存储库初始化完毕！" << endl;
     sqlite3_close(db);
 
+    //头指针默认指向main分支
     ofstream file("current_branch.txt");
     file<<1;
     file.close();

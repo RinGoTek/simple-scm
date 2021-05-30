@@ -13,17 +13,19 @@ using namespace std;
 static char head_node[100];
 int id;
 
-static int callback(void *NotUsed, int cnt, char **pValue, char **pName) {
+static int callback(void *NotUsed, int cnt, char **pValue, char **pName)//用于创建新分支的回调函数，没有实际作用
+{
     for (int i = 1; i <= cnt; i++) cout << pName << "=" << (pValue[i] ? pValue[i] : "NULL") << endl;
     return 0;
 }
 
-static int get_id(void *NotUsed, int cnt, char **pValue, char **pName) {
+static int get_id(void *NotUsed, int cnt, char **pValue, char **pName)//用于获得新分支id的回调函数
+{
     id= atoi(pValue[0]);
     return 0;
 }
 
-static int get_node(void *NotUsed, int cnt, char **pValue, char **pName)
+static int get_node(void *NotUsed, int cnt, char **pValue, char **pName)//用于获得当前节点的回调函数
 {
     strcpy(head_node,pValue[0]);
     return 0;
@@ -36,16 +38,18 @@ void model_new_branch::creat_branch(char branch_name[])
     int rc;
     char *sql;
 
+    //从文件中读取当前分支
     ifstream file("current_branch.txt");
     int current_branch;
     file>>current_branch;
     file.close();
     //cout<<"current_branch="<<current_branch<<endl;
 
+    //打开数据库
     rc = sqlite3_open(".simple-scm/simple-scm.db", &db);
     if(rc)
     {
-        clog<<"[ERROR]数据库打开失败："<<endl;
+        cerr<<"[ERROR]数据库打开失败："<<endl;
         exit(1);
     }
     else
@@ -53,11 +57,12 @@ void model_new_branch::creat_branch(char branch_name[])
         clog<<"[INFO]数据库打开成功！"<<endl;
     }
 
+    //获取当前节点
     sprintf(sql,  "SELECT BranchHead FROM Branch WHERE ID='%d'",current_branch);
     rc = sqlite3_exec(db, sql, get_node, NULL, &zErrMsg);
     if(rc != SQLITE_OK)
     {
-        clog<<"[ERROR]节点信息获取失败："<<zErrMsg<<endl;
+        cerr<<"[ERROR]节点信息获取失败："<<zErrMsg<<endl;
         exit(1);
     }
     else
@@ -66,9 +71,12 @@ void model_new_branch::creat_branch(char branch_name[])
     }
 
     //cout<<"head_node="<<head_node<<endl;
+
+    //获取本地时间
     char tmp_time[100];
     strcpy(tmp_time, database::getCurrentTimeChar());
 
+    //创建新分支
     sprintf(sql,  "INSERT INTO Branch (ID,Name,BranchRoot,BranchHead,CreatedDateTime,UpdatedDateTime) VALUES (NULL,'%s', (SELECT SHA FROM Node WHERE SHA='%s'), (SELECT SHA FROM Node WHERE SHA='%s'),'%s','%s')",branch_name,head_node,head_node,tmp_time,tmp_time);
 
     rc = sqlite3_exec(db, sql, callback, 0, &zErrMsg);
@@ -78,7 +86,8 @@ void model_new_branch::creat_branch(char branch_name[])
         clog << "[INFO]新分支创建成功！" << endl;
     }
 
-    sprintf(sql, "SELECT last_insert_rowid() from Branch");//获取最后插入数据的id
+    //获取最后插入branch表的数据行的id
+    sprintf(sql, "SELECT last_insert_rowid() from Branch");
     rc = sqlite3_exec(db, sql, get_id, 0, &zErrMsg);
 
     if (rc != SQLITE_OK) {
@@ -90,6 +99,7 @@ void model_new_branch::creat_branch(char branch_name[])
     strcpy(tmp_time, database::getCurrentTimeChar());
     //cout<<"time="<<tmp_time<<endl;
 
+    //连接新分支和根节点（根节点即当前节点）
     sprintf(sql,  "INSERT INTO Node2Branch (ID,Node,Branch,CreatedDateTime) VALUES (NULL, (SELECT SHA FROM Node WHERE SHA='%s'), (SELECT ID FROM Branch WHERE ID='%d'), '%s')",head_node,id,tmp_time);
 
     rc = sqlite3_exec(db, sql, callback, 0, &zErrMsg);
