@@ -22,10 +22,10 @@
 ./simple-scm init
 ```
 
-添加新分支：
+从当前节点创建新分支：
 
 ```
-./simple-scm new-branch
+./simple-scm new-branch <BranchName>
 ```
 
 显示分支列表：
