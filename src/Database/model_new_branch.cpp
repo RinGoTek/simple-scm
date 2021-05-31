@@ -31,18 +31,21 @@ static int get_node(void *NotUsed, int cnt, char **pValue, char **pName)
 
 void model_new_branch::create_branch(char *branch_name)
 {
+
     sqlite3 *db;
     char *zErrMsg = 0;
     int rc;
-    char *sql;
+    char sql[500];
 
     ifstream file("current_branch.txt");
+
     int current_branch;
     file>>current_branch;
     file.close();
     //cout<<"current_branch="<<current_branch<<endl;
 
     rc = sqlite3_open(".simple-scm/simple-scm.db", &db);
+
     if(rc)
     {
         clog<<"[ERROR]数据库加载失败："<<endl;
@@ -54,7 +57,9 @@ void model_new_branch::create_branch(char *branch_name)
     }
 
     sprintf(sql,  "SELECT BranchHead FROM Branch WHERE ID='%d'",current_branch);
+
     rc = sqlite3_exec(db, sql, get_node, NULL, &zErrMsg);
+
     if(rc != SQLITE_OK)
     {
         clog<<"[ERROR]节点信息获取失败："<<zErrMsg<<endl;
@@ -64,6 +69,7 @@ void model_new_branch::create_branch(char *branch_name)
     {
         clog<<"[INFO]节点信息获取成功！"<<endl;
     }
+
 
     //cout<<"head_node="<<head_node<<endl;
     char tmp_time[100];
@@ -90,6 +96,7 @@ void model_new_branch::create_branch(char *branch_name)
     } else {
         clog << "[INFO]新分支id获取成功！" << endl;
     }
+
     //cout<<"id="<<id<<endl;
     tmpp = database::getCurrentTimeChar();
     strcpy(tmp_time, tmpp);
@@ -104,6 +111,7 @@ void model_new_branch::create_branch(char *branch_name)
     } else {
         clog << "[INFO]新分支与根节点连接成功！" << endl;
     }
+
 
     sqlite3_close(db);
 
