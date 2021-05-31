@@ -94,7 +94,7 @@ void deal_with_three_arg(char * parameters[])
 
         model_new_branch tmp;
         //cout<<const_cast<char *>(command2.c_str())<<endl;
-        tmp.creat_branch(command2);
+        tmp.create_branch(command2);
     }
     else
         tip_command_error();
