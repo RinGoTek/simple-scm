@@ -18,7 +18,7 @@
 using namespace std;
 
 static int callback(void *NotUsed, int cnt, char **pValue, char **pName) {
-    for (int i = 1; i <= cnt; i++) cout << pName << "=" << (pValue[i] ? pValue[i] : "NULL") << endl;
+    for (int i = 0; i < cnt; i++) cout << pName[i] << "=" << (pValue[i] ? pValue[i] : "NULL") << endl;
     return 0;
 }
 
@@ -54,7 +54,7 @@ void init_db::do_init() {
     }
 
 
-    if (mkdir((sha1_dir ).c_str(), 0700) < 0) {
+    if (mkdir((sha1_dir).c_str(), 0700) < 0) {
         if (errno != EEXIST) {
             cerr << "[ERROR]发生错误： " << sha1_dir << endl;
             exit(1);
@@ -177,7 +177,8 @@ void init_db::do_init() {
 
     char tmp_sql[1000];
 
-    sprintf(tmp_sql, "INSERT INTO Node (SHA, CreatedDateTime, Message) VALUES ('000000', '%s','Initialize');", tmp_time);
+    sprintf(tmp_sql, "INSERT INTO Node (SHA, CreatedDateTime, Message) VALUES ('000000', '%s','Initialize');",
+            tmp_time);
 
 
     rc = sqlite3_exec(db, tmp_sql, callback, 0, &zErrMsg);
@@ -190,7 +191,9 @@ void init_db::do_init() {
     //创建主分支
     strcpy(tmp_time, database::getCurrentTimeChar());
 
-    sprintf(tmp_sql, "INSERT INTO Branch (ID,Name, BranchRoot, BranchHead, CreatedDateTime, UpdatedDateTime) VALUES ((NULL),'main', (SELECT SHA FROM Node WHERE SHA = '000000'), (SELECT SHA FROM Node WHERE SHA = '000000'),'%s', '%s')", tmp_time, tmp_time);
+    sprintf(tmp_sql,
+            "INSERT INTO Branch (ID,Name, BranchRoot, BranchHead, CreatedDateTime, UpdatedDateTime) VALUES ((NULL),'main', (SELECT SHA FROM Node WHERE SHA = '000000'), (SELECT SHA FROM Node WHERE SHA = '000000'),'%s', '%s')",
+            tmp_time, tmp_time);
 
     rc = sqlite3_exec(db, tmp_sql, callback, 0, &zErrMsg);
     if (rc != SQLITE_OK) {
@@ -203,7 +206,9 @@ void init_db::do_init() {
     //连接主分支和根节点
     strcpy(tmp_time, database::getCurrentTimeChar());
 
-    sprintf(tmp_sql,"INSERT INTO Node2Branch (ID,Node,Branch,CreatedDateTime) VALUES (NULL, (SELECT SHA FROM Node WHERE SHA = '000000'), (SELECT ID FROM Branch WHERE ID = 1),'%s')",tmp_time);
+    sprintf(tmp_sql,
+            "INSERT INTO Node2Branch (ID,Node,Branch,CreatedDateTime) VALUES (NULL, (SELECT SHA FROM Node WHERE SHA = '000000'), (SELECT ID FROM Branch WHERE ID = 1),'%s')",
+            tmp_time);
 
     rc = sqlite3_exec(db, tmp_sql, callback, 0, &zErrMsg);
     if (rc != SQLITE_OK) {
@@ -217,7 +222,7 @@ void init_db::do_init() {
 
     //头指针默认指向main分支
     ofstream file("current_branch.txt");
-    file<<1;
+    file << 1;
     file.close();
 }
 

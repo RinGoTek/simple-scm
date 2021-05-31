@@ -8,7 +8,6 @@
 #include"database.h"
 
 
-
 class init_db {
 private:
     init_db() = default;
@@ -20,4 +19,5 @@ private:
     friend class database;
 
 };
+
 #endif //SIMPLE_SCM_INIT_DB_H

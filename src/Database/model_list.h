@@ -7,8 +7,8 @@
 
 
 class model_list {
-    public:
-        void list();
+public:
+    void list();
 
 };
 
