@@ -10,7 +10,7 @@ using namespace std;
 
 class model_new_branch {
     public:
-        void creat_branch(char[]);
+        void create_branch(char[]);
 };
 
 

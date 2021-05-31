@@ -11,15 +11,24 @@
 using namespace std;
 
 void deal_with_two_arg(char *parameters[]);//处理有两个参数的函数
+void deal_with_three_arg(char *parameters[]);//处理有3个参数的函数
 
 void usage();//输出用法的函数
+
+//用来提示命令错误的函数
+void tip_command_error()
+{
+    cout<<"指令错误！"<<endl;
+    usage();
+    exit(0);
+}
 
 //入口函数
 int main(int count, char *parameters[]) {
     //用户的命令
     if(count == 1)
     {
-        cout<<"请使用 --usage 来查看用法."<<endl;
+        tip_command_error();
         return 0;
     }
     switch(count)
@@ -27,14 +36,20 @@ int main(int count, char *parameters[]) {
         case 2:
             deal_with_two_arg(parameters);
             break;
+        case 3:
+            deal_with_three_arg(parameters);
+            break;
         default:
-            usage();
+            tip_command_error();
             break;
 
     }
 
+    return 0;
+
 }
 
+//用于处理2参数指令的函数
 void deal_with_two_arg(char *parameters[])
 {
     string command = parameters[1];
@@ -55,14 +70,7 @@ void deal_with_two_arg(char *parameters[])
         model_commit tmp;
         tmp.commit();
     }
-    else if(command == "new-branch")
-    {
-        cout<< "请输入分支名称"<<endl;
-        char branch_name[100];
-        cin>>branch_name;
-        model_new_branch tmp;
-        tmp.creat_branch(branch_name);
-    }
+
     else if(command == "list")
     {
         model_list tmp;
@@ -70,9 +78,26 @@ void deal_with_two_arg(char *parameters[])
     }
     else {
 
-        cout << "请输入正确的命令"<<endl;
-        usage();
+        tip_command_error();
     }
+}
+
+
+//用于处理3参数指令的函数
+void deal_with_three_arg(char * parameters[])
+{
+    string command1 = parameters[1];
+    char* command2 = parameters[2];
+
+    if (command1 == "new-branch")
+    {
+
+        model_new_branch tmp;
+        //cout<<const_cast<char *>(command2.c_str())<<endl;
+        tmp.creat_branch(command2);
+    }
+    else
+        tip_command_error();
 }
 
 
@@ -80,5 +105,6 @@ void usage()
 {
     cout<<"Usage:\n"
         <<"init      初始化存储仓库\n"
+        <<"new-branch <BranchName>      从当前节点新建分支"
         <<endl;
 }

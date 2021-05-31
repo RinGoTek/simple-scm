@@ -29,7 +29,7 @@ static int get_node(void *NotUsed, int cnt, char **pValue, char **pName)
     return 0;
 }
 
-void model_new_branch::creat_branch(char branch_name[])
+void model_new_branch::create_branch(char *branch_name)
 {
     sqlite3 *db;
     char *zErrMsg = 0;
@@ -45,12 +45,12 @@ void model_new_branch::creat_branch(char branch_name[])
     rc = sqlite3_open(".simple-scm/simple-scm.db", &db);
     if(rc)
     {
-        clog<<"[ERROR]数据库打开失败："<<endl;
+        clog<<"[ERROR]数据库加载失败："<<endl;
         exit(1);
     }
     else
     {
-        clog<<"[INFO]数据库打开成功！"<<endl;
+        clog<<"[INFO]数据库加载成功！"<<endl;
     }
 
     sprintf(sql,  "SELECT BranchHead FROM Branch WHERE ID='%d'",current_branch);
@@ -67,9 +67,13 @@ void model_new_branch::creat_branch(char branch_name[])
 
     //cout<<"head_node="<<head_node<<endl;
     char tmp_time[100];
-    strcpy(tmp_time, database::getCurrentTimeChar());
+    auto tmpp = database::getCurrentTimeChar();
+    strcpy(tmp_time, tmpp);
+    free(tmpp);
 
     sprintf(sql,  "INSERT INTO Branch (ID,Name,BranchRoot,BranchHead,CreatedDateTime,UpdatedDateTime) VALUES (NULL,'%s', (SELECT SHA FROM Node WHERE SHA='%s'), (SELECT SHA FROM Node WHERE SHA='%s'),'%s','%s')",branch_name,head_node,head_node,tmp_time,tmp_time);
+
+
 
     rc = sqlite3_exec(db, sql, callback, 0, &zErrMsg);
     if (rc != SQLITE_OK) {
@@ -87,7 +91,9 @@ void model_new_branch::creat_branch(char branch_name[])
         clog << "[INFO]新分支id获取成功！" << endl;
     }
     //cout<<"id="<<id<<endl;
-    strcpy(tmp_time, database::getCurrentTimeChar());
+    tmpp = database::getCurrentTimeChar();
+    strcpy(tmp_time, tmpp);
+    free(tmpp);
     //cout<<"time="<<tmp_time<<endl;
 
     sprintf(sql,  "INSERT INTO Node2Branch (ID,Node,Branch,CreatedDateTime) VALUES (NULL, (SELECT SHA FROM Node WHERE SHA='%s'), (SELECT ID FROM Branch WHERE ID='%d'), '%s')",head_node,id,tmp_time);
@@ -100,4 +106,7 @@ void model_new_branch::creat_branch(char branch_name[])
     }
 
     sqlite3_close(db);
+
+
+
 }
