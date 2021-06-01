@@ -15,6 +15,9 @@ void deal_with_three_arg(char *parameters[]);//处理有3个参数的函数
 
 void usage();//输出用法的函数
 
+//是否是开发模式
+bool DEV_MODE = true;
+
 //用来提示命令错误的函数
 void tip_command_error()
 {
@@ -77,6 +80,12 @@ void deal_with_two_arg(char *parameters[])
         //list模块
         module_list tmp;
         tmp.list();
+    }
+    else if(DEV_MODE&&command=="walk-folder")
+    {
+        //walk folder
+    #include "Database/file_system.h"
+        walk_folder();
     }
     else {
 

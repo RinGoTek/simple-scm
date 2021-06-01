@@ -36,4 +36,6 @@ const std::string DEFAULT_DB_ENVIRONMENT = ".simple-scm/objects";
 static std::string cwd = get_current_dir_name();
 
 
+
+
 #endif //SIMPLE_SCM_CACHE_H
