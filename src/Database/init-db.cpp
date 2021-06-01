@@ -221,7 +221,7 @@ void init_db::do_init() {
     sqlite3_close(db);
 
     //头指针默认指向main分支
-    ofstream file("current_branch.txt");
+    ofstream file(".simple-scm/current_branch.txt");
     file << 1;
     file.close();
 }

@@ -51,7 +51,7 @@ void module_detect_changes::detect_changes() {
     char *sql;
 
     //从文件中读取当前分支
-    ifstream file("current_branch.txt");
+    ifstream file("./simple-scm/current_branch.txt");
     int current_branch;
     file >> current_branch;
     file.close();
