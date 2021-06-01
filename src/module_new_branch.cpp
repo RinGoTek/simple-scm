@@ -40,7 +40,7 @@ void module_new_branch::create_branch(char *branch_name) {
     char sql[500];
 
     //从文件中读取当前分支
-    ifstream file("current_branch.txt");
+    ifstream file(".simple-scm/current_branch.txt");
 
     int current_branch;
     file >> current_branch;
