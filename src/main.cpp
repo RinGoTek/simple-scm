@@ -77,7 +77,7 @@ int main(int count, char *parameters[]) {
     }
     else if (main_command == "ignore")
     {
-        //创建新分支
+        //忽略特定文件
         module_ignore tmp;
         //命令错误
         if(count != 3)
@@ -112,5 +112,6 @@ void usage()
         <<"init      初始化存储仓库\n"
         <<"new-branch <BranchName>      从当前节点新建分支\n"
         <<"list      展示当前所有分支\n"
+        <<"ignore <path>      添加路径到ignore\n"
         <<endl;
 }
