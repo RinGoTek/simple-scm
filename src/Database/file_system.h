@@ -17,7 +17,7 @@ using namespace std;
  * @param: base_dir 基础目录，默认是cwd
  * @return
  */
-std::vector<std::string> walk_folder(std::string base_dir=cwd);
+std::vector<std::string> walk_folder(std::string base_dir);
 
 
 /**

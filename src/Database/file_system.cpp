@@ -36,8 +36,7 @@ static int select_ignore_callback(void *NotUsed, int cnt, char **pValue, char **
 //返回一个数组，包含所有的文件的（除了ignore以外的）路径信息
 vector<string> walk_folder(string base_dir) {
     vector<string> ans;
-    if (!(base_dir == cwd))
-        base_dir = cwd + '/' + base_dir;
+
     ignore.emplace_back(".simple-scm");
 
     sqlite3 *db;

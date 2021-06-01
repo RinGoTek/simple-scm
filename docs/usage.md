@@ -34,5 +34,9 @@
 ./simple-scm list
 ```
 
+添加路径到ignore
 
+```
+./simple-scm ignore <path>
+```
 
