@@ -34,57 +34,52 @@ int main(int count, char *parameters[]) {
         tip_command_error();
         return 0;
     }
-    switch(count)
-    {
-        case 2:
-            deal_with_two_arg(parameters);
-            break;
-        case 3:
-            deal_with_three_arg(parameters);
-            break;
-        default:
-            tip_command_error();
-            break;
-
-    }
-
-    return 0;
-
-}
-
-//用于处理2参数指令的函数
-void deal_with_two_arg(char *parameters[])
-{
-    string command = parameters[1];
-    if (command == "init")
+    string main_command = parameters[1];
+    if (main_command == "init")
     {
         //初始化存储库
         database db;
         db.init();
     }
-    else if(command == "--usage")
+    else if(main_command == "--usage")
     {
         //输出用法
         usage();
 
     }
-    else if(command == "commit")
+    else if(main_command == "commit")
     {
         //commit模块
         module_commit tmp;
         tmp.commit();
     }
 
-    else if(command == "list")
+    else if(main_command == "list")
     {
         //list模块
         module_list tmp;
-        tmp.list();
+
+        //列出所有分支的信息
+        if(count == 2)
+            tmp.list();
     }
-    else if(DEV_MODE&&command=="walk-folder")
+    else if (main_command == "new-branch")
+    {
+        //创建新分支
+        module_new_branch tmp;
+        //命令错误
+        if(count != 3)
+            tip_command_error();
+
+        char* command2 = parameters[2];
+        tmp.create_branch(command2);
+
+    }
+    else if(DEV_MODE&&main_command=="walk-folder")
     {
         //walk folder
-    #include "Database/file_system.h"
+        //这仅仅是开发用的
+        #include "Database/file_system.h"
         auto ans = walk_folder("install");
         for(auto x:ans)
             cout<<x<<endl;
@@ -93,25 +88,9 @@ void deal_with_two_arg(char *parameters[])
 
         tip_command_error();
     }
-}
 
+    return 0;
 
-//用于处理3参数指令的函数
-void deal_with_three_arg(char * parameters[])
-{
-    string command1 = parameters[1];
-    char* command2 = parameters[2];
-
-    if (command1 == "new-branch")
-    {
-
-        module_new_branch tmp;
-        //cout<<const_cast<char *>(command2.c_str())<<endl;
-        tmp.create_branch(command2);
-
-    }
-    else
-        tip_command_error();
 }
 
 
