@@ -108,6 +108,7 @@ void usage()
 {
     cout<<"Usage:\n"
         <<"init      初始化存储仓库\n"
-        <<"new-branch <BranchName>      从当前节点新建分支"
+        <<"new-branch <BranchName>      从当前节点新建分支\n"
+        <<"list      展示当前所有分支\n"
         <<endl;
 }
