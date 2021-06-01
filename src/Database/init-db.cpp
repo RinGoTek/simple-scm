@@ -172,8 +172,10 @@ void init_db::do_init() {
 
     //创建根节点
     char tmp_time[100];
+    auto tmpp = database::getCurrentTimeChar();
+    strcpy(tmp_time, tmpp);
+    free(tmpp);
 
-    strcpy(tmp_time, database::getCurrentTimeChar());
 
     char tmp_sql[1000];
 
@@ -204,7 +206,9 @@ void init_db::do_init() {
 
 
     //连接主分支和根节点
-    strcpy(tmp_time, database::getCurrentTimeChar());
+    tmpp = database::getCurrentTimeChar();
+    strcpy(tmp_time, tmpp);
+    free(tmpp);
 
     sprintf(tmp_sql,
             "INSERT INTO Node2Branch (ID,Node,Branch,CreatedDateTime) VALUES (NULL, (SELECT SHA FROM Node WHERE SHA = '000000'), (SELECT ID FROM Branch WHERE ID = 1),'%s')",
