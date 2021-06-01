@@ -7,8 +7,8 @@
 
 
 class model_commit {
-    public:
-        void commit();
+public:
+    void commit();
 };
 
 

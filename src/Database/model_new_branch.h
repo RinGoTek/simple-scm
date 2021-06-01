@@ -4,13 +4,15 @@
 
 #ifndef SIMPLE_SCM_MODEL_NEW_BRANCH_H
 #define SIMPLE_SCM_MODEL_NEW_BRANCH_H
+
 #include<string>
+
 using namespace std;
 
 
 class model_new_branch {
-    public:
-        void create_branch(char[]);
+public:
+    void create_branch(char[]);
 };
 
 

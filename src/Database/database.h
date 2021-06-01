@@ -23,10 +23,10 @@ public:
     void init();
 
     //获取当前时间的函数
-    static tm* getCurrentTime();
+    static tm *getCurrentTime();
 
     //获取当前已格式化的，可存入数据库的时间字符串的函数
-    static char* getCurrentTimeChar();
+    static char *getCurrentTimeChar();
 
 private:
 

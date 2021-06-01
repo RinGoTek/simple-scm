@@ -5,10 +5,10 @@
 #include "model_commit.h"
 #include "model_detect_changes.h"
 #include<iostream>
+
 using namespace std;
 
-void model_commit::commit()
-{
+void model_commit::commit() {
     model_detect_changes tmp;
     tmp.detect_changes();
 }

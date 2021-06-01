@@ -5,20 +5,19 @@
 #include "model_list.h"
 #include<sqlite3.h>
 #include<iostream>
+
 using namespace std;
 
 static int callback(void *NotUsed, int cnt, char **pValue, char **pName)//用于输出branch表所有信息的回调函数
 {
-    for(int i=0;i<cnt;i++)
-    {
-        cout<<pName[i]<<"="<<(pValue[i] ? pValue[i] : "NULL") <<endl;
+    for (int i = 0; i < cnt; i++) {
+        cout << pName[i] << "=" << (pValue[i] ? pValue[i] : "NULL") << endl;
     }
-    cout<<endl;
+    cout << endl;
     return 0;
 }
 
-void model_list::list()
-{
+void model_list::list() {
     sqlite3 *db;
     char *zErrMsg = 0;
     int rc;
@@ -26,25 +25,20 @@ void model_list::list()
 
     //打开数据库
     rc = sqlite3_open(".simple-scm/simple-scm.db", &db);
-    if(rc != SQLITE_OK)
-    {
-        cerr<<"[ERROR]数据库打开失败："<<zErrMsg<<endl;
+    if (rc != SQLITE_OK) {
+        cerr << "[ERROR]数据库打开失败：" << zErrMsg << endl;
         exit(1);
-    }
-    else
-    {
-        clog<<"[INFO]数据库打开成功！"<<endl;
+    } else {
+        clog << "[INFO]数据库打开成功！" << endl;
     }
 
 
-    //sprintf(sql,"SELECT * FROM Branch"); 错误，原因未知
     //获得branch表中所有信息并输出
-    sql="SELECT * FROM Branch";
+    sql = "SELECT * FROM Branch";
     rc = sqlite3_exec(db, sql, callback, NULL, &zErrMsg);
 
-    if(rc != SQLITE_OK)
-    {
-        cerr<<"[ERROR]发生错误："<<zErrMsg<<endl;
+    if (rc != SQLITE_OK) {
+        cerr << "[ERROR]发生错误：" << zErrMsg << endl;
         exit(1);
     }
     sqlite3_close(db);
