@@ -170,6 +170,17 @@ void init_db::do_init() {
         clog << "[INFO]数据表AddList创建成功！" << endl;
     }
 
+    sql = "CREATE TABLE IgnoreList("\
+        "Path Text(300) PRIMARY KEY,"\
+        "CreatedDateTime DATETIME NOT NULL);";
+
+    rc = sqlite3_exec(db, sql, callback, 0, &zErrMsg);
+    if (rc != SQLITE_OK) {
+        cerr << "[ERROR]数据表IgnoreList创建失败: " << zErrMsg << endl;
+    } else {
+        clog << "[INFO]数据表IgnoreList创建成功！" << endl;
+    }
+
     //创建根节点
     char tmp_time[100];
 
