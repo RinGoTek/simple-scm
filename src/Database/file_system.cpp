@@ -11,6 +11,7 @@
 #include<sqlite3.h>
 #include<algorithm>
 #include<stack>
+#include <sys/stat.h>
 
 using namespace std;
 
@@ -34,9 +35,10 @@ static int select_ignore_callback(void *NotUsed, int cnt, char **pValue, char **
 
 //对外开放的，获取文件夹下所有文件的函数
 //返回一个数组，包含所有的文件的（除了ignore以外的）路径信息
-vector<string> walk_folder() {
+vector<string> walk_folder(string base_dir) {
     vector<string> ans;
-    string base_dir = cwd;
+    if (!(base_dir == cwd))
+        base_dir = cwd + '/' + base_dir;
     ignore.emplace_back(".simple-scm");
 
     sqlite3 *db;
@@ -52,7 +54,7 @@ vector<string> walk_folder() {
     }
 
     //获取ignore列表
-    char* sql = "SELECT Path From IgnoreList";
+    char *sql = "SELECT Path From IgnoreList";
     rc = sqlite3_exec(db, sql, select_ignore_callback, nullptr, &zErrMsg);
 
     if (rc != SQLITE_OK) {
@@ -64,7 +66,7 @@ vector<string> walk_folder() {
 
     //要遍历的目录
     stack<string> walk_list;
-    walk_list.push(".");
+    walk_list.push(base_dir);
 
     while (!walk_list.empty()) {
         string current_dir = walk_list.top();
@@ -73,23 +75,21 @@ vector<string> walk_folder() {
         walk_return wk = do_walk_folder(current_dir);
 
         //判断文件夹是否在忽略列表中
-        for(const auto& x:wk.dirs)
-        {
+        for (const auto &x:wk.dirs) {
             auto it = find(ignore.begin(), ignore.end(), x);
 
             //不在忽略列表中
-            if(it == ignore.end())
+            if (it == ignore.end())
                 walk_list.push(x);
         }
 
         //判断文件夹是否在忽略列表中
-        for(const auto& x:wk.files)
-        {
+        for (const auto &x:wk.files) {
             auto it = find(ignore.begin(), ignore.end(), x);
 
             //不在忽略列表中
-            if(it == ignore.end())
-               ans.emplace_back(x);
+            if (it == ignore.end())
+                ans.emplace_back(x);
         }
     }
 
@@ -112,6 +112,7 @@ walk_return do_walk_folder(const string &base_dir) {
 //打开文件夹失败
     if ((dir = opendir(base_dir.c_str())) == NULL) {
         cerr << "[ERROR]打开文件夹失败" << endl;
+        cout << base_dir << endl;
         exit(1);
     }
 
@@ -139,3 +140,19 @@ walk_return do_walk_folder(const string &base_dir) {
     wk.files = files;
     return wk;
 }
+
+/**
+ * 判断是否是文件,
+ * */
+bool is_file(std::string path) {
+    struct stat buffer;
+    return (stat(path.c_str(), &buffer) == 0 && S_ISREG(buffer.st_mode));
+};
+
+/**
+ * 判断是否是一个文件夹,
+ * */
+bool is_dir(std::string path) {
+    struct stat buffer;
+    return (stat(path.c_str(), &buffer) == 0 && S_ISDIR(buffer.st_mode));
+};

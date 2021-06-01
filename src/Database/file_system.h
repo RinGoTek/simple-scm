@@ -8,6 +8,27 @@
 #endif //SIMPLE_SCM_FILE_SYSTEM_H
 #include<string>
 #include<vector>
-std::vector<std::string> walk_folder();
+#include<sys/stat.h>
+
+#include "../headers/cache.h"
+
+/**
+ * 遍历目录下的所有文件
+ * @param: base_dir 基础目录，默认是cwd
+ * @return
+ */
+std::vector<std::string> walk_folder(std::string base_dir=cwd);
+
+
+/**
+ * 判断是否是文件,
+ * */
+bool is_file(std::string path);
+
+
+/**
+ * 判断是否是一个文件夹,
+ * */
+bool is_dir(std::string path) ;
 
 

@@ -85,7 +85,9 @@ void deal_with_two_arg(char *parameters[])
     {
         //walk folder
     #include "Database/file_system.h"
-        walk_folder();
+        auto ans = walk_folder("install");
+        for(auto x:ans)
+            cout<<x<<endl;
     }
     else {
 
