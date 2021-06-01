@@ -7,11 +7,11 @@
 #include"module_detect_changes.h"
 #include"module_new_branch.h"
 #include"module_list.h"
+#include "module_ignore.h"
 
 using namespace std;
 
-void deal_with_two_arg(char *parameters[]);//处理有两个参数的函数
-void deal_with_three_arg(char *parameters[]);//处理有3个参数的函数
+
 
 void usage();//输出用法的函数
 
@@ -73,6 +73,18 @@ int main(int count, char *parameters[]) {
 
         char* command2 = parameters[2];
         tmp.create_branch(command2);
+
+    }
+    else if (main_command == "ignore")
+    {
+        //创建新分支
+        module_ignore tmp;
+        //命令错误
+        if(count != 3)
+            tip_command_error();
+
+        char* command2 = parameters[2];
+        tmp.do_ignore(command2);
 
     }
     else if(DEV_MODE&&main_command=="walk-folder")
