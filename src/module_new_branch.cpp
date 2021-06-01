@@ -2,7 +2,7 @@
 // Created by a2447742618 on 2021/5/29.
 //
 
-#include "model_new_branch.h"
+#include "module_new_branch.h"
 #include"Database/database.h"
 #include<fstream>
 #include<sqlite3.h>
@@ -33,7 +33,7 @@ static int get_node(void *NotUsed, int cnt, char **pValue, char **pName)//用于
     return 0;
 }
 
-void model_new_branch::create_branch(char *branch_name) {
+void module_new_branch::create_branch(char *branch_name) {
     sqlite3 *db;
     char *zErrMsg = 0;
     int rc;

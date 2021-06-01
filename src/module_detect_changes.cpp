@@ -2,7 +2,7 @@
 // Created by a2447742618 on 2021/5/28.
 //
 
-#include "model_detect_changes.h"
+#include "module_detect_changes.h"
 #include<sqlite3.h>
 #include<iostream>
 #include<cstdlib>
@@ -14,13 +14,13 @@ using namespace std;
 static char head_node[100], root_node[100], node[100];
 
 
-model_detect_changes::model_detect_changes() {
+module_detect_changes::module_detect_changes() {
     vis.clear();
     //object_info.clear();
     object.clear();
 }
 
-model_detect_changes tmp;
+module_detect_changes tmp;
 
 static int get_node(void *NotUsed, int cnt, char **pValue, char **pName)//用来获得当前分支头节点的回调函数
 {
@@ -43,7 +43,7 @@ static int get_object(void *NotUsed, int cnt, char **pValue, char **pName)//获�
     return 0;
 }
 
-void model_detect_changes::detect_changes() {
+void module_detect_changes::detect_changes() {
 
     sqlite3 *db;
     char *zErrMsg = 0;

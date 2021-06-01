@@ -2,7 +2,7 @@
 // Created by a2447742618 on 2021/5/29.
 //
 
-#include "model_list.h"
+#include "module_list.h"
 #include<sqlite3.h>
 #include<iostream>
 
@@ -17,7 +17,7 @@ static int callback(void *NotUsed, int cnt, char **pValue, char **pName)//用于
     return 0;
 }
 
-void model_list::list() {
+void module_list::list() {
     sqlite3 *db;
     char *zErrMsg = 0;
     int rc;

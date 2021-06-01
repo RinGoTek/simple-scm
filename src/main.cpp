@@ -3,10 +3,10 @@
 #include"headers/cache.h"
 
 #include"Database/database.h"
-#include"model_commit.h"
-#include"model_detect_changes.h"
-#include"model_new_branch.h"
-#include"model_list.h"
+#include"module_commit.h"
+#include"module_detect_changes.h"
+#include"module_new_branch.h"
+#include"module_list.h"
 
 using namespace std;
 
@@ -68,14 +68,14 @@ void deal_with_two_arg(char *parameters[])
     else if(command == "commit")
     {
         //commit模块
-        model_commit tmp;
+        module_commit tmp;
         tmp.commit();
     }
 
     else if(command == "list")
     {
         //list模块
-        model_list tmp;
+        module_list tmp;
         tmp.list();
     }
     else {
@@ -94,7 +94,7 @@ void deal_with_three_arg(char * parameters[])
     if (command1 == "new-branch")
     {
 
-        model_new_branch tmp;
+        module_new_branch tmp;
         //cout<<const_cast<char *>(command2.c_str())<<endl;
         tmp.create_branch(command2);
 

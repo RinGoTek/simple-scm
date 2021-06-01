@@ -2,17 +2,17 @@
 // Created by a2447742618 on 2021/5/28.
 //
 
-#ifndef SIMPLE_SCM_MODEL_DETECT_CHANGES_H
-#define SIMPLE_SCM_MODEL_DETECT_CHANGES_H
+#ifndef SIMPLE_SCM_MODULE_DETECT_CHANGES_H
+#define SIMPLE_SCM_MODULE_DETECT_CHANGES_H
 
 #include<map>
 #include<vector>
 
 using namespace std;
 
-class model_detect_changes {
+class module_detect_changes {
 public:
-    model_detect_changes();
+    module_detect_changes();
 
     void detect_changes();
 
@@ -22,4 +22,4 @@ public:
 };
 
 
-#endif //SIMPLE_SCM_MODEL_DETECT_CHANGES_H
+#endif //SIMPLE_SCM_MODULE_DETECT_CHANGES_H
