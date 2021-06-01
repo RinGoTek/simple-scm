@@ -3,10 +3,10 @@
 #include"headers/cache.h"
 
 #include"Database/database.h"
-#include"Database/model_commit.h"
-#include"Database/model_detect_changes.h"
-#include"Database/model_new_branch.h"
-#include"Database/model_list.h"
+#include"model_commit.h"
+#include"model_detect_changes.h"
+#include"model_new_branch.h"
+#include"model_list.h"
 
 using namespace std;
 
