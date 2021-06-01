@@ -47,3 +47,22 @@ char *database::getCurrentTimeChar() {
     strcpy(res, str.c_str());
     return res;
 }
+
+char *database::getTimeChar(time_t tt) {
+
+    tt = tt + 8 * 3600;  // transform the time zone
+    tm *t = gmtime(&tt);
+
+    stringstream fmt;
+
+    fmt << t->tm_year + 1900 << '-' << setw(2) << setfill('0') << t->tm_mon + 1 << '-' << setw(2) << setfill('0')
+        << t->tm_mday
+        << ' ' << setw(2) << setfill('0') << t->tm_hour << ':' << setw(2) << setfill('0') << t->tm_min << ':' << setw(2)
+        << setfill('0') << t->tm_sec;
+    string str = fmt.str();
+
+    char *res = new char[str.size() + 1];
+    strcpy(res, str.c_str());
+    return res;
+
+}
