@@ -1,0 +1,8 @@
+//
+// Created by windsoul on 2021/6/2.
+//
+
+#ifndef SIMPLE_SCM_MODULE_CHECKOUT_H
+#define SIMPLE_SCM_MODULE_CHECKOUT_H
+
+#endif //SIMPLE_SCM_MODULE_CHECKOUT_H
