@@ -6,7 +6,7 @@ find_package(ZLIB)
 find_package(OpenSSL REQUIRED)
 
 
-add_executable(simple-scm src/main.cpp src/headers/cache.h src/Database/init-db.cpp src/Database/init-db.h src/Database/database.cpp src/Database/database.h src/module_detect_changes.h src/module_detect_changes.cpp src/module_detect_changes.cpp src/module_detect_changes.h src/module_commit.cpp src/module_commit.h src/module_new_branch.cpp src/module_new_branch.h src/module_list.cpp src/module_list.h src/Database/file_system.cpp src/Database/file_system.h src/module_ignore.cpp src/module_ignore.h)
+add_executable(simple-scm src/main.cpp src/headers/cache.h src/Database/init-db.cpp src/Database/init-db.h src/Database/database.cpp src/Database/database.h src/module_detect_changes.h src/module_detect_changes.cpp src/module_detect_changes.cpp src/module_detect_changes.h src/module_commit.cpp src/module_commit.h src/module_new_branch.cpp src/module_new_branch.h src/module_list.cpp src/module_list.h src/Database/file_system.cpp src/Database/file_system.h src/module_ignore.cpp src/module_ignore.h src/module_checkout.cpp src/module_checkout.h)
 
 target_link_libraries(${PROJECT_NAME} ZLIB::ZLIB)
 target_link_libraries(${PROJECT_NAME} OpenSSL::Crypto)
