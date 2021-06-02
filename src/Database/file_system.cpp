@@ -16,8 +16,7 @@
 using namespace std;
 
 //将要被忽略的文件、路径
-vector<string> ignore;
-
+static vector<string> ignore;
 
 struct walk_return {
     std::vector<std::string> files;

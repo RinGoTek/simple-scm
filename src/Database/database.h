@@ -28,6 +28,9 @@ public:
     //获取当前已格式化的，可存入数据库的时间字符串的函数
     static char *getCurrentTimeChar();
 
+    //将time_h转化为char *类型的函数
+    static char *getTimeChar(time_t);
+
 private:
 
 

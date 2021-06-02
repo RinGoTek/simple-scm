@@ -9,7 +9,7 @@
 #include<string>
 #include<vector>
 #include<sys/stat.h>
-
+using namespace std;
 #include "../headers/cache.h"
 
 /**
@@ -30,5 +30,4 @@ bool is_file(std::string path);
  * 判断是否是一个文件夹,
  * */
 bool is_dir(std::string path) ;
-
 
