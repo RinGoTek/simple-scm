@@ -4,6 +4,7 @@
 
 #include "module_add.h"
 #include"Database/file_system.h"
+#include"Database/database.h"
 #include<sys/stat.h>
 #include<sqlite3.h>
 #include<vector>
@@ -18,8 +19,6 @@ static int callback(void *NotUsed, int cnt, char **pValue, char **pName) {
 static vector<string>ignore;
 static stack<string> walk_list;
 static vector<string>file;
-
-extern struct walk_return;
 
 static int select_ignore_callback(void *NotUsed, int cnt, char **pValue, char **pName)//获取ignore信息的函数
 {
@@ -63,22 +62,26 @@ void module_add::add(char *path)
         string current_dir = walk_list.top();
         walk_list.pop();
 
-        extern struct walk_return wk;//do_walk_folder(current_dir);
-
-        for (const auto &x:wk.dirs) walk_list.push(x);
-        for (const auto &x:wk.files) ignore.emplace_back(x);
+        vector<string>tmp = walk_folder(current_dir);
+        ignore.insert(ignore.end(),tmp.begin(),tmp.end());
     }
 
     for(auto p:file)
     {
+        auto it = find(ignore.begin(), ignore.end(), x);
+
+        //在忽略列表中
+        if (it != ignore.end()) continue;
+
         struct stat buf;
         stat(p.c_str(), &buf);
 
-        sprintf(sql, "INSERT INTO AddList (OriginPath,CreatedDateTime,UpdatedDateTime) VALUES ('%s','%s','%s')", path,buf.st_mtim, buf.st_mtim);
+        sprintf(sql, "INSERT INTO AddList (OriginPath,CreatedDateTime,UpdatedDateTime) VALUES ('%s','%s','%s')", p.c_str(),database::getTimeChar(buf.st_mtime), database::getTimeChar(buf.st_mtime));
         rc = sqlite3_exec(db, sql, callback, 0, &zErrMsg);
 
         if (rc != SQLITE_OK) {
             cerr << "发生错误: " << zErrMsg << endl;
+            exit(1);
         }
     }
 
