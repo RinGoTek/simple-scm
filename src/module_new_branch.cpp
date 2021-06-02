@@ -106,7 +106,7 @@ void module_new_branch::create_branch(char *branch_name) {
     //连接新分支和根节点（根节点即当前节点）
     sprintf(sql,
             "INSERT INTO Node2Branch (ID,Node,Branch,CreatedDateTime) VALUES (NULL, (SELECT SHA FROM Node WHERE SHA='%s'), (SELECT ID FROM Branch WHERE ID='%d'), '%s')",
-            head_node, id, tmp_time);
+            head_node, id, tmp_time);//每个节点存了它父节点的信息
 
     rc = sqlite3_exec(db, sql, callback, 0, &zErrMsg);
     if (rc != SQLITE_OK) {
