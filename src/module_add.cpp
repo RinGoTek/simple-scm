@@ -9,6 +9,7 @@
 #include<sqlite3.h>
 #include<vector>
 #include<stack>
+#include<algorithm>
 using namespace std;
 
 static int callback(void *NotUsed, int cnt, char **pValue, char **pName) {
@@ -68,7 +69,7 @@ void module_add::add(char *path)
 
     for(auto p:file)
     {
-        auto it = find(ignore.begin(), ignore.end(), x);
+        auto it = find(ignore.begin(), ignore.end(), p);
 
         //在忽略列表中
         if (it != ignore.end()) continue;
