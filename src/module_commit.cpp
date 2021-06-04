@@ -9,6 +9,10 @@
 using namespace std;
 
 void module_commit::commit() {
-    module_detect_changes tmp;
-    tmp.detect_changes();
+
+    detect_info info;
+    module_detect_changes commit_tmp;
+    info = commit_tmp.detect_changes();
+
+
 }

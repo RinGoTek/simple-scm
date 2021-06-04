@@ -3,24 +3,34 @@
 //
 
 #include "module_detect_changes.h"
+#include"Database/file_system.h"
+#include"Database/database.h"
 #include<sqlite3.h>
 #include<iostream>
 #include<cstdlib>
 #include<fstream>
 #include<cstring>
+#include<stack>
+#include<vector>
+#include<algorithm>
 
 using namespace std;
 
 static char head_node[100], root_node[100], node[100];
+static map<char *, char *> object_updated_time; //储存从文件哈希值到文件更改时间的映射
+static map<string, bool> vis;
+static vector<string> object;
+static stack<string> walk_list;
+static vector<string> ignore_object;
+static vector<string> local_object;
 
-
-module_detect_changes::module_detect_changes() {
-    vis.clear();
-    //object_info.clear();
+void init() {
     object.clear();
+    object_updated_time.clear();
+    vis.clear();
+    ignore_object.clear();
+    local_object.clear();
 }
-
-module_detect_changes tmp;
 
 static int get_node(void *NotUsed, int cnt, char **pValue, char **pName)//用来获得当前分支头节点的回调函数
 {
@@ -37,13 +47,26 @@ static int update_node(void *NotUsed, int cnt, char **pValue, char **pName)//将
 
 static int get_object(void *NotUsed, int cnt, char **pValue, char **pName)//获得当前节点包含的object的回调函数
 {
-    if (tmp.vis[pValue[0]]) return 0;
-    tmp.vis[pValue[0]] = 1;
-    if (atoi(pValue[1]) != -1) tmp.object.push_back(pValue[1]);
+    if (vis[pValue[0]]) return 0;
+    vis[pValue[0]] = 1;
+    if (atoi(pValue[1]) != -1) object.push_back(pValue[1]);
     return 0;
 }
 
-void module_detect_changes::detect_changes() {
+static int select_ignore_callback(void *NotUsed, int cnt, char **pValue, char **pName)//获取ignore信息的函数
+{
+    //把信息添加到ignore数组或者等待遍历的目录stack
+    if (is_file(pValue[0])) ignore_object.emplace_back(pValue[0]);
+    else if (is_dir(pValue[0])) walk_list.push(pValue[0]);
+    return 0;
+}
+
+static int get_updated_time(void *NotUsed, int cnt, char **pValue, char **pName)//获取文件对应的更新时间
+{
+    object_updated_time[pValue[0]] = pValue[1];
+}
+
+detect_info module_detect_changes::detect_changes() {
 
     sqlite3 *db;
     char *zErrMsg = 0;
@@ -77,7 +100,7 @@ void module_detect_changes::detect_changes() {
 
 
     strcpy(node, head_node);
-    //节点不断向根节点更新从而获得所有包含的object，保存在tmp中
+    //节点不断向根节点更新从而获得所有包含的object
     while (!strcmp(node, root_node)) {
         sprintf(sql, "SELECT File,Mode FROM Obj2Node WHERE Node='%s'", node);
         rc = sqlite3_exec(db, sql, get_object, NULL, &zErrMsg);
@@ -95,6 +118,63 @@ void module_detect_changes::detect_changes() {
         }
     }
 
-    //未完待续
+    //找到所有ignore的文件或文件夹
+    sprintf(sql, "SELECT Path From IgnoreList");
+    rc = sqlite3_exec(db, sql, select_ignore_callback, nullptr, &zErrMsg);
 
+    if (rc != SQLITE_OK) {
+        cerr << "[ERROR]发生错误：" << zErrMsg << endl;
+        exit(1);
+    }
+
+    //获得所有ignore文件夹下的文件
+    while (!walk_list.empty()) {
+        string current_dir = walk_list.top();
+        walk_list.pop();
+
+        vector<string> tmp = walk_folder(current_dir);
+        ignore_object.insert(ignore_object.end(), tmp.begin(), tmp.end());
+    }
+
+    //获得本地所有文件路径
+    local_object = walk_folder(cwd);
+
+    for(auto p:local_object)
+    {
+        auto it = find (ignore_object.begin(), ignore_object.end(), p);
+
+        //在忽略列表中
+        if (it != ignore_object.end()) continue;
+
+        sprintf(sql,"SELECT SHA,UpdatedDateTime FROM Object WHERE SHA='%s'",p.c_str());
+
+        rc = sqlite3_exec(db, sql, get_updated_time, nullptr, &zErrMsg);
+
+        if (rc != SQLITE_OK) {
+            cerr << "[ERROR]发生错误：" << zErrMsg << endl;
+            exit(1);
+        }
+
+    }
+
+    detect_info sav;
+
+    for (auto p:local_object) {
+        auto it = find (ignore_object.begin(), ignore_object.end(), p);
+
+        //在忽略列表中
+        if (it != ignore_object.end()) continue;
+
+        struct stat buf;
+        if(stat(p.c_str(), &buf)==-1)//找不到该文件
+        {
+            sav.del.emplace_back(p);
+            continue;
+        }
+
+        char *time1;
+        if(strcpy(time1,database::getTimeChar(buf.st_mtime))) sav.change.emplace_back(p);//文件更新时间与表中不同
+    }
+
+    return sav;
 }

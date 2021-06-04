@@ -10,15 +10,31 @@
 
 using namespace std;
 
+struct detect_info//用来保存检测结果
+{
+    vector<string> del;//保存删除的文件哈希值
+    vector<string> change;//保存更改的文件哈希值
+
+    detect_info() {
+        del.clear();
+        change.clear();
+    }
+
+    detect_info &operator=(const detect_info &tmp) {
+        del = tmp.del;
+        change = tmp.change;
+        return *this;
+    }
+
+};
+
+
 class module_detect_changes {
 public:
-    module_detect_changes();
+    module_detect_changes() {};
 
-    void detect_changes();
+    detect_info detect_changes();
 
-    //map <string,char*> object_info; //储存从文件哈希值到文件更改时间的映射
-    map<string, bool> vis;
-    vector<string> object;
 };
 
 
