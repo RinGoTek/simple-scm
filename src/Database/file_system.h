@@ -31,3 +31,10 @@ bool is_file(std::string path);
  * */
 bool is_dir(std::string path) ;
 
+
+/**  计算sha1的函数
+     *  返回char×
+     ×  文件无法访问时返回nullptr
+     */
+char* calculate_sha1(std::string path);
+

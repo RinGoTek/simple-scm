@@ -12,6 +12,8 @@
 #include<algorithm>
 #include<stack>
 #include <sys/stat.h>
+#include<openssl/sha.h>
+#include<fstream>
 
 using namespace std;
 
@@ -154,3 +156,56 @@ bool is_dir(std::string path) {
     struct stat buffer;
     return (stat(path.c_str(), &buffer) == 0 && S_ISDIR(buffer.st_mode));
 };
+
+
+char *calculate_sha1(string path)
+{
+    /**  计算sha1的函数
+     *  返回char×
+     ×  文件无法访问时返回nullptr
+     */
+    //以二进制读的方式打开文件
+    ifstream fin(path, ios::in | ios::binary);
+    if (!fin)
+    {
+        return nullptr;
+    }
+
+    filebuf *pbuf;
+    //获取fin对应的buffer对象的指针
+    pbuf = fin.rdbuf();
+
+    //调用buffer对象方法获取文件大小
+    long long size = pbuf->pubseekoff(0, ios::end, ios::in);
+
+    pbuf->pubseekpos(0, ios::in);
+
+    //分配内存空间
+    char *buffer = new char[size + 1];
+
+    //获取文件内容
+    pbuf->sgetn(buffer, size);
+    buffer[size] = '\0'; //这是关键
+    fin.close();
+
+    unsigned char opt[21];
+    char res[40];
+
+    SHA1((unsigned char *)buffer, size, opt);
+
+    int j = 0;
+    for (int i = 0; i < 20; i++)
+    {
+        char tmp[5];
+        //把十六进制转成字符串
+        sprintf(tmp, "%02x", opt[i]);
+        res[j] = tmp[0];
+        res[j + 1] = tmp[1];
+        j += 2;
+    }
+    cout << res << endl;
+    //释放内存
+    delete[] buffer;
+
+    return res;
+}
