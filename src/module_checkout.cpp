@@ -2,7 +2,7 @@
 // Created by windsoul on 2021/6/2.
 //
 
-#include "module_checkout.h"
+/*#include "module_checkout.h"
 #include <iostream>
 #include <sqlite3.h>
 #include <cstring>
@@ -97,4 +97,5 @@ void module_checkout::checkout_switch_branch(char *switch_branch_name) {
     clog<<"[INFO]切换到分支"<<switch_branch_name<<"成功！"<<endl;
 
     sqlite3_close(db);
-}
+}*/
+
