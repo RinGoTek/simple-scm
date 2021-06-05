@@ -68,7 +68,7 @@ void module_add::add(char *path) {
     }
 
     //把不在ignore中的所有文件信息加入AddList中
-    for (auto p:file) {
+    for (auto &p:file) {
         auto it = find(ignore.begin(), ignore.end(), p);
 
         //在忽略列表中

@@ -44,16 +44,45 @@ void module_commit::commit(char *Message) {
     module_detect_changes commit_tmp;
     info = commit_tmp.detect_changes();
 
-    //获得新节点的sha1
-    stringstream tmp_SHA;
-    for (auto &p:info.change) tmp_SHA << p;
-    new_sha1 = tmp_SHA.str();
-
-
     sqlite3 *db;
     char *zErrMsg = 0;
     int rc;
     char *sql;
+
+    //打开数据库
+    rc = sqlite3_open(".simple-scm/simple-scm.db", &db);
+    if (rc != SQLITE_OK) {
+        cerr << "[ERROR]数据库打开失败" << endl;
+        exit(1);
+    } else {
+        clog << "[INFO]数据库打开成功！" << endl;
+    }
+
+    //获得add表中的信息
+    sprintf(sql, "SELECT SHA FROM AddList");
+    rc = sqlite3_exec(db, sql, get_add_sha1, NULL, &zErrMsg);
+    if (rc != SQLITE_OK) {
+        cerr << "[ERROR]发生错误：" << zErrMsg << endl;
+        exit(1);
+    }
+
+    //清空AddList表
+    sprintf(sql, "DELETE FROM AddList");
+    rc = sqlite3_exec(db, sql, callback, NULL, &zErrMsg);
+    if (rc != SQLITE_OK) {
+        cerr << "[ERROR]清空AddList表失败：" << zErrMsg << endl;
+        exit(1);
+    } else {
+        clog << "[INFO]AddList表清空成功！" << endl;
+    }
+
+    //获得新节点的sha1
+    stringstream tmp_SHA;
+    for (auto &p:info.change) tmp_SHA << p;
+    for (auto &p:info.del) tmp_SHA << p;
+    for (auto &p:add) tmp_SHA << p;
+    new_sha1 = tmp_SHA.str();
+
 
     //从文件中读取当前分支
     ifstream file(".simple-scm/current_branch.txt");
@@ -61,16 +90,8 @@ void module_commit::commit(char *Message) {
     file >> current_branch;
     file.close();
 
-    //打开数据库
-    rc = sqlite3_open(".simple-scm/simple-scm.db", &db);
-    if (rc != SQLITE_OK) {
-        cerr << "[ERROR]数据库打开失败：" << endl;
-        exit(1);
-    } else {
-        clog << "[INFO]数据库打开成功！" << endl;
-    }
 
-    //获得当前分支头节点，即新节点的父亲节点的SHA
+    //获得当前分支头节点信息，即新节点的父亲节点的SHA
     sprintf(sql, "SELECT BranchRoot,BranchHead FROM Branch WHERE ID='%d'", current_branch);
     rc = sqlite3_exec(db, sql, get_head_node, NULL, &zErrMsg);
     if (rc != SQLITE_OK) {
@@ -109,12 +130,15 @@ void module_commit::commit(char *Message) {
         clog << "[INFO]新节点与分支连接成功！" << endl;
     }
 
-    //获得add表中的信息
-    sprintf(sql, "SELECT SHA FROM AddList");
-    rc = sqlite3_exec(db, sql, get_add_sha1, NULL, &zErrMsg);
+    //将当前分支头节点改为新节点
+    sprintf(sql, "UPDATE Branch SET HeadNode=(SELECT FROM Node WHERE SHA='%s') WHERE ID='%d'", new_sha1.c_str(),
+            current_branch);
+    rc = sqlite3_exec(db, sql, callback, NULL, &zErrMsg);
     if (rc != SQLITE_OK) {
-        cerr << "[ERROR]发生错误：" << zErrMsg << endl;
+        cerr << "[ERROR]分支头节点更改失败：" << zErrMsg << endl;
         exit(1);
+    } else {
+        clog << "[INFO]分支头节点更改成功！" << endl;
     }
 
     tmpp = database::getCurrentTimeChar();
@@ -180,7 +204,7 @@ void module_commit::commit(char *Message) {
             exit(1);
 
         }
-
-        sqlite3_close(db);
     }
+
+    sqlite3_close(db);
 }
