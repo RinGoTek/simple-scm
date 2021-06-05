@@ -233,6 +233,7 @@ char *calculate_sha1(const string &path) {
     unsigned char opt[21];
     char *res = new char[41];
 
+    //@todo 这里计算的sha和直接算字符串sha不一致
     SHA1((unsigned char *) original.c_str(), original.length() * sizeof(unsigned char), opt);
 
     int j = 0;

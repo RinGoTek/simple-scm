@@ -118,6 +118,7 @@ int main(int count, char *parameters[]) {
     else if (DEV_MODE && main_command == "compress") {
 
         //这仅仅是开发用的
+
         cout<<"compress"<<endl;
         Compress tmp;
 
