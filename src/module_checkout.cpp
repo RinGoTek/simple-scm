@@ -104,6 +104,7 @@ void module_checkout::checkout_switch_branch(char *switch_branch_name) {
 #include <cstring>
 #include <sqlite3.h>
 #include <algorithm>
+#include "headers/cache.h"
 #include "module_checkout.h"
 #include "Database/file_system.h"
 #include "module_detect_changes.h"
@@ -115,22 +116,14 @@ static vector<string> compressedSHA;
 static vector<string> new_file_list;
 static vector<string> old_file_list;
 static vector<string> ignore_list;
+static int branch_exist_judge=0;
 static char switch_branch_headnode[50];
 
-static int FileRemove(const char* filename)//const char*,删除文件
+static int branch_exist(void *NotUsed, int cnt, char **pValue, char **pName)//判断分支是否存在
 {
-    return remove(filename);
-}//删除成功返回值为0，删除失败返回值为-1
-
-static void CopyFile(const char* sourcefile, char* new_file)//将路径sourcefile的文件在路径new_file处复制一份
-{
-    string command = "cp ";
-    command+= sourcefile;
-    command+= " ";
-    command+= new_file;
-    system((char*)command.c_str());
+    branch_exist_judge= atoi(pValue[0]);
+    return 0;
 }
-
 static int get_headnode(void *NotUsed, int cnt, char **pValue, char **pName)//获得分支的头节点的回调函数
 {
     strcpy(switch_branch_headnode,pValue[0]);
@@ -160,12 +153,14 @@ static int get_ignore_file(void *NotUsed, int cnt, char **pValue, char **pName)
 }
 
 void module_checkout::checkout_switch_branch(char *switch_branch) {
-    /*int ok= detect_info()
-    if (ok==0)
-    {
-        cerr<<"[ERROR]请将做出的修改进行提交或删除后再切换分支"<<endl;
-        exit(0);
-    }*/
+
+        //检测是否有修改未提交
+        module_detect_changes op;
+        detect_info x=op.detect_changes();
+        if(x.change.size()||x.del.size()){
+            cerr<<"[ERROR]请将做出的修改进行提交或删除后再切换分支"<<endl;
+            exit(0);
+        }
 
         sqlite3 *db;
         char *zErrMsg = 0;
@@ -180,6 +175,18 @@ void module_checkout::checkout_switch_branch(char *switch_branch) {
         }
 
         char sql[500];
+
+        //检测switch_branch分支是否存在
+        sprintf(sql,"SELECT ID FROM Branch WHERE NAME='%s'",switch_branch);
+        rc= sqlite3_exec(db,sql,branch_exist,NULL,&zErrMsg);
+        if(rc!=SQLITE_OK){
+            cerr << "[ERROR]检测所切换的分支失败:" <<zErrMsg<< endl;
+            exit(0);
+        }
+        if(branch_exist_judge==0){
+            cerr<<"[ERROR]所切换的分支不存在!"<<endl;
+            exit(0);
+        }
 
         //获取所切换分支的头节点
         sprintf(sql,"SELECT BranchHead FROM Branch WHERE NAME='%s'",switch_branch);
@@ -213,7 +220,7 @@ void module_checkout::checkout_switch_branch(char *switch_branch) {
         clog<<"[INFO]获取所切换分支的文件的路径成功!"<<endl;
 
         //获取工作目录的文件
-        old_file_list= walk_folder(".simple-scm");
+        old_file_list= walk_folder(cwd);
 
         //获取不需要删除的文件
         sprintf(sql,"SELECT Path FROM IgnoreList");
@@ -242,7 +249,7 @@ void module_checkout::checkout_switch_branch(char *switch_branch) {
         //将所切换的分支的文件复制到工作目录中
         for(auto x:new_file_list)
         {
-            CopyFile(x.c_str(),".simple-scm");
+            CopyFile(x.c_str(),cwd.c_str());
         }
 }
 
