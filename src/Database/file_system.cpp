@@ -157,17 +157,51 @@ bool is_dir(std::string path) {
     return (stat(path.c_str(), &buffer) == 0 && S_ISDIR(buffer.st_mode));
 };
 
+/**
+ * 计算字符串的sha1
+ * @param str 待计算的字符串
+ * @return sha1
+ */
+char *calculate_string_sha1(const string &str) {
+    return calculate_char_sha1(str.c_str());
+}
 
-char *calculate_sha1(string path)
-{
-    /**  计算sha1的函数
+/**
+ * 计算char×字符串的sha1
+ * @param str 待计算的字符串
+ * @return sha1
+ */
+char *calculate_char_sha1(const char *str) {
+    unsigned char opt[21];
+    char *res = new char[41];
+    unsigned long long size = strlen(str) * sizeof(unsigned char);
+    SHA1((unsigned char *) str, size, opt);
+
+    int j = 0;
+    for (int i = 0; i < 20; i++) {
+        char tmp[5];
+        //把十六进制转成字符串
+        sprintf(tmp, "%02x", opt[i]);
+        res[j] = tmp[0];
+        res[j + 1] = tmp[1];
+        j += 2;
+    }
+    res[40] = '\0';
+    //cout << res << endl;
+
+    return res;
+
+
+}
+
+char *calculate_sha1(const string &path) {
+    /**  计算文件sha1的函数
      *  返回char×
      ×  文件无法访问时返回nullptr
      */
     //以二进制读的方式打开文件
     ifstream fin(path, ios::in | ios::binary);
-    if (!fin)
-    {
+    if (!fin) {
         return nullptr;
     }
 
@@ -189,13 +223,12 @@ char *calculate_sha1(string path)
     fin.close();
 
     unsigned char opt[21];
-    char res[40];
+    char *res = new char[41];
 
-    SHA1((unsigned char *)buffer, size, opt);
+    SHA1((unsigned char *) buffer, size, opt);
 
     int j = 0;
-    for (int i = 0; i < 20; i++)
-    {
+    for (int i = 0; i < 20; i++) {
         char tmp[5];
         //把十六进制转成字符串
         sprintf(tmp, "%02x", opt[i]);
@@ -203,7 +236,8 @@ char *calculate_sha1(string path)
         res[j + 1] = tmp[1];
         j += 2;
     }
-    cout << res << endl;
+    //cout << res << endl;
+    res[41] = '\0';
     //释放内存
     delete[] buffer;
 

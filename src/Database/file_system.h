@@ -36,5 +36,20 @@ bool is_dir(std::string path) ;
      *  返回char×
      ×  文件无法访问时返回nullptr
      */
-char* calculate_sha1(std::string path);
+char* calculate_sha1(const std::string& path);
+
+/**
+ * 计算char×字符串的sha1
+ * @param str 待计算的字符串
+ * @return sha1
+ */
+char *calculate_char_sha1(const char* str);
+
+/**
+ * 计算字符串的sha1
+ * @param str 待计算的字符串
+ * @return sha1
+ */
+char *calculate_string_sha1(const string& str);
+
 

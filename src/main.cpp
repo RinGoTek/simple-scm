@@ -9,6 +9,8 @@
 #include"module_list.h"
 #include "module_ignore.h"
 
+#include "Database/file_system.h"
+
 using namespace std;
 
 
@@ -92,15 +94,20 @@ int main(int count, char *parameters[]) {
         auto ans = walk_folder("install");
         for (auto x:ans)
             cout << x << endl;
-    } else if (DEV_MODE && main_command == "sha1") {
-        //walk folder
+    }
+    else if (DEV_MODE && main_command == "sha1") {
+
         //这仅仅是开发用的
-#include "Database/file_system.h"
+        cout<<"xxx"<<endl;
+        cout<<calculate_char_sha1("123456")<<endl;
+        cout<<calculate_string_sha1("123456")<<endl;
+
 
         if (count != 3) {
             cerr << "请输入正确的命令！" << endl;
             exit(0);
         }
+
         char *command2 = parameters[2];
         auto ans = calculate_sha1(string(command2));
         cout << ans << endl;
