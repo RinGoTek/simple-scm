@@ -43,7 +43,12 @@ int main(int count, char *parameters[]) {
     } else if (main_command == "commit") {
         //commit模块
         module_commit tmp;
-        tmp.commit();
+
+        if (count != 3)
+            tip_command_error();
+
+        char *command2 = parameters[2];
+        tmp.commit(command2);
     } else if (main_command == "list") {
         //list模块
         module_list tmp;
@@ -69,15 +74,12 @@ int main(int count, char *parameters[]) {
             //添加到ignore
             char *command2 = parameters[2];
             tmp.do_ignore(command2);
-        }
-        else if (count == 4)
-        {
+        } else if (count == 4) {
             string command2 = parameters[2];
             char *command3 = parameters[3];
 
             //取消ignore
-            if(command2 == "-d")
-            {
+            if (command2 == "-d") {
                 tmp.deIgnore(command3);
             }
         }
@@ -118,5 +120,6 @@ void usage() {
          << "new-branch <BranchName>      从当前节点新建分支\n"
          << "list      展示当前所有分支\n"
          << "ignore <path>      添加路径到ignore\n"
+         << "commit <Message>      创建新节点\n"
          << endl;
 }

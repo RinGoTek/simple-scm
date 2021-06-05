@@ -8,7 +8,7 @@
 
 class module_commit {
 public:
-    void commit();
+    void commit(char *);
 };
 
 

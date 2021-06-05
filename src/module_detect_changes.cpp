@@ -17,7 +17,7 @@
 using namespace std;
 
 static char head_node[100], root_node[100], node[100];
-static map<char *, char *> object_updated_time; //储存从文件哈希值到文件更改时间的映射
+static map<string, char *> object_updated_time; //储存从文件哈希值到文件更改时间的映射
 static map<string, bool> vis;
 static vector<string> object;
 static stack<string> walk_list;
@@ -32,7 +32,7 @@ void init() {
     local_object.clear();
 }
 
-static int get_node(void *NotUsed, int cnt, char **pValue, char **pName)//用来获得当前分支头节点的回调函数
+static int get_node(void *NotUsed, int cnt, char **pValue, char **pName)//用来获得当前分支头节点和根节点的回调函数
 {
     strcpy(root_node, pValue[0]);
     strcpy(head_node, pValue[1]);
@@ -64,6 +64,7 @@ static int select_ignore_callback(void *NotUsed, int cnt, char **pValue, char **
 static int get_updated_time(void *NotUsed, int cnt, char **pValue, char **pName)//获取文件对应的更新时间
 {
     object_updated_time[pValue[0]] = pValue[1];
+    return 0;
 }
 
 detect_info module_detect_changes::detect_changes() {
@@ -139,14 +140,13 @@ detect_info module_detect_changes::detect_changes() {
     //获得本地所有文件路径
     local_object = walk_folder(cwd);
 
-    for(auto p:local_object)
-    {
-        auto it = find (ignore_object.begin(), ignore_object.end(), p);
+    for (auto p:local_object) {
+        auto it = find(ignore_object.begin(), ignore_object.end(), p);
 
         //在忽略列表中
         if (it != ignore_object.end()) continue;
 
-        sprintf(sql,"SELECT SHA,UpdatedDateTime FROM Object WHERE SHA='%s'",p.c_str());
+        sprintf(sql, "SELECT SHA,UpdatedDateTime FROM Object WHERE SHA='%s'", p.c_str());
 
         rc = sqlite3_exec(db, sql, get_updated_time, nullptr, &zErrMsg);
 
@@ -160,20 +160,20 @@ detect_info module_detect_changes::detect_changes() {
     detect_info sav;
 
     for (auto p:local_object) {
-        auto it = find (ignore_object.begin(), ignore_object.end(), p);
+        auto it = find(ignore_object.begin(), ignore_object.end(), p);
 
         //在忽略列表中
         if (it != ignore_object.end()) continue;
 
         struct stat buf;
-        if(stat(p.c_str(), &buf)==-1)//找不到该文件
+        if (stat(p.c_str(), &buf) == -1)//找不到该文件
         {
             sav.del.emplace_back(p);
             continue;
         }
 
         char *time1;
-        if(strcpy(time1,database::getTimeChar(buf.st_mtime))) sav.change.emplace_back(p);//文件更新时间与表中不同
+        if (strcpy(time1, database::getTimeChar(buf.st_mtime))) sav.change.emplace_back(p);//文件更新时间与表中不同
     }
 
     return sav;
