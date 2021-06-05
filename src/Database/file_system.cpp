@@ -251,3 +251,17 @@ char *calculate_sha1(const string &path) {
 
     return res;
 }
+
+void CopyFile(const char* src, const char* dst)//将路径sourcefile的文件在路径new_file处复制一份
+{
+string command = "cp ";
+command+= src;
+command+= " ";
+command+= dst;
+system((char*)command.c_str());
+}
+
+int FileRemove(const char* filename)//const char*,删除文件
+{
+    return remove(filename);
+}//删除成功返回值为0，删除失败返回值为-1

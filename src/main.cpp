@@ -8,9 +8,8 @@
 #include"module_new_branch.h"
 #include"module_list.h"
 #include "module_ignore.h"
-
+#include "module_checkout.h"
 #include "Database/file_system.h"
-
 #include "Database/Compress.h"
 
 using namespace std;
@@ -114,6 +113,10 @@ int main(int count, char *parameters[]) {
         char *command2 = parameters[2];
         auto ans = calculate_sha1(string(command2));
         cout << ans << endl;
+    } else if(main_command=="checkout"){
+            char *command2=parameters[2];
+            module_checkout rbq;
+            rbq.checkout_switch_branch(command2);
     }
     else if (DEV_MODE && main_command == "compress") {
 
@@ -153,5 +156,6 @@ void usage() {
          << "list      展示当前所有分支\n"
          << "ignore <path>      添加路径到ignore\n"
          << "commit <Message>      创建新节点\n"
+         << "checkout <BranchName>      切换分支\n"
          << endl;
 }

@@ -19,6 +19,19 @@ using namespace std;
  */
 std::vector<std::string> walk_folder(std::string base_dir);
 
+/**
+ *将路径src的文件在路径dst处复制一份
+ * @param src源文件路径
+ * @param dst 目标路径
+ */
+void CopyFile(const char* src, const char* dst);//将路径sourcefile的文件在路径new_file处复制一份
+
+/**
+ * 删除路径为filename的文件
+ * @param filename 源文件路径
+ * @return 删除成功返回值为0,否则为-1
+ */
+int FileRemove(const char* filename);//const char*,删除文件
 
 /**
  * 判断是否是文件,
