@@ -12,6 +12,8 @@ public:
     module_ignore()=default;
     //把路径加入到ignore列表
     void do_ignore(std::string path);
+    //取消ignore
+    void deIgnore(std::string path);
 
 };
 

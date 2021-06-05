@@ -72,9 +72,9 @@ detect_info module_detect_changes::detect_changes() {
     char *zErrMsg = 0;
     int rc;
     char *sql;
-
+    init();
     //从文件中读取当前分支
-    ifstream file("./simple-scm/current_branch.txt");
+    ifstream file(".simple-scm/current_branch.txt");
     int current_branch;
     file >> current_branch;
     file.close();
