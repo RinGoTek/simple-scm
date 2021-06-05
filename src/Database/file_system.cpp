@@ -14,6 +14,7 @@
 #include <sys/stat.h>
 #include<openssl/sha.h>
 #include<fstream>
+#include<sstream>
 
 using namespace std;
 
@@ -144,7 +145,7 @@ walk_return do_walk_folder(const string &base_dir) {
 /**
  * 判断是否是文件,
  * */
-bool is_file(std::string path) {
+bool is_file(const std::string &path) {
     struct stat buffer;
     return (stat(path.c_str(), &buffer) == 0 && S_ISREG(buffer.st_mode));
 };
@@ -152,7 +153,7 @@ bool is_file(std::string path) {
 /**
  * 判断是否是一个文件夹,
  * */
-bool is_dir(std::string path) {
+bool is_dir(const std::string &path) {
     struct stat buffer;
     return (stat(path.c_str(), &buffer) == 0 && S_ISDIR(buffer.st_mode));
 };
@@ -199,33 +200,40 @@ char *calculate_sha1(const string &path) {
      *  返回char×
      ×  文件无法访问时返回nullptr
      */
-    //以二进制读的方式打开文件
-    ifstream fin(path, ios::in | ios::binary);
-    if (!fin) {
-        return nullptr;
-    }
+    /*
+   //以二进制读的方式打开文件
+   ifstream fin(path, ios::in | ios::binary);
+   if (!fin) {
+       return nullptr;
+   }
 
-    filebuf *pbuf;
-    //获取fin对应的buffer对象的指针
-    pbuf = fin.rdbuf();
+   filebuf *pbuf;
+   //获取fin对应的buffer对象的指针
+   pbuf = fin.rdbuf();
 
-    //调用buffer对象方法获取文件大小
-    long long size = pbuf->pubseekoff(0, ios::end, ios::in);
+   //调用buffer对象方法获取文件大小
+   long long size = pbuf->pubseekoff(0, ios::end, ios::in);
 
-    pbuf->pubseekpos(0, ios::in);
+   pbuf->pubseekpos(0, ios::in);
 
-    //分配内存空间
-    char *buffer = new char[size + 1];
+   //分配内存空间
+   char *buffer = new char[size + 1];
 
-    //获取文件内容
-    pbuf->sgetn(buffer, size);
-    buffer[size] = '\0'; //这是关键
-    fin.close();
-
+   //获取文件内容
+   pbuf->sgetn(buffer, size);
+   buffer[size] = '\0'; //这是关键
+   fin.close();
+*/
+    //以二进制方式读入文件
+    ifstream ifs(path, ios::binary);
+    stringstream ss;
+    ss << ifs.rdbuf();
+    string original = ss.str();
+    ifs.close();
     unsigned char opt[21];
     char *res = new char[41];
 
-    SHA1((unsigned char *) buffer, size, opt);
+    SHA1((unsigned char *) original.c_str(), original.length() * sizeof(unsigned char), opt);
 
     int j = 0;
     for (int i = 0; i < 20; i++) {
@@ -238,8 +246,7 @@ char *calculate_sha1(const string &path) {
     }
     //cout << res << endl;
     res[41] = '\0';
-    //释放内存
-    delete[] buffer;
+
 
     return res;
 }

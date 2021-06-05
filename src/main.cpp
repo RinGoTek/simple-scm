@@ -11,6 +11,8 @@
 
 #include "Database/file_system.h"
 
+#include "Database/Compress.h"
+
 using namespace std;
 
 
@@ -92,6 +94,7 @@ int main(int count, char *parameters[]) {
 #include "Database/file_system.h"
 
         auto ans = walk_folder("install");
+
         for (auto x:ans)
             cout << x << endl;
     }
@@ -111,7 +114,28 @@ int main(int count, char *parameters[]) {
         char *command2 = parameters[2];
         auto ans = calculate_sha1(string(command2));
         cout << ans << endl;
-    } else {
+    }
+    else if (DEV_MODE && main_command == "compress") {
+
+        //这仅仅是开发用的
+        cout<<"compress"<<endl;
+        Compress tmp;
+
+        auto res = tmp.compress(string(parameters[2]));
+        cout<<res.sha1<<endl;
+        cout<<res.compressed_path<<endl;
+
+
+        if (count != 3) {
+            cerr << "请输入正确的命令！" << endl;
+            exit(0);
+        }
+
+        char *command2 = parameters[2];
+        auto ans = calculate_sha1(string(command2));
+        cout << ans << endl;
+    }
+    else {
 
         tip_command_error();
     }

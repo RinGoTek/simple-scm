@@ -23,13 +23,13 @@ std::vector<std::string> walk_folder(std::string base_dir);
 /**
  * 判断是否是文件,
  * */
-bool is_file(std::string path);
+bool is_file(const std::string& path);
 
 
 /**
  * 判断是否是一个文件夹,
  * */
-bool is_dir(std::string path) ;
+bool is_dir(const std::string& path) ;
 
 
 /**  计算sha1的函数
