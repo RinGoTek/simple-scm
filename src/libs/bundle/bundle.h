@@ -50,6 +50,7 @@
 #include <stdbool.h> // bool
 
 #ifdef __cplusplus
+
 extern "C" {
 #endif
 
