@@ -200,13 +200,13 @@ char *calculate_sha1(const string &path) {
      *  返回char×
      ×  文件无法访问时返回nullptr
      */
-    /*
+
    //以二进制读的方式打开文件
    ifstream fin(path, ios::in | ios::binary);
    if (!fin) {
        return nullptr;
    }
-
+/*
    filebuf *pbuf;
    //获取fin对应的buffer对象的指针
    pbuf = fin.rdbuf();
@@ -223,18 +223,23 @@ char *calculate_sha1(const string &path) {
    pbuf->sgetn(buffer, size);
    buffer[size] = '\0'; //这是关键
    fin.close();
+
+    unsigned char opt[21];
+    char *res = new char[41];
+    SHA1((unsigned char *) buffer, strlen(buffer) * sizeof(unsigned char ), opt);
 */
+
     //以二进制方式读入文件
     ifstream ifs(path, ios::binary);
     stringstream ss;
     ss << ifs.rdbuf();
     string original = ss.str();
     ifs.close();
+    //cout<<calculate_string_sha1(original)<<endl;
     unsigned char opt[21];
     char *res = new char[41];
 
-    //@todo 这里计算的sha和直接算字符串sha不一致
-    SHA1((unsigned char *) original.c_str(), original.length() * sizeof(unsigned char), opt);
+    SHA1((unsigned char *) original.c_str(), strlen(original.c_str())*sizeof(unsigned char ), opt);
 
     int j = 0;
     for (int i = 0; i < 20; i++) {
@@ -250,6 +255,27 @@ char *calculate_sha1(const string &path) {
 
 
     return res;
+}
+int custom_mkdirs(std::string s,mode_t mode)
+{
+    size_t pre=0,pos;
+    std::string dir;
+    int mdret;
+
+    if(s[s.size()-1]!='/'){
+        // force trailing / so we can handle everything in loop
+        s+='/';
+    }
+
+    while((pos=s.find_first_of('/',pre))!=std::string::npos){
+        dir=s.substr(0,pos++);
+        pre=pos;
+        if(dir.empty()) continue; // if leading / first time is 0 length
+        if((mdret=::mkdir(dir.c_str(),mode)) && errno!=EEXIST){
+            return mdret;
+        }
+    }
+    return mdret;
 }
 
 void CopyFile(const char* src, const char* dst)//将路径sourcefile的文件在路径new_file处复制一份

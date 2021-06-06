@@ -7,6 +7,7 @@
 #include<fstream>
 #include"../libs/bundle/bundle.h"
 #include"file_system.h"
+#include<stdexcept>
 
 using namespace std;
 
@@ -23,18 +24,7 @@ compress_return Compress::compress(const std::string &path) {
     if (!is_file(path))
         return compress_return();
 
-        /*
-    //分离文件名
-    for (unsigned long long i = path.length() - 1; i >= 0; --i) {
-        if (path[i] == '/' || path[i] == '\\') {
-            fileName = path.substr(i + 1, path.length());
-            break;
-        }
-        if (i == 0) {
-            fileName = path;
-        }
-    }
-*/
+
     //以二进制方式读入文件
     ifstream ifs(path, ios::binary);
     stringstream ss;
@@ -69,6 +59,73 @@ std::vector<compress_return> Compress::batch_compress(const std::vector<std::str
     for (const auto &x:path)
         ret.emplace_back(compress(x));
     return ret;
+}
+
+decompress_return Compress::decompress(const string &compressed_path, const string &path) {
+
+    //不是文件就抛出异常
+    if (!is_file(compressed_path))
+        throw string("The size of vector<compressed_path> must be equal with that of vector<path>");
+    //以二进制方式读入文件
+    ifstream fin(compressed_path, ios::binary);
+    stringstream ss;
+    ss << fin.rdbuf();
+    string compressed = ss.str();
+    fin.close();
+    //解压缩
+    string unpacked = bundle::unpack(compressed);
+
+    //分离文件目录
+    string dirs;
+    for (unsigned long long i = path.length() - 1; i >= 0; --i) {
+        if (path[i] == '/' || path[i] == '\\') {
+            dirs = path.substr(0, i);
+            break;
+        }
+    }
+
+    //先创建文件夹（若已存在会自动忽略）
+    custom_mkdirs(dirs);
+
+    ofstream fout(path, ios::binary);
+    fout << unpacked << endl;
+    fout.close();
+
+    decompress_return ret;
+    ret.sha1 = calculate_string_sha1(unpacked);
+    ret.decompressed_path = path;
+    return ret;
+}
+
+/**
+     * 批量解压文件到指定路径
+     * @param compressed_path 压缩文件的路径
+     * @param path 解压到哪里
+     * @return vector<decompress_return>
+     */
+std::vector<decompress_return>
+Compress::batch_decompress(const vector<std::string> &compressed_path, const vector<std::string> &path) {
+    vector<decompress_return> ret;
+    //两者的大小必须相同
+    if (compressed_path.size() != path.size())
+        throw string("The size of vector<compressed_path> must be equal with that of vector<path>");
+
+    //提前分配空间，提升性能
+    auto size = compressed_path.size();
+    ret.resize(size);
+
+    //顺序访问，提升性能
+    auto compressed_path_iter = compressed_path.begin();
+    auto path_iter = path.begin();
+
+    //批量解压
+    while (compressed_path_iter != compressed_path.end()) {
+        ret.emplace_back(decompress(*compressed_path_iter, *path_iter));
+        compressed_path_iter++;
+        path_iter++;
+    }
+    return ret;
+
 }
 
 

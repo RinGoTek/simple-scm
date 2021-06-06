@@ -65,4 +65,7 @@ char *calculate_char_sha1(const char* str);
  */
 char *calculate_string_sha1(const string& str);
 
+//自动创建s内的各级路径
+int custom_mkdirs(std::string s,mode_t mode=0777);
+
 

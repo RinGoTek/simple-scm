@@ -129,6 +129,12 @@ int main(int count, char *parameters[]) {
         cout<<res.sha1<<endl;
         cout<<res.compressed_path<<endl;
 
+        cout<<calculate_sha1(res.compressed_path)<<endl;
+        cout<<"decompressing..."<<endl;
+        cout<<"aaa/"+ string(parameters[2])<<endl;
+        auto decompress_info = tmp.decompress(res.compressed_path, "aaa/"+ string(parameters[2]));
+        cout<<decompress_info.decompressed_path<<endl;
+        cout<<decompress_info.sha1<<endl;
 
         if (count != 3) {
             cerr << "请输入正确的命令！" << endl;
@@ -137,7 +143,7 @@ int main(int count, char *parameters[]) {
 
         char *command2 = parameters[2];
         auto ans = calculate_sha1(string(command2));
-        cout << ans << endl;
+        //cout << ans << endl;
     }
     else {
 
