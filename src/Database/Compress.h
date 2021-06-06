@@ -11,7 +11,8 @@
 struct compress_return
 {
 
-    std::string sha1;   //文件读入后的字符串的sha1
+    std::string sha1;   //压缩后的文件的sha1
+
     std::string compressed_path; // 文件压缩后保存到的路径
 };
 
