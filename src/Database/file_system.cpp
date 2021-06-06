@@ -201,11 +201,11 @@ char *calculate_sha1(const string &path) {
      ×  文件无法访问时返回nullptr
      */
 
-   //以二进制读的方式打开文件
-   ifstream fin(path, ios::in | ios::binary);
-   if (!fin) {
-       return nullptr;
-   }
+    //以二进制读的方式打开文件
+    ifstream fin(path, ios::in | ios::binary);
+    if (!fin) {
+        return nullptr;
+    }
 
 
     //以二进制方式读入文件
@@ -218,7 +218,7 @@ char *calculate_sha1(const string &path) {
     unsigned char opt[21];
     char *res = new char[41];
 
-    SHA1((unsigned char *) original.c_str(), strlen(original.c_str())*sizeof(unsigned char ), opt);
+    SHA1((unsigned char *) original.c_str(), strlen(original.c_str()) * sizeof(unsigned char), opt);
 
     int j = 0;
     for (int i = 0; i < 20; i++) {
@@ -242,41 +242,40 @@ char *calculate_sha1(const string &path) {
  * @param mode 权限
  * @return 状态码
  */
-int custom_mkdirs(std::string s,mode_t mode)
-{
-    size_t pre=0,pos;
+int custom_mkdirs(std::string s, mode_t mode) {
+    size_t pre = 0, pos;
     std::string dir;
     int mdret;
 
-    if(s[s.size()-1]!='/'){
+    if (s[s.size() - 1] != '/') {
         // force trailing / so we can handle everything in loop
-        s+='/';
+        s += '/';
     }
 
-    while((pos=s.find_first_of('/',pre))!=std::string::npos){
-        dir=s.substr(0,pos++);
-        pre=pos;
-        if(dir.empty()) continue; // if leading / first time is 0 length
-        if((mdret=::mkdir(dir.c_str(),mode)) && errno!=EEXIST){
+    while ((pos = s.find_first_of('/', pre)) != std::string::npos) {
+        dir = s.substr(0, pos++);
+        pre = pos;
+        if (dir.empty()) continue; // if leading / first time is 0 length
+        if ((mdret = ::mkdir(dir.c_str(), mode)) && errno != EEXIST) {
             return mdret;
         }
     }
     return mdret;
 }
 
-void CopyFile(const char* src, const char* dst)//将路径sourcefile的文件在路径new_file处复制一份
+void CopyFile(const char *src, const char *dst)//将路径sourcefile的文件在路径new_file处复制一份
 {
-    if(!is_file(src))
-        throw string ("src is not a file");
+    if (!is_file(src))
+        throw string("src is not a file");
     custom_mkdirs(dst);
-string command = "cp ";
-command+= src;
-command+= " ";
-command+= dst;
-system((char*)command.c_str());
+    string command = "cp ";
+    command += src;
+    command += " ";
+    command += dst;
+    system((char *) command.c_str());
 }
 
-int FileRemove(const char* filename)//const char*,删除文件
+int FileRemove(const char *filename)//const char*,删除文件
 {
     return remove(filename);
 }//删除成功返回值为0，删除失败返回值为-1
@@ -286,8 +285,7 @@ int FileRemove(const char* filename)//const char*,删除文件
  * @param path 文件路径
  * @return 文件所在的目录
  */
-string get_file_parent_dir(const string & path)
-{
+string get_file_parent_dir(const string &path) {
 
     //分离文件目录
     string parent;

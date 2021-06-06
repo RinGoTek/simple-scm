@@ -239,5 +239,10 @@ void init_db::do_init() {
     ofstream file(".simple-scm/current_branch.txt");
     file << 1;
     file.close();
+
+    //当前节点的指针
+    ofstream fout("./simple-scm/HEAD");
+    fout<<"000000";
+    fout.close();
 }
 
