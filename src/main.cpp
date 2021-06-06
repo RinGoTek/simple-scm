@@ -161,7 +161,7 @@ void usage() {
          << "new-branch <BranchName>      从当前节点新建分支\n"
          << "list      展示当前所有分支\n"
          << "ignore <path>      添加路径到ignore\n"
-         << "commit <Message>      创建新节点\n"
+         << "commit <Message>      提交代码到存储库\n"
          << "checkout <BranchName>      切换分支\n"
          << endl;
 }

@@ -75,14 +75,7 @@ decompress_return Compress::decompress(const string &compressed_path, const stri
     //解压缩
     string unpacked = bundle::unpack(compressed);
 
-    //分离文件目录
-    string dirs;
-    for (unsigned long long i = path.length() - 1; i >= 0; --i) {
-        if (path[i] == '/' || path[i] == '\\') {
-            dirs = path.substr(0, i);
-            break;
-        }
-    }
+    string dirs = get_file_parent_dir(path);
 
     //先创建文件夹（若已存在会自动忽略）
     custom_mkdirs(dirs);

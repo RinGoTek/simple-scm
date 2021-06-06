@@ -206,28 +206,7 @@ char *calculate_sha1(const string &path) {
    if (!fin) {
        return nullptr;
    }
-/*
-   filebuf *pbuf;
-   //获取fin对应的buffer对象的指针
-   pbuf = fin.rdbuf();
 
-   //调用buffer对象方法获取文件大小
-   long long size = pbuf->pubseekoff(0, ios::end, ios::in);
-
-   pbuf->pubseekpos(0, ios::in);
-
-   //分配内存空间
-   char *buffer = new char[size + 1];
-
-   //获取文件内容
-   pbuf->sgetn(buffer, size);
-   buffer[size] = '\0'; //这是关键
-   fin.close();
-
-    unsigned char opt[21];
-    char *res = new char[41];
-    SHA1((unsigned char *) buffer, strlen(buffer) * sizeof(unsigned char ), opt);
-*/
 
     //以二进制方式读入文件
     ifstream ifs(path, ios::binary);
@@ -256,6 +235,13 @@ char *calculate_sha1(const string &path) {
 
     return res;
 }
+
+/**
+ * 生成各级文件夹
+ * @param s 路径
+ * @param mode 权限
+ * @return 状态码
+ */
 int custom_mkdirs(std::string s,mode_t mode)
 {
     size_t pre=0,pos;
@@ -280,6 +266,9 @@ int custom_mkdirs(std::string s,mode_t mode)
 
 void CopyFile(const char* src, const char* dst)//将路径sourcefile的文件在路径new_file处复制一份
 {
+    if(!is_file(src))
+        throw string ("src is not a file");
+    custom_mkdirs(dst);
 string command = "cp ";
 command+= src;
 command+= " ";
@@ -291,3 +280,22 @@ int FileRemove(const char* filename)//const char*,删除文件
 {
     return remove(filename);
 }//删除成功返回值为0，删除失败返回值为-1
+
+/**
+ * 分离得到文件所在的目录
+ * @param path 文件路径
+ * @return 文件所在的目录
+ */
+string get_file_parent_dir(const string & path)
+{
+
+    //分离文件目录
+    string parent;
+    for (unsigned long long i = path.length() - 1; i >= 0; --i) {
+        if (path[i] == '/' || path[i] == '\\') {
+            parent = path.substr(0, i);
+            break;
+        }
+    }
+    return parent;
+}

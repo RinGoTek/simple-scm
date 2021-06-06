@@ -68,4 +68,11 @@ char *calculate_string_sha1(const string& str);
 //自动创建s内的各级路径
 int custom_mkdirs(std::string s,mode_t mode=0777);
 
+/**
+ * 分离得到文件所在的目录
+ * @param path 文件路径
+ * @return 文件所在的目录
+ */
+std::string get_file_parent_dir(std::string path);
+
 
