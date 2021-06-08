@@ -65,7 +65,7 @@ decompress_return Compress::decompress(const string &compressed_path, const stri
 
     //不是文件就抛出异常
     if (!is_file(compressed_path))
-        throw string("The size of vector<compressed_path> must be equal with that of vector<path>");
+        throw string("No such file " + compressed_path);
     //以二进制方式读入文件
     ifstream fin(compressed_path, ios::binary);
     stringstream ss;
