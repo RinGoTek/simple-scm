@@ -73,6 +73,6 @@ int custom_mkdirs(std::string s,mode_t mode=0777);
  * @param path 文件路径
  * @return 文件所在的目录
  */
-std::string get_file_parent_dir(std::string path);
+std::string get_file_parent_dir(const std::string &path);
 
 
