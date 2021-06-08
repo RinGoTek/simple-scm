@@ -6,6 +6,7 @@
 #include"Database/file_system.h"
 #include "module_commit.h"
 #include "module_detect_changes.h"
+#include"Database/Compress.h"
 #include<iostream>
 #include<fstream>
 #include<sqlite3.h>
@@ -92,13 +93,13 @@ void module_commit::commit(char *Message) {
 
 
     //获得当前分支头节点信息，即新节点的父亲节点的SHA
-    sprintf(sql, "SELECT BranchRoot,BranchHead FROM Branch WHERE ID='%d'", current_branch);
+    sprintf(sql, "SELECT BranchHead FROM Branch WHERE ID='%d'", current_branch);
     rc = sqlite3_exec(db, sql, get_head_node, NULL, &zErrMsg);
     if (rc != SQLITE_OK) {
-        cerr << "[ERROR]头节点信息获取失败：" << zErrMsg << endl;
+        cerr << "[ERROR]当前分支头节点信息获取失败：" << zErrMsg << endl;
         exit(1);
     } else {
-        clog << "[INFO]头节点信息获取成功！" << endl;
+        clog << "[INFO]当前分支头节点信息获取成功！" << endl;
     }
 
     char tmp_time[100];
@@ -135,10 +136,10 @@ void module_commit::commit(char *Message) {
             current_branch);
     rc = sqlite3_exec(db, sql, callback, NULL, &zErrMsg);
     if (rc != SQLITE_OK) {
-        cerr << "[ERROR]分支头节点更改失败：" << zErrMsg << endl;
+        cerr << "[ERROR]当前分支头节点更改失败：" << zErrMsg << endl;
         exit(1);
     } else {
-        clog << "[INFO]分支头节点更改成功！" << endl;
+        clog << "[INFO]当前分支头节点更改成功！" << endl;
     }
 
     tmpp = database::getCurrentTimeChar();
@@ -148,8 +149,8 @@ void module_commit::commit(char *Message) {
     //将add信息加入到连接表和Object表中
     for (auto &p:add) {
         sprintf(sql,
-                "INSERT INTO Obj2Node (File,Mode,Node,CreatedDateTime) VALUES (SELECT FROM Object WHERE SHA='%s' ),1,(SELECT FROM Node WHERE SHA='%s'),'%s'",
-                p.c_str(), new_sha1.c_str(), tmp_time);
+                "INSERT INTO Obj2Node (File,Mode,Node,CreatedDateTime) VALUES (SELECT FROM Object WHERE SHA='%s'),1,(SELECT FROM Node WHERE SHA='%s'),'%s'",
+                calculate_sha1(p), new_sha1.c_str(), tmp_time);
         rc = sqlite3_exec(db, sql, callback, NULL, &zErrMsg);
         if (rc != SQLITE_OK) {
             cerr << "[ERROR]发生错误：" << zErrMsg << endl;
@@ -159,9 +160,13 @@ void module_commit::commit(char *Message) {
         struct stat buf;
         stat(p.c_str(), &buf);
 
+        Compress compress_tmp;
+        compress_return compress_info = compress_tmp.compress(p);
+
         sprintf(sql,
-                "INSERT INTO Object (OriginSHA,OriginPath,CreatedDateTime,UpdatedDateTime) VALUES ('%s','%s','%s','%s')",
-                calculate_sha1(p), p.c_str(), database::getTimeChar(buf.st_ctime), database::getTimeChar(buf.st_mtime));
+                "INSERT INTO Object (CompressedSHA,CompressedPath,OriginSHA,OriginPath,CreatedDateTime,UpdatedDateTime) VALUES ('%s','%s','%s','%s','%s','%s')",
+                compress_info.sha1.c_str(), compress_info.compressed_path.c_str(), calculate_sha1(p), p.c_str(),
+                database::getTimeChar(buf.st_ctime), database::getTimeChar(buf.st_mtime));
         rc = sqlite3_exec(db, sql, callback, NULL, &zErrMsg);
         if (rc != SQLITE_OK) {
             cerr << "[ERROR]发生错误：" << zErrMsg << endl;
@@ -195,9 +200,13 @@ void module_commit::commit(char *Message) {
         struct stat buf;
         stat(p.c_str(), &buf);
 
+        Compress compress_tmp;
+        compress_return compress_info = compress_tmp.compress(p);
+
         sprintf(sql,
-                "INSERT INTO Object (OriginSHA,OriginPath,CreatedDateTime,UpdatedDateTime) VALUES ('%s','%s','%s','%s')",
-                calculate_sha1(p), p.c_str(), database::getTimeChar(buf.st_ctime), database::getTimeChar(buf.st_mtime));
+                "INSERT INTO Object (CompressedSHA,CompressedPath,OriginSHA,OriginPath,CreatedDateTime,UpdatedDateTime) VALUES ('%s','%s','%s','%s','%s','%s')",
+                compress_info.sha1.c_str(), compress_info.compressed_path.c_str(), calculate_sha1(p), p.c_str(),
+                database::getTimeChar(buf.st_ctime), database::getTimeChar(buf.st_mtime));
         rc = sqlite3_exec(db, sql, callback, NULL, &zErrMsg);
         if (rc != SQLITE_OK) {
             cerr << "[ERROR]发生错误：" << zErrMsg << endl;

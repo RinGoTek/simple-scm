@@ -79,7 +79,7 @@ void module_add::add(char *path) {
 
         sprintf(sql,
                 "INSERT INTO AddList (OriginSHA,OriginPath,CreatedDateTime,UpdatedDateTime) VALUES ('%s','%s','%s','%s')",
-                calculate_sha1(p), p.c_str(), database::getTimeChar(buf.st_mtime), database::getTimeChar(buf.st_mtime));
+                calculate_sha1(p), p.c_str(), database::getTimeChar(buf.st_ctime), database::getTimeChar(buf.st_mtime));
         rc = sqlite3_exec(db, sql, callback, 0, &zErrMsg);
 
         if (rc != SQLITE_OK) {

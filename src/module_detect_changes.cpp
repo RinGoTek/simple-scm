@@ -140,7 +140,7 @@ detect_info module_detect_changes::detect_changes() {
     //获得本地所有文件路径
     local_object = walk_folder(cwd);
 
-    for (auto p:local_object) {
+    for (auto &p:local_object) {
         auto it = find(ignore_object.begin(), ignore_object.end(), p);
 
         //在忽略列表中
@@ -159,7 +159,7 @@ detect_info module_detect_changes::detect_changes() {
 
     detect_info sav;
 
-    for (auto p:local_object) {
+    for (auto &p:local_object) {
         auto it = find(ignore_object.begin(), ignore_object.end(), p);
 
         //在忽略列表中
@@ -173,8 +173,11 @@ detect_info module_detect_changes::detect_changes() {
         }
 
         char *time1;
-        if (strcpy(time1, database::getTimeChar(buf.st_mtime))) sav.change.emplace_back(p);//文件更新时间与表中不同
+        strcpy(time1,object_updated_time[p]);
+        if (strcmp(time1, database::getTimeChar(buf.st_mtime))) sav.change.emplace_back(p);//文件更新时间与表中不同
     }
+
+    sqlite3_close(db);
 
     return sav;
 }
