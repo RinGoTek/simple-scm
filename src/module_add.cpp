@@ -18,6 +18,13 @@ static int callback(void *NotUsed, int cnt, char **pValue, char **pName) {
     return 0;
 }
 
+static bool file_exit;
+static int check_exit(void *NotUsed, int cnt, char **pValue, char **pName) {
+    file_exit=1;
+    return 0;
+}
+
+
 static vector<string> ignore;
 static stack<string> walk_list;
 static vector<string> file;
@@ -31,6 +38,8 @@ static int select_ignore_callback(void *NotUsed, int cnt, char **pValue, char **
 }
 
 void module_add::add(char *path) {
+    int cnt=0;
+
     if (is_file(path)) file.emplace_back(path);
     else if (is_dir(path)) file = walk_folder(path);
     else return;
@@ -74,6 +83,20 @@ void module_add::add(char *path) {
         //在忽略列表中
         if (it != ignore.end()) continue;
 
+        file_exit=0;
+        sprintf(sql,"SELECT * FROM AddList WHERE OriginPath='%s'",p.c_str());
+        rc = sqlite3_exec(db, sql, check_exit, 0, &zErrMsg);
+        if (rc != SQLITE_OK) {
+            cerr << "发生错误: " << zErrMsg << endl;
+            exit(1);
+        }
+
+        if(file_exit)
+        {
+            clog<<"[ERROR]"<<"请勿重复添加文件"<<p<<endl;
+            continue;
+        }
+
         struct stat buf;
         stat(p.c_str(), &buf);
 
@@ -86,8 +109,10 @@ void module_add::add(char *path) {
             cerr << "发生错误: " << zErrMsg << endl;
             exit(1);
         }
+        cnt++;
     }
 
+    clog<<"[INFO]添加成功，共有"<<cnt<<"条添加记录"<<endl;
     sqlite3_close(db);
 
 }

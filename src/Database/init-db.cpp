@@ -95,9 +95,9 @@ void init_db::do_init() {
     }
 
     sql = "CREATE TABLE Node("\
-        "SHA CHAR(40) PRIMARY KEY,"\
+        "SHA CHAR(500) PRIMARY KEY,"\
         "CreatedDateTime DATETIME NOT NULL,"\
-        "Parent CHAR(40),"\
+        "Parent CHAR(500),"\
         "Message TEXT(1000) NOT NULL,"\
         "FOREIGN KEY (Parent) REFERENCES Node(SHA) ON DELETE CASCADE);";
 

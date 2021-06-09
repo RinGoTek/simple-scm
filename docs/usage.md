@@ -34,15 +34,29 @@
 ./simple-scm list
 ```
 
-忽略路径
+忽略路径：
 
 ```
 ./simple-scm ignore <path>
 ```
 
-取消忽略路径
+取消忽略路径：
 
 ```
 ./simple-scm ignore -d <path>
 ```
+
+添加路径到AddList：
+
+```
+./simple-scm add <path>
+```
+
+
+提交本地内容至新节点：
+
+```
+./simple-scm commit <Message>
+```
+
 

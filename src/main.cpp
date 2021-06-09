@@ -8,6 +8,7 @@
 #include"module_new_branch.h"
 #include"module_list.h"
 #include "module_ignore.h"
+#include"module_add.h"
 #include "module_checkout.h"
 #include "Database/file_system.h"
 #include "Database/Compress.h"
@@ -69,6 +70,13 @@ int main(int count, char *parameters[]) {
         char *command2 = parameters[2];
         tmp.create_branch(command2);
 
+    } else if (main_command == "add") {
+        module_add tmp;
+        if (count != 3)
+            tip_command_error();
+
+        char *command2 = parameters[2];
+        tmp.add(command2);
     } else if (main_command == "ignore") {
         //忽略特定文件
         module_ignore tmp;
@@ -96,13 +104,12 @@ int main(int count, char *parameters[]) {
 
         for (auto x:ans)
             cout << x << endl;
-    }
-    else if (DEV_MODE && main_command == "sha1") {
+    } else if (DEV_MODE && main_command == "sha1") {
 
         //这仅仅是开发用的
-        cout<<"xxx"<<endl;
-        cout<<calculate_char_sha1("123456")<<endl;
-        cout<<calculate_string_sha1("123456")<<endl;
+        cout << "xxx" << endl;
+        cout << calculate_char_sha1("123456") << endl;
+        cout << calculate_string_sha1("123456") << endl;
 
 
         if (count != 3) {
@@ -113,28 +120,27 @@ int main(int count, char *parameters[]) {
         char *command2 = parameters[2];
         auto ans = calculate_sha1(string(command2));
         cout << ans << endl;
-    } else if(main_command=="checkout"){
-            char *command2=parameters[2];
-            module_checkout rbq;
-            rbq.checkout_switch_branch(command2);
-    }
-    else if (DEV_MODE && main_command == "compress") {
+    } else if (main_command == "checkout") {
+        char *command2 = parameters[2];
+        module_checkout rbq;
+        rbq.checkout_switch_branch(command2);
+    } else if (DEV_MODE && main_command == "compress") {
 
         //这仅仅是开发用的
 
-        cout<<"compress"<<endl;
+        cout << "compress" << endl;
         Compress tmp;
 
         auto res = tmp.compress(string(parameters[2]));
-        cout<<res.sha1<<endl;
-        cout<<res.compressed_path<<endl;
+        cout << res.sha1 << endl;
+        cout << res.compressed_path << endl;
 
-        cout<<calculate_sha1(res.compressed_path)<<endl;
-        cout<<"decompressing..."<<endl;
-        cout<<"aaa/"+ string(parameters[2])<<endl;
-        auto decompress_info = tmp.decompress(res.compressed_path, "aaa/"+ string(parameters[2]));
-        cout<<decompress_info.decompressed_path<<endl;
-        cout<<decompress_info.sha1<<endl;
+        cout << calculate_sha1(res.compressed_path) << endl;
+        cout << "decompressing..." << endl;
+        cout << "aaa/" + string(parameters[2]) << endl;
+        auto decompress_info = tmp.decompress(res.compressed_path, "aaa/" + string(parameters[2]));
+        cout << decompress_info.decompressed_path << endl;
+        cout << decompress_info.sha1 << endl;
 
         if (count != 3) {
             cerr << "请输入正确的命令！" << endl;
@@ -144,8 +150,7 @@ int main(int count, char *parameters[]) {
         char *command2 = parameters[2];
         auto ans = calculate_sha1(string(command2));
         //cout << ans << endl;
-    }
-    else {
+    } else {
 
         tip_command_error();
     }
@@ -163,5 +168,6 @@ void usage() {
          << "ignore <path>      添加路径到ignore\n"
          << "commit <Message>      提交代码到存储库\n"
          << "checkout <BranchName>      切换分支\n"
+         << "add <path>      添加路径到AddList\n"
          << endl;
 }

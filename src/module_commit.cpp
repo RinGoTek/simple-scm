@@ -13,6 +13,7 @@
 #include<cstring>
 #include<vector>
 #include<sstream>
+#include<string>
 
 
 using namespace std;
@@ -32,13 +33,14 @@ static int callback(void *NotUsed, int cnt, char **pValue, char **pName) {
     return 0;
 }
 
-static int get_add_sha1(void *NotUsed, int cnt, char **pValue, char **pName) {
+static int get_add_path(void *NotUsed, int cnt, char **pValue, char **pName) {
     add.emplace_back(pValue[0]);
     return 0;
 }
 
 void module_commit::commit(char *Message) {
 
+    clog << "[INFO]正在检测更改信息..." << endl;
     add.clear();
 
     detect_info info;
@@ -48,7 +50,7 @@ void module_commit::commit(char *Message) {
     sqlite3 *db;
     char *zErrMsg = 0;
     int rc;
-    char *sql;
+    char sql[1000];
 
     //打开数据库
     rc = sqlite3_open(".simple-scm/simple-scm.db", &db);
@@ -60,8 +62,8 @@ void module_commit::commit(char *Message) {
     }
 
     //获得add表中的信息
-    sprintf(sql, "SELECT SHA FROM AddList");
-    rc = sqlite3_exec(db, sql, get_add_sha1, NULL, &zErrMsg);
+    sprintf(sql, "SELECT OriginPath FROM AddList");
+    rc = sqlite3_exec(db, sql, get_add_path, NULL, &zErrMsg);
     if (rc != SQLITE_OK) {
         cerr << "[ERROR]发生错误：" << zErrMsg << endl;
         exit(1);
@@ -79,9 +81,10 @@ void module_commit::commit(char *Message) {
 
     //获得新节点的sha1
     stringstream tmp_SHA;
-    for (auto &p:info.change) tmp_SHA << p;
-    for (auto &p:info.del) tmp_SHA << p;
-    for (auto &p:add) tmp_SHA << p;
+    for (auto &p:info.change) tmp_SHA << calculate_char_sha1(p.c_str());
+    for (auto &p:info.del) tmp_SHA << calculate_char_sha1(p.c_str());
+    for (auto &p:add) tmp_SHA << calculate_char_sha1(p.c_str());
+    clog << tmp_SHA.str() << endl;
     new_sha1 = tmp_SHA.str();
 
 
@@ -102,15 +105,17 @@ void module_commit::commit(char *Message) {
         clog << "[INFO]当前分支头节点信息获取成功！" << endl;
     }
 
-    char tmp_time[100];
+    char tmp_time[500];
     auto tmpp = database::getCurrentTimeChar();
+
     strcpy(tmp_time, tmpp);
     free(tmpp);
 
     //创建新节点
     sprintf(sql,
-            "INSERT INTO Node (SHA,CreatedDateTime,Parent,Message) VALUES ('%s','%s',(SELECT FROM Node WHERE SHA = '%s'),'%s')",
+            "INSERT INTO Node (SHA,CreatedDateTime,Parent,Message) VALUES ('%s','%s',(SELECT SHA FROM Node WHERE SHA='%s'),'%s' )",
             new_sha1.c_str(), tmp_time, parent_sha1.c_str(), Message);
+
     rc = sqlite3_exec(db, sql, callback, NULL, &zErrMsg);
     if (rc != SQLITE_OK) {
         cerr << "[ERROR]新节点创建失败：" << zErrMsg << endl;
@@ -121,9 +126,10 @@ void module_commit::commit(char *Message) {
 
     //连接新节点和分支
     sprintf(sql,
-            "INSERT INTO Node2Branch (ID,Node,Branch,CreatedDateTime) VALUES (NULL,(SELECT FROM Node WHERE SHA='%s'),(SELECT FROM Branch WHERE ID='%d'),'%s')",
+            "INSERT INTO Node2Branch (ID,Node,Branch,CreatedDateTime) VALUES (NULL,(SELECT SHA FROM Node WHERE SHA='%s'),(SELECT ID FROM Branch WHERE ID='%d'),'%s')",
             new_sha1.c_str(), current_branch, tmp_time);
     rc = sqlite3_exec(db, sql, callback, NULL, &zErrMsg);
+
     if (rc != SQLITE_OK) {
         cerr << "[ERROR]新节点与分支连接失败：" << zErrMsg << endl;
         exit(1);
@@ -132,7 +138,7 @@ void module_commit::commit(char *Message) {
     }
 
     //将当前分支头节点改为新节点
-    sprintf(sql, "UPDATE Branch SET HeadNode=(SELECT FROM Node WHERE SHA='%s') WHERE ID='%d'", new_sha1.c_str(),
+    sprintf(sql, "UPDATE Branch SET BranchHead=(SELECT SHA FROM Node WHERE SHA='%s') WHERE ID='%d'", new_sha1.c_str(),
             current_branch);
     rc = sqlite3_exec(db, sql, callback, NULL, &zErrMsg);
     if (rc != SQLITE_OK) {
@@ -146,16 +152,8 @@ void module_commit::commit(char *Message) {
     strcpy(tmp_time, tmpp);
     free(tmpp);
 
-    //将add信息加入到连接表和Object表中
+    //将add信息加入到连接表和Objects表中
     for (auto &p:add) {
-        sprintf(sql,
-                "INSERT INTO Obj2Node (File,Mode,Node,CreatedDateTime) VALUES (SELECT FROM Object WHERE SHA='%s'),1,(SELECT FROM Node WHERE SHA='%s'),'%s'",
-                calculate_sha1(p), new_sha1.c_str(), tmp_time);
-        rc = sqlite3_exec(db, sql, callback, NULL, &zErrMsg);
-        if (rc != SQLITE_OK) {
-            cerr << "[ERROR]发生错误：" << zErrMsg << endl;
-            exit(1);
-        }
 
         struct stat buf;
         stat(p.c_str(), &buf);
@@ -164,9 +162,19 @@ void module_commit::commit(char *Message) {
         compress_return compress_info = compress_tmp.compress(p);
 
         sprintf(sql,
-                "INSERT INTO Object (CompressedSHA,CompressedPath,OriginSHA,OriginPath,CreatedDateTime,UpdatedDateTime) VALUES ('%s','%s','%s','%s','%s','%s')",
+                "INSERT INTO Objects (CompressedSHA,CompressedPath,OriginSHA,OriginPath,CreatedDateTime,UpdatedDateTime) VALUES ('%s','%s','%s','%s','%s','%s')",
                 compress_info.sha1.c_str(), compress_info.compressed_path.c_str(), calculate_sha1(p), p.c_str(),
                 database::getTimeChar(buf.st_ctime), database::getTimeChar(buf.st_mtime));
+        rc = sqlite3_exec(db, sql, callback, NULL, &zErrMsg);
+        if (rc != SQLITE_OK) {
+            cerr << "[ERROR]发生错误：" << zErrMsg << endl;
+            exit(1);
+        }
+
+
+        sprintf(sql,
+                "INSERT INTO Obj2Node (File,Mode,Node,CreatedDateTime) VALUES ((SELECT CompressedSHA FROM Objects WHERE CompressedSHA='%s'),1,(SELECT SHA FROM Node WHERE SHA='%s'),'%s')",
+                compress_info.sha1.c_str(), new_sha1.c_str(), tmp_time);
         rc = sqlite3_exec(db, sql, callback, NULL, &zErrMsg);
         if (rc != SQLITE_OK) {
             cerr << "[ERROR]发生错误：" << zErrMsg << endl;
@@ -176,9 +184,12 @@ void module_commit::commit(char *Message) {
 
     //把del信息加入连接表中
     for (auto &p:info.del) {
+        Compress compress_tmp;
+        compress_return compress_info = compress_tmp.compress(p);
+
         sprintf(sql,
-                "INSERT INTO Obj2Node (File,Mode,Node,CreatedDateTime) VALUES (SELECT FROM Object WHERE SHA='%s' ),-1,(SELECT FROM Node WHERE SHA='%s'),'%s'",
-                calculate_sha1(p), new_sha1.c_str(), tmp_time);
+                "INSERT INTO Obj2Node (File,Mode,Node,CreatedDateTime) VALUES ((SELECT CompressedSHA FROM Objects WHERE CompressedSHA='%s' ),-1,(SELECT SHA FROM Node WHERE SHA='%s'),'%s')",
+                compress_info.sha1.c_str(), new_sha1.c_str(), tmp_time);
         rc = sqlite3_exec(db, sql, callback, NULL, &zErrMsg);
         if (rc != SQLITE_OK) {
             cerr << "[ERROR]发生错误：" << zErrMsg << endl;
@@ -186,17 +197,9 @@ void module_commit::commit(char *Message) {
         }
     }
 
-    //把change信息加入连接表和Object表中
-    for (auto &p:info.change) {
-        sprintf(sql,
-                "INSERT INTO Obj2Node (File,Mode,Node,CreatedDateTime) VALUES (SELECT FROM Object WHERE SHA='%s' ),0,(SELECT FROM Node WHERE SHA='%s'),'%s'",
-                calculate_sha1(p), new_sha1.c_str(), tmp_time);
-        rc = sqlite3_exec(db, sql, callback, NULL, &zErrMsg);
-        if (rc != SQLITE_OK) {
-            cerr << "[ERROR]发生错误：" << zErrMsg << endl;
-            exit(1);
-        }
 
+    //把change信息加入连接表和Objects表中
+    for (auto &p:info.change) {
         struct stat buf;
         stat(p.c_str(), &buf);
 
@@ -204,16 +207,25 @@ void module_commit::commit(char *Message) {
         compress_return compress_info = compress_tmp.compress(p);
 
         sprintf(sql,
-                "INSERT INTO Object (CompressedSHA,CompressedPath,OriginSHA,OriginPath,CreatedDateTime,UpdatedDateTime) VALUES ('%s','%s','%s','%s','%s','%s')",
+                "INSERT INTO Objects (CompressedSHA,CompressedPath,OriginSHA,OriginPath,CreatedDateTime,UpdatedDateTime) VALUES ('%s','%s','%s','%s','%s','%s')",
                 compress_info.sha1.c_str(), compress_info.compressed_path.c_str(), calculate_sha1(p), p.c_str(),
                 database::getTimeChar(buf.st_ctime), database::getTimeChar(buf.st_mtime));
         rc = sqlite3_exec(db, sql, callback, NULL, &zErrMsg);
         if (rc != SQLITE_OK) {
             cerr << "[ERROR]发生错误：" << zErrMsg << endl;
             exit(1);
+        }
 
+        sprintf(sql,
+                "INSERT INTO Obj2Node (File,Mode,Node,CreatedDateTime) VALUES ((SELECT CompressedSHA FROM Objects WHERE CompressedSHA='%s' ),0,(SELECT SHA FROM Node WHERE SHA='%s'),'%s')",
+                compress_info.sha1.c_str(), new_sha1.c_str(), tmp_time);
+        rc = sqlite3_exec(db, sql, callback, NULL, &zErrMsg);
+        if (rc != SQLITE_OK) {
+            cerr << "[ERROR]发生错误：" << zErrMsg << endl;
+            exit(1);
         }
     }
 
+    clog << "[INFO]commit完成！" << endl;
     sqlite3_close(db);
 }

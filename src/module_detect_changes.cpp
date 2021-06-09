@@ -16,8 +16,8 @@
 
 using namespace std;
 
-static char head_node[100], root_node[100], node[100];
-static map<string, char *> object_updated_time; //储存从文件哈希值到文件更改时间的映射
+static char head_node[500], root_node[500], node[500];
+static map<string, char[500]> object_updated_time; //储存从文件哈希值到文件更改时间的映射
 static map<string, bool> vis;
 static vector<string> object;
 static stack<string> walk_list;
@@ -63,7 +63,7 @@ static int select_ignore_callback(void *NotUsed, int cnt, char **pValue, char **
 
 static int get_updated_time(void *NotUsed, int cnt, char **pValue, char **pName)//获取文件对应的更新时间
 {
-    object_updated_time[pValue[0]] = pValue[1];
+    strcpy(object_updated_time[(string)pValue[0]], pValue[1]);
     return 0;
 }
 
@@ -72,7 +72,7 @@ detect_info module_detect_changes::detect_changes() {
     sqlite3 *db;
     char *zErrMsg = 0;
     int rc;
-    char *sql;
+    char sql[500];
     init();
     //从文件中读取当前分支
     ifstream file(".simple-scm/current_branch.txt");
@@ -102,14 +102,16 @@ detect_info module_detect_changes::detect_changes() {
 
     strcpy(node, head_node);
     //节点不断向根节点更新从而获得所有包含的object
-    while (!strcmp(node, root_node)) {
+    while (strcmp(node, root_node)) {
+
         sprintf(sql, "SELECT File,Mode FROM Obj2Node WHERE Node='%s'", node);
+
         rc = sqlite3_exec(db, sql, get_object, NULL, &zErrMsg);
+
         if (rc != SQLITE_OK) {
             cerr << "[ERROR]发生错误：" << zErrMsg << endl;
             exit(1);
         }
-
 
         sprintf(sql, "SELECT Parent FROM Node WHERE SHA='%s'", node);
         rc = sqlite3_exec(db, sql, update_node, NULL, &zErrMsg);
@@ -122,7 +124,6 @@ detect_info module_detect_changes::detect_changes() {
     //找到所有ignore的文件或文件夹
     sprintf(sql, "SELECT Path From IgnoreList");
     rc = sqlite3_exec(db, sql, select_ignore_callback, nullptr, &zErrMsg);
-
     if (rc != SQLITE_OK) {
         cerr << "[ERROR]发生错误：" << zErrMsg << endl;
         exit(1);
@@ -136,7 +137,6 @@ detect_info module_detect_changes::detect_changes() {
         vector<string> tmp = walk_folder(current_dir);
         ignore_object.insert(ignore_object.end(), tmp.begin(), tmp.end());
     }
-
     //获得本地所有文件路径
     local_object = walk_folder(cwd);
 
@@ -146,7 +146,7 @@ detect_info module_detect_changes::detect_changes() {
         //在忽略列表中
         if (it != ignore_object.end()) continue;
 
-        sprintf(sql, "SELECT SHA,UpdatedDateTime FROM Object WHERE SHA='%s'", p.c_str());
+        sprintf(sql, "SELECT OriginPath,UpdatedDateTime FROM Objects WHERE OriginPath='%s'", p.c_str());
 
         rc = sqlite3_exec(db, sql, get_updated_time, nullptr, &zErrMsg);
 
@@ -158,6 +158,7 @@ detect_info module_detect_changes::detect_changes() {
     }
 
     detect_info sav;
+
 
     for (auto &p:local_object) {
         auto it = find(ignore_object.begin(), ignore_object.end(), p);
@@ -172,12 +173,14 @@ detect_info module_detect_changes::detect_changes() {
             continue;
         }
 
-        char *time1;
+        char time1[500];
         strcpy(time1,object_updated_time[p]);
         if (strcmp(time1, database::getTimeChar(buf.st_mtime))) sav.change.emplace_back(p);//文件更新时间与表中不同
+
     }
 
     sqlite3_close(db);
+    clog<<"[INFO]检测完成"<<endl;
 
     return sav;
 }
