@@ -100,7 +100,7 @@ int main(int count, char *parameters[]) {
         //这仅仅是开发用的
 #include "Database/file_system.h"
 
-        auto ans = walk_folder("install");
+        auto ans = walk_folder(".");
 
         for (auto x:ans)
             cout << x << endl;

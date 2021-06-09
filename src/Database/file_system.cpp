@@ -41,6 +41,7 @@ vector<string> walk_folder(string base_dir) {
     vector<string> ans;
 
     ignore.emplace_back(".simple-scm");
+    ignore.emplace_back("./.simple-scm");
 
     sqlite3 *db;
     char *zErrMsg = 0;
