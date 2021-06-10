@@ -10,6 +10,18 @@
 #include <string>
 #include<time.h>
 #include"init-db.h"
+#include<string>
+
+struct node_full_info
+{
+    std::string SHA;
+    std::string CreatedDateTime;
+    std::string Parent;
+    std::string Message;
+    int Branch;
+    bool isVirtualNode;
+    std::string toVirtualNode;
+};
 
 class database {
 
