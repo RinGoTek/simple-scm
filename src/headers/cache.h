@@ -20,7 +20,7 @@
 
 
 #include<openssl/sha.h>
-#include<zlib.h>
+
 #include <unistd.h>
 
 /*

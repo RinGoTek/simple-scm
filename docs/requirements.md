@@ -1,6 +1,7 @@
 # 依赖项
 
-1、openssl-dev
+1、libssl-dev
+
 
 2、openssl
 
