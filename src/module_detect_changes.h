@@ -8,13 +8,13 @@
 #include<map>
 #include<vector>
 
-using namespace std;
+
 
 struct detect_info//用来保存检测结果
 {
-    vector<string> del;//保存删除的文件哈希值
-    vector<string> change;//保存更改的文件哈希值
-    map<string,string> path2SHA;//保存文件路径到CompressedSHA的映射，用于del和change
+    std::vector<std::string> del;//保存删除的文件哈希值
+    std::vector<std::string> change;//保存更改的文件哈希值
+    std::map<std::string,std::string> path2SHA;//保存文件路径到CompressedSHA的映射，用于del和change
 
     detect_info() {
         del.clear();
@@ -33,12 +33,12 @@ struct detect_info//用来保存检测结果
 
 struct node_info
 {
-    string compressed_sha;
-    string origin_path;
-    string compressed_path;
-    string updated_datetime;
-    string created_datetime;
-    string origin_sha;
+    std::string compressed_sha;
+    std::string origin_path;
+    std::string compressed_path;
+    std::string updated_datetime;
+    std::string created_datetime;
+    std::string origin_sha;
 
     node_info()
     {
@@ -55,9 +55,14 @@ class module_detect_changes {
 public:
     module_detect_changes() {};
 
-    detect_info detect_changes();
+    /**
+     * 检测指定节点与当前文件系统中文件的改变情况
+     * @param NodeSHA 指定的节点的sha
+     * @return detect_info
+     */
+    detect_info detect_changes(std::string NodeSHA);
 
-    vector<node_info> get_node_info(string);
+    std::vector<node_info> get_node_files(std::string);
 };
 
 

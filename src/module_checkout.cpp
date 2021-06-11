@@ -104,6 +104,7 @@ void module_checkout::checkout_switch_branch(char *switch_branch_name) {
 #include <cstring>
 #include <sqlite3.h>
 #include <algorithm>
+#include <fstream>
 #include "headers/cache.h"
 #include "module_checkout.h"
 #include "Database/file_system.h"
@@ -155,8 +156,11 @@ static int get_ignore_file(void *NotUsed, int cnt, char **pValue, char **pName)
 void module_checkout::checkout_switch_branch(char *switch_branch) {
 
         //检测是否有修改未提交
+        ifstream fin(".simple-scm/HEAD");
+        string HEAD;
+        fin>>HEAD;
         module_detect_changes op;
-        detect_info x=op.detect_changes();
+        detect_info x=op.detect_changes(HEAD);
         if(x.change.size()||x.del.size()){
             cerr<<"[ERROR]请将做出的修改进行提交或删除后再切换分支"<<endl;
             exit(0);

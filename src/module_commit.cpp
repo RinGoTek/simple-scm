@@ -19,15 +19,11 @@
 
 using namespace std;
 
-static string parent_sha1;
+
 static string new_sha1;
 static vector<string> add;
+static string branch_head;
 
-static int get_head_node(void *NotUsed, int cnt, char **pValue, char **pName)//用来获得当前分支头节点的回调函数
-{
-    parent_sha1 = pValue[0];
-    return 0;
-}
 
 static int callback(void *NotUsed, int cnt, char **pValue, char **pName) {
     for (int i = 0; i < cnt; i++) cout << pName[i] << "=" << (pValue[i] ? pValue[i] : "NULL") << endl;
@@ -39,6 +35,11 @@ static int get_add_path(void *NotUsed, int cnt, char **pValue, char **pName) {
     return 0;
 }
 
+static int get_branch_head(void *NotUsed, int cnt, char **pValue, char **pName) {
+    branch_head = pValue[0];
+    return 0;
+}
+
 void module_commit::commit(char *Message) {
 
     clog << "[INFO]正在检测更改信息..." << endl;
@@ -46,7 +47,7 @@ void module_commit::commit(char *Message) {
 
     detect_info info;
     module_detect_changes commit_tmp;
-    info = commit_tmp.detect_changes();
+
 
     sqlite3 *db;
     char *zErrMsg = 0;
@@ -59,6 +60,21 @@ void module_commit::commit(char *Message) {
         cerr << "[ERROR]数据库打开失败" << endl;
         exit(1);
     }
+
+    //从文件中读取当前分支
+    ifstream file(".simple-scm/current_branch.txt");
+    int current_branch;
+    file >> current_branch;
+    file.close();
+
+    sprintf(sql, "SELECT BranchHead FROM Branch WHERE ID=%d", current_branch);
+    rc = sqlite3_exec(db, sql, get_branch_head, NULL, &zErrMsg);
+    if (rc != SQLITE_OK) {
+        cerr << "[ERROR]发生错误：" << zErrMsg << endl;
+        exit(1);
+    }
+
+    info = commit_tmp.detect_changes(branch_head);
 
     //获得add表中的信息
     sprintf(sql, "SELECT OriginPath FROM AddList");
@@ -91,7 +107,7 @@ void module_commit::commit(char *Message) {
 
     //对原始路径排序，算节点的sha1
     vector<string> det;
-    det.resize(info.change.size()+info.del.size()+add.size());
+    det.resize(info.change.size() + info.del.size() + add.size());
     det.insert(det.end(), info.change.begin(), info.change.end());
 
     det.insert(det.end(), add.begin(), add.end());
@@ -99,37 +115,20 @@ void module_commit::commit(char *Message) {
     sort(det.begin(), det.end());
 
 
-    for(auto &x:det)
-    {
-        tmp_SHA<<calculate_sha1(x);
+    for (auto &x:det) {
+        tmp_SHA << calculate_sha1(x);
     }
     det.clear();
     //防止del的被算文件哈希(无法读文件），改为算文件路径哈希
     det.insert(det.end(), info.del.begin(), info.del.end());
     sort(det.begin(), det.end());
-    for(auto &x:det)
-    {
-        tmp_SHA<<calculate_string_sha1(x);
+    for (auto &x:det) {
+        tmp_SHA << calculate_string_sha1(x);
     }
 
 
     new_sha1 = calculate_string_sha1(tmp_SHA.str());
 
-
-    //从文件中读取当前分支
-    ifstream file(".simple-scm/current_branch.txt");
-    int current_branch;
-    file >> current_branch;
-    file.close();
-
-
-    //获得当前分支头节点信息，即新节点的父亲节点的SHA
-    sprintf(sql, "SELECT BranchHead FROM Branch WHERE ID='%d'", current_branch);
-    rc = sqlite3_exec(db, sql, get_head_node, NULL, &zErrMsg);
-    if (rc != SQLITE_OK) {
-        cerr << "[ERROR]当前分支头节点信息获取失败：" << zErrMsg << endl;
-        exit(1);
-    }
 
     char tmp_time[500];
     auto tmpp = database::getCurrentTimeChar();
@@ -140,7 +139,7 @@ void module_commit::commit(char *Message) {
     //创建新节点
     sprintf(sql,
             "INSERT INTO Node (SHA,CreatedDateTime,Parent,Message) VALUES ('%s','%s',(SELECT SHA FROM Node WHERE SHA='%s'),'%s' )",
-            new_sha1.c_str(), tmp_time, parent_sha1.c_str(), Message);
+            new_sha1.c_str(), tmp_time, branch_head.c_str(), Message);
 
     rc = sqlite3_exec(db, sql, callback, NULL, &zErrMsg);
     if (rc != SQLITE_OK) {

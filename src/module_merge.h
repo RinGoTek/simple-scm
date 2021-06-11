@@ -9,6 +9,7 @@
 #include<sqlite3.h>
 #include <iostream>
 #include<vector>
+#include <fstream>
 
 class module_merge {
 public:
@@ -21,6 +22,12 @@ public:
         } else {
             std::clog << "[INFO]数据库加载成功！" << std::endl;
         }
+
+        std::ifstream fin(".simple-scm/current_branch.txt");
+        std::string tmp;
+        fin>>tmp;
+        fin.close();
+        current_branch = std::atoi(tmp.c_str());
     }
 
     ~module_merge() = default;
