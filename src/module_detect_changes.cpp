@@ -16,24 +16,29 @@
 
 using namespace std;
 
-static char head_node[500], root_node[500], node[500];
+static char head_node[500], node[500];
 static string tmp_updated_time;
 static map<string, bool> vis;
 static vector<string> object_sha;
 static vector<string> object_path;
 static stack<string> walk_list;
 static vector<string> ignore_object;
+static vector<node_info> node_info_sav;
 
-void init() {
+void
+
+
+init() {
     object_sha.clear();
     object_path.clear();
     vis.clear();
     ignore_object.clear();
+    node_info_sav.clear();
 }
 
 static detect_info sav;
 
-static int get_node(void *NotUsed, int cnt, char **pValue, char **pName)//用来获得当前分支头节点和根节点的回调函数
+static int get_node(void *NotUsed, int cnt, char **pValue, char **pName)//用来获得当前分支头节点的回调函数
 {
     strcpy(head_node, pValue[0]);
     return 0;
@@ -72,6 +77,19 @@ static int get_tmp_updated_time(void *NotUsed, int cnt, char **pValue, char **pN
 {
     if (strcmp(pValue[0], tmp_updated_time.c_str()) > 0)//查询到的更新时间晚于当前时间则更新
         tmp_updated_time = pValue[0];
+    return 0;
+}
+
+static int get_object_info(void *NotUsed, int cnt, char **pValue, char **pName)//获得文件所有信息
+{
+    node_info tmp;
+    tmp.compressed_sha = pValue[0];
+    tmp.origin_sha = pValue[1];
+    tmp.origin_path = pValue[2];
+    tmp.compressed_path = pValue[3];
+    tmp.created_datetime = pValue[4];
+    tmp.updated_datetime = pValue[5];
+    node_info_sav.emplace_back(tmp);
     return 0;
 }
 
@@ -161,7 +179,7 @@ detect_info module_detect_changes::detect_changes() {
 
     //遍历节点所包含文件的路径，获得检测信息
     for (auto &p:object_path) {
-        clog << p << endl;
+        //clog << p << endl;
         auto it = find(ignore_object.begin(), ignore_object.end(), p);
 
         //在忽略列表中
@@ -192,4 +210,55 @@ detect_info module_detect_changes::detect_changes() {
     clog << "[INFO]检测完成" << endl;
 
     return sav;
+}
+
+vector<node_info> module_detect_changes::get_node_info(string current_node) {
+    init();
+
+    sqlite3 *db;
+    char *zErrMsg = 0;
+    int rc;
+    char sql[500];
+    init();
+
+    //打开数据库
+    rc = sqlite3_open(".simple-scm/simple-scm.db", &db);
+    if (rc != SQLITE_OK) {
+        cerr << "[ERROR]数据库打开失败：" << endl;
+        exit(1);
+    }
+
+    strcpy(node, current_node.c_str());
+
+    while (strcmp(node, "000000")) {
+
+        sprintf(sql, "SELECT File,Mode FROM Obj2Node WHERE Node='%s'", node);
+
+        rc = sqlite3_exec(db, sql, get_object, NULL, &zErrMsg);
+
+        if (rc != SQLITE_OK) {
+            cerr << "[ERROR]发生错误：" << zErrMsg << endl;
+            exit(1);
+        }
+
+        sprintf(sql, "SELECT Parent FROM Node WHERE SHA='%s'", node);
+        rc = sqlite3_exec(db, sql, update_node, NULL, &zErrMsg);
+        if (rc != SQLITE_OK) {
+            cerr << "[ERROR]发生错误：" << zErrMsg << endl;
+            exit(1);
+        }
+    }
+
+    for (auto p:object_sha) {
+        sprintf(sql, "SELECT * FROM Objects WHERE CompressedSHA='%s'", p.c_str());
+
+        rc = sqlite3_exec(db, sql, get_object_info, NULL, &zErrMsg);
+        if (rc != SQLITE_OK) {
+            cerr << "[ERROR]发生错误：" << zErrMsg << endl;
+            exit(1);
+        }
+    }
+    sqlite3_close(db);
+
+    return node_info_sav;
 }

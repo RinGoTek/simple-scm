@@ -31,6 +31,25 @@ struct detect_info//用来保存检测结果
 
 };
 
+struct node_info
+{
+    string compressed_sha;
+    string origin_path;
+    string compressed_path;
+    string updated_datetime;
+    string created_datetime;
+    string origin_sha;
+
+    node_info()
+    {
+        compressed_path="";
+        compressed_sha="";
+        origin_path="";
+        updated_datetime="";
+        created_datetime="";
+        origin_sha="";
+    }
+};
 
 class module_detect_changes {
 public:
@@ -38,6 +57,7 @@ public:
 
     detect_info detect_changes();
 
+    vector<node_info> get_node_info(string);
 };
 
 

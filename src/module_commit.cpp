@@ -162,8 +162,8 @@ void module_commit::commit(char *Message) {
         Compress compress_tmp;
         compress_return compress_info = compress_tmp.compress(p);
 
-        clog << "compress sha  " << compress_info.sha1 << endl;
-        clog << "compress path  " << compress_info.compressed_path << endl;
+        //clog << "compress sha  " << compress_info.sha1 << endl;
+        //clog << "compress path  " << compress_info.compressed_path << endl;
 
         sprintf(sql,
                 "INSERT INTO Objects (CompressedSHA,CompressedPath,OriginSHA,OriginPath,CreatedDateTime,UpdatedDateTime) VALUES ('%s','%s','%s','%s','%s','%s')",

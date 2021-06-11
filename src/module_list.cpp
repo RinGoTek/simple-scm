@@ -30,7 +30,7 @@ static int callback(void *NotUsed, int cnt, char **pValue, char **pName)//用于
     return 0;
 }
 
-char head_node[100], root_node[100];
+static char head_node[100], root_node[100];
 
 static int get_node(void *NotUsed, int cnt, char **pValue, char **pName)//输出节点信息并向上更新节点的回调函数
 {
