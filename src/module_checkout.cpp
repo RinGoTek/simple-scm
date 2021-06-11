@@ -7,6 +7,7 @@
 #include <cstring>
 #include <sqlite3.h>
 #include <algorithm>
+#include <fstream>
 #include "headers/cache.h"
 #include "module_checkout.h"
 #include "Database/file_system.h"
@@ -54,8 +55,11 @@ static int get_ignore_file(void *NotUsed, int cnt, char **pValue, char **pName)
 void module_checkout::checkout_switch_node(char *switch_node) {
 
     //检测是否有修改未提交
+    ifstream fin(".simple-scm/HEAD");
+    string HEAD;
+    fin>>HEAD;
     module_detect_changes op;
-    detect_info x=op.detect_changes();
+    detect_info x=op.detect_changes(HEAD);
     if(x.change.size()||x.del.size()){
         cerr<<"[ERROR]请将做出的修改进行提交或删除后再切换节点"<<endl;
         exit(0);
@@ -76,7 +80,6 @@ void module_checkout::checkout_switch_node(char *switch_node) {
     char sql[500];
 
     //检测switch_node
-
     sprintf(sql,"SELECT FROM Node WHERE SHA='%s'",switch_node);
     rc= sqlite3_exec(db,sql,node_is_exist,NULL,&zErrMsg);
     if(rc!=SQLITE_OK){
@@ -119,7 +122,7 @@ void module_checkout::checkout_switch_node(char *switch_node) {
 
     //将该节点快照压缩文件解压到工作目录
     module_detect_changes rbq;
-    vector<node_info> compressedSHA=rbq.get_node_info(switch_node);
+    vector<file_info> compressedSHA=rbq.get_node_files(switch_node);
     for(auto x:compressedSHA){
         Compress rbq1;
         rbq1.decompress(x.compressed_path,cwd);

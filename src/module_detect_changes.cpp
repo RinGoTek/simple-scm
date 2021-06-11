@@ -23,7 +23,7 @@ static vector<string> object_sha;
 static vector<string> object_path;
 static stack<string> walk_list;
 static vector<string> ignore_object;
-static vector<node_info> node_info_sav;
+static vector<file_info> node_info_sav;
 
 void init() {
     object_sha.clear();
@@ -47,10 +47,39 @@ static int update_node(void *NotUsed, int cnt, char **pValue, char **pName)//将
     return 0;
 }
 
+string origin_path_tmp;
+
+static int get_origin_path(void *NotUsed, int cnt, char **pValue, char **pName)
+{
+    origin_path_tmp=pValue[0];
+    return 0;
+}
+
 static int get_object(void *NotUsed, int cnt, char **pValue, char **pName)//获得当前节点包含的object的回调函数
 {
-    if (vis[pValue[0]]) return 0;
-    vis[pValue[0]] = 1;
+    sqlite3 *db;
+    char *zErrMsg = 0;
+    int rc;
+    char sql[500];
+
+    rc = sqlite3_open(".simple-scm/simple-scm.db", &db);
+    if (rc != SQLITE_OK) {
+        cerr << "[ERROR]数据库打开失败：" << endl;
+        exit(1);
+    }
+
+    sprintf(sql,"SELECT FROM Objects WHERE CompressedSHA='%s'",pValue[0]);
+    rc = sqlite3_exec(db, sql, get_origin_path, NULL, &zErrMsg);
+
+    if (rc != SQLITE_OK) {
+        cerr << "[ERROR]发生错误：" << zErrMsg << endl;
+        exit(1);
+    }
+
+    sqlite3_close(db);
+
+    if (vis[origin_path_tmp]) return 0;
+    vis[origin_path_tmp] = 1;
     if (atoi(pValue[1]) != -1) object_sha.push_back(pValue[0]);
     return 0;
 }
@@ -79,7 +108,7 @@ static int get_tmp_updated_time(void *NotUsed, int cnt, char **pValue, char **pN
 
 static int get_object_info(void *NotUsed, int cnt, char **pValue, char **pName)//获得文件所有信息
 {
-    node_info tmp;
+    file_info tmp;
     tmp.compressed_sha = pValue[0];
     tmp.origin_sha = pValue[1];
     tmp.origin_path = pValue[2];
@@ -90,7 +119,7 @@ static int get_object_info(void *NotUsed, int cnt, char **pValue, char **pName)/
     return 0;
 }
 
-detect_info module_detect_changes::detect_changes() {
+detect_info module_detect_changes::detect_changes(string NodeSHA) {
 
     sqlite3 *db;
     char *zErrMsg = 0;
@@ -98,11 +127,13 @@ detect_info module_detect_changes::detect_changes() {
     char sql[500];
     init();
 
+    /*
     //从文件中读取当前分支
     ifstream file(".simple-scm/current_branch.txt");
     int current_branch;
     file >> current_branch;
     file.close();
+     */
 
     //打开数据库
     rc = sqlite3_open(".simple-scm/simple-scm.db", &db);
@@ -113,6 +144,7 @@ detect_info module_detect_changes::detect_changes() {
         clog << "[INFO]数据库打开成功！" << endl;
     }
 
+    /*
     //获得当前分支头节点，即当前节点
     sprintf(sql, "SELECT BranchHead FROM Branch WHERE ID='%d'", current_branch);
     rc = sqlite3_exec(db, sql, get_node, NULL, &zErrMsg);
@@ -122,9 +154,10 @@ detect_info module_detect_changes::detect_changes() {
     } else {
         clog << "[INFO]节点信息获取成功！" << endl;
     }
-
-
+    */
+    strcpy(head_node, NodeSHA.c_str());
     strcpy(node, head_node);
+
     //节点不断向根节点更新从而获得所有包含的object
     while (strcmp(node, "000000")) {
 
@@ -209,7 +242,7 @@ detect_info module_detect_changes::detect_changes() {
     return sav;
 }
 
-vector<node_info> module_detect_changes::get_node_info(string current_node) {
+vector<file_info> module_detect_changes::get_node_files(string NodeSHA) {
     init();
 
     sqlite3 *db;
@@ -225,7 +258,7 @@ vector<node_info> module_detect_changes::get_node_info(string current_node) {
         exit(1);
     }
 
-    strcpy(node, current_node.c_str());
+    strcpy(node, NodeSHA.c_str());
 
     while (strcmp(node, "000000")) {
 
