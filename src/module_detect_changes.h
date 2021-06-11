@@ -67,7 +67,7 @@ public:
      * @param NodeSHA 节点的sha1
      * @return vector<node_info>
      */
-    std::vector<node_info> get_node_files(std::string NodeSHA);
+    std::vector<file_info> get_node_files(std::string NodeSHA);
 };
 
 

@@ -10,6 +10,7 @@
 #include <iostream>
 #include<vector>
 #include <fstream>
+#include"module_detect_changes.h"
 
 class module_merge {
 public:
@@ -34,7 +35,6 @@ public:
 
     /**
      * 执行合并
-     * @param node1 本分支的节点的sha1
      * @param node2 要被合并进来的节点的sha1
      * @param currentBranch 当前分支的编号
      */

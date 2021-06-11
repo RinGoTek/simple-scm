@@ -12,6 +12,7 @@
 #include "module_checkout.h"
 #include "Database/file_system.h"
 #include "Database/Compress.h"
+#include"module_merge.h"
 
 using namespace std;
 
@@ -93,8 +94,14 @@ int main(int count, char *parameters[]) {
             if (command2 == "-d") {
                 tmp.deIgnore(command3);
             }
-        }
+        } else tip_command_error();
 
+    } else if (main_command == "merge") {
+        //将另一个节点并入当前分支
+        if (count != 2)
+            tip_command_error();
+        module_merge tmp;
+        tmp.merge(parameters[2]);
     } else if (DEV_MODE && main_command == "walk-folder") {
         //walk folder
         //这仅仅是开发用的
