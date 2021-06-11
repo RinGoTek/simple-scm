@@ -47,10 +47,39 @@ static int update_node(void *NotUsed, int cnt, char **pValue, char **pName)//将
     return 0;
 }
 
+string origin_path_tmp;
+
+static int get_origin_path(void *NotUsed, int cnt, char **pValue, char **pName)
+{
+    origin_path_tmp=pValue[0];
+    return 0;
+}
+
 static int get_object(void *NotUsed, int cnt, char **pValue, char **pName)//获得当前节点包含的object的回调函数
 {
-    if (vis[pValue[0]]) return 0;
-    vis[pValue[0]] = 1;
+    sqlite3 *db;
+    char *zErrMsg = 0;
+    int rc;
+    char sql[500];
+
+    rc = sqlite3_open(".simple-scm/simple-scm.db", &db);
+    if (rc != SQLITE_OK) {
+        cerr << "[ERROR]数据库打开失败：" << endl;
+        exit(1);
+    }
+
+    sprintf(sql,"SELECT FROM Objects WHERE CompressedSHA='%s'",pValue[0]);
+    rc = sqlite3_exec(db, sql, get_origin_path, NULL, &zErrMsg);
+
+    if (rc != SQLITE_OK) {
+        cerr << "[ERROR]发生错误：" << zErrMsg << endl;
+        exit(1);
+    }
+
+    sqlite3_close(db);
+
+    if (vis[origin_path_tmp]) return 0;
+    vis[origin_path_tmp] = 1;
     if (atoi(pValue[1]) != -1) object_sha.push_back(pValue[0]);
     return 0;
 }
