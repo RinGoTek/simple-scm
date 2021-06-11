@@ -213,7 +213,7 @@ detect_info module_detect_changes::detect_changes(string NodeSHA) {
     return sav;
 }
 
-vector<node_info> module_detect_changes::get_node_files(string current_node) {
+vector<node_info> module_detect_changes::get_node_files(string NodeSHA) {
     init();
 
     sqlite3 *db;
@@ -229,7 +229,7 @@ vector<node_info> module_detect_changes::get_node_files(string current_node) {
         exit(1);
     }
 
-    strcpy(node, current_node.c_str());
+    strcpy(node, NodeSHA.c_str());
 
     while (strcmp(node, "000000")) {
 

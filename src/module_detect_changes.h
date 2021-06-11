@@ -31,7 +31,7 @@ struct detect_info//用来保存检测结果
 
 };
 
-struct node_info
+struct file_info
 {
     std::string compressed_sha;
     std::string origin_path;
@@ -40,7 +40,7 @@ struct node_info
     std::string created_datetime;
     std::string origin_sha;
 
-    node_info()
+    file_info()
     {
         compressed_path="";
         compressed_sha="";
@@ -62,7 +62,12 @@ public:
      */
     detect_info detect_changes(std::string NodeSHA);
 
-    std::vector<node_info> get_node_files(std::string);
+    /**
+     * 获取节点的文件列表的函数
+     * @param NodeSHA 节点的sha1
+     * @return vector<node_info>
+     */
+    std::vector<node_info> get_node_files(std::string NodeSHA);
 };
 
 
