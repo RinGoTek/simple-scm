@@ -23,7 +23,7 @@ static vector<string> object_sha;
 static vector<string> object_path;
 static stack<string> walk_list;
 static vector<string> ignore_object;
-static vector<node_info> node_info_sav;
+static vector<file_info> node_info_sav;
 
 void init() {
     object_sha.clear();
@@ -79,7 +79,7 @@ static int get_tmp_updated_time(void *NotUsed, int cnt, char **pValue, char **pN
 
 static int get_object_info(void *NotUsed, int cnt, char **pValue, char **pName)//获得文件所有信息
 {
-    node_info tmp;
+    file_info tmp;
     tmp.compressed_sha = pValue[0];
     tmp.origin_sha = pValue[1];
     tmp.origin_path = pValue[2];
@@ -213,7 +213,7 @@ detect_info module_detect_changes::detect_changes(string NodeSHA) {
     return sav;
 }
 
-vector<node_info> module_detect_changes::get_node_files(string NodeSHA) {
+vector<file_info> module_detect_changes::get_node_files(string NodeSHA) {
     init();
 
     sqlite3 *db;
