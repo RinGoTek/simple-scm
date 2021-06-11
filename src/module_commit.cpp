@@ -14,6 +14,7 @@
 #include<vector>
 #include<sstream>
 #include<string>
+#include<algorithm>
 
 
 using namespace std;
@@ -84,11 +85,25 @@ void module_commit::commit(char *Message) {
 
     //获得新节点的sha1
     stringstream tmp_SHA;
-    for (auto &p:info.change) tmp_SHA << calculate_char_sha1(p.c_str()), clog << "change  " << p << endl;
-    for (auto &p:info.del) tmp_SHA << calculate_char_sha1(p.c_str()), clog << "del  " << p << endl;
-    for (auto &p:add) tmp_SHA << calculate_char_sha1(p.c_str()), clog << "add  " << p << endl;
+    for (auto &p:info.change) clog << "change  " << p << endl;
+    for (auto &p:info.del) clog << "del  " << p << endl;
+    for (auto &p:add) clog << "add  " << p << endl;
 
-    new_sha1 = tmp_SHA.str();
+    //对原始路径排序，算节点的sha1
+    vector<string> det;
+    det.resize(info.change.size()+info.del.size()+add.size());
+    det.insert(det.end(), info.change.begin(), info.change.end());
+    det.insert(det.end(), info.del.begin(), info.del.end());
+    det.insert(det.end(), add.begin(), add.end());
+
+    sort(det.begin(), det.end());
+
+    for(auto &x:det)
+    {
+        tmp_SHA<<calculate_sha1(x);
+    }
+
+    new_sha1 = calculate_string_sha1(tmp_SHA.str());
 
 
     //从文件中读取当前分支

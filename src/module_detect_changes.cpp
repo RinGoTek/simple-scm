@@ -25,10 +25,7 @@ static stack<string> walk_list;
 static vector<string> ignore_object;
 static vector<node_info> node_info_sav;
 
-void
-
-
-init() {
+void init() {
     object_sha.clear();
     object_path.clear();
     vis.clear();
