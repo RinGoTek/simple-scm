@@ -31,16 +31,10 @@ static int node_is_exist(void *NotUsed, int cnt, char **pValue, char **pName)//�
     return 0;
 }
 
-static int get_node_parent(void *NotUsed, int cnt, char **pValue, char **pName)
+static int get_branch_headnode(void *NotUsed, int cnt, char **pValue, char **pName)//获得分支的头节点
 {
     strcpy(pNode,pValue[0]);
-    return 0;
-}
-
-
-static int get_new_file_path(void *NotUsed, int cnt, char **pValue, char **pName)//获取所切换分支的文件的路径
-{
-    new_file_list.push_back(pValue[0]);
+    if(cnt>0) node_exist_judge=1;
     return 0;
 }
 
@@ -60,10 +54,12 @@ void module_checkout::checkout_switch_node(char *switch_node) {
     fin>>HEAD;
     module_detect_changes op;
     detect_info x=op.detect_changes(HEAD);
-    if(x.change.size()||x.del.size()){
+    //puts("tess_line");
+    if(x.change.size()>0||x.del.size()>0){
         cerr<<"[ERROR]请将做出的修改进行提交或删除后再切换节点"<<endl;
         exit(0);
     }
+
 
     sqlite3 *db;
     char *zErrMsg = 0;
@@ -148,13 +144,13 @@ void module_checkout::checkout_switch_branch(char *switch_branch)
 
     //获取所切换分支的头节点
     sprintf(sql,"SELECT BranchHead FROM Branch WHERE NAME='%s'",switch_branch);
-    rc= sqlite3_exec(db,sql,node_is_exist,NULL,&zErrMsg);
+    rc= sqlite3_exec(db,sql,get_branch_headnode,NULL,&zErrMsg);
     if(rc!=SQLITE_OK){
         cerr<<"[ERROR]获取所切换分支的头节点失败:"<<zErrMsg<<endl;
         exit(0);
     }
     if(node_exist_judge==0){//分支不存在则新建该分支
-        cerr<<"[ERROR]所切换的分支不存在!"<<endl;
+        cerr<<"[ERROR]所切换的分支不存在!新建该分支成功！"<<endl;
         module_new_branch rbq;
         rbq.create_branch(switch_branch);
         exit(0);

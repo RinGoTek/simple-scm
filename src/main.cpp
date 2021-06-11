@@ -7,6 +7,7 @@
 #include"module_detect_changes.h"
 #include"module_new_branch.h"
 #include"module_list.h"
+#include "module_reset.h"
 #include "module_ignore.h"
 #include"module_add.h"
 #include "module_checkout.h"
@@ -124,7 +125,12 @@ int main(int count, char *parameters[]) {
         char *command2 = parameters[2];
         module_checkout rbq;
         rbq.checkout_switch_branch(command2);
-    } else if (DEV_MODE && main_command == "compress") {
+    }
+    else if(main_command=="reset"){
+        char *command2 = parameters[2];
+        module_reset rbq;
+        rbq.reset(command2);
+    }else if (DEV_MODE && main_command == "compress") {
 
         //这仅仅是开发用的
 
@@ -168,6 +174,7 @@ void usage() {
          << "ignore <path>      添加路径到ignore\n"
          << "commit <Message>      提交代码到存储库\n"
          << "checkout <BranchName>      切换分支\n"
+         << "reset <NodeName>      回退当前分支的版本\n"
          << "add <path>      添加路径到AddList\n"
          << endl;
 }
