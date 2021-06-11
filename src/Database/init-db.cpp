@@ -99,13 +99,7 @@ void init_db::do_init() {
         "CreatedDateTime DATETIME NOT NULL,"\
         "Parent CHAR(500),"\
         "Message TEXT(1000) NOT NULL,"\
-        "Branch INTEGER NOT NULL,"\
-        "isVirtualNode BOOLEAN DEFAULT 'false' NOT NULL,"\
-          "toVirtualNode Char(500),"\
-        "FOREIGN KEY (Parent) REFERENCES Node(SHA) ON DELETE CASCADE,"\
-          "FOREIGN KEY (Branch) REFERENCES Branch(ID) ON DELETE CASCADE,"\
-          "FOREIGN KEY (toVirtualNode) REFERENCES Node(SHA) ON DELETE CASCADE"
-          ");";
+        "FOREIGN KEY (Parent) REFERENCES Node(SHA) ON DELETE CASCADE);";
 
     rc = sqlite3_exec(db, sql, callback, 0, &zErrMsg);
     if (rc != SQLITE_OK) {
@@ -196,7 +190,7 @@ void init_db::do_init() {
 
     char tmp_sql[1000];
 
-    sprintf(tmp_sql, "INSERT INTO Node (SHA, CreatedDateTime, Message, Branch) VALUES ('000000', '%s','Initialize', 1);",
+    sprintf(tmp_sql, "INSERT INTO Node (SHA, CreatedDateTime, Message) VALUES ('000000', '%s','Initialize');",
             tmp_time);
 
 
