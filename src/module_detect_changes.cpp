@@ -17,25 +17,25 @@
 using namespace std;
 
 static char head_node[500], root_node[500], node[500];
-static map<string, char[500]> object_updated_time; //储存从文件哈希值到文件更改时间的映射
+static string tmp_updated_time;
 static map<string, bool> vis;
-static vector<string> object;
+static vector<string> object_sha;
+static vector<string> object_path;
 static stack<string> walk_list;
 static vector<string> ignore_object;
-static vector<string> local_object;
 
 void init() {
-    object.clear();
-    object_updated_time.clear();
+    object_sha.clear();
+    object_path.clear();
     vis.clear();
     ignore_object.clear();
-    local_object.clear();
 }
+
+static detect_info sav;
 
 static int get_node(void *NotUsed, int cnt, char **pValue, char **pName)//用来获得当前分支头节点和根节点的回调函数
 {
-    strcpy(root_node, pValue[0]);
-    strcpy(head_node, pValue[1]);
+    strcpy(head_node, pValue[0]);
     return 0;
 }
 
@@ -49,7 +49,7 @@ static int get_object(void *NotUsed, int cnt, char **pValue, char **pName)//获�
 {
     if (vis[pValue[0]]) return 0;
     vis[pValue[0]] = 1;
-    if (atoi(pValue[1]) != -1) object.push_back(pValue[1]);
+    if (atoi(pValue[1]) != -1) object_sha.push_back(pValue[0]);
     return 0;
 }
 
@@ -61,9 +61,17 @@ static int select_ignore_callback(void *NotUsed, int cnt, char **pValue, char **
     return 0;
 }
 
-static int get_updated_time(void *NotUsed, int cnt, char **pValue, char **pName)//获取文件对应的更新时间
+static int get_object_path(void *NotUsed, int cnt, char **pValue, char **pName)//获得当前节点包含的object的回调函数
 {
-    strcpy(object_updated_time[(string)pValue[0]], pValue[1]);
+    sav.path2SHA[pValue[0]] = pValue[1];
+    object_path.emplace_back(pValue[0]);
+    return 0;
+}
+
+static int get_tmp_updated_time(void *NotUsed, int cnt, char **pValue, char **pName)//获得该文件最后的更新时间
+{
+    if (strcmp(pValue[0], tmp_updated_time.c_str()) > 0)//查询到的更新时间晚于当前时间则更新
+        tmp_updated_time = pValue[0];
     return 0;
 }
 
@@ -74,6 +82,7 @@ detect_info module_detect_changes::detect_changes() {
     int rc;
     char sql[500];
     init();
+
     //从文件中读取当前分支
     ifstream file(".simple-scm/current_branch.txt");
     int current_branch;
@@ -90,7 +99,7 @@ detect_info module_detect_changes::detect_changes() {
     }
 
     //获得当前分支头节点，即当前节点
-    sprintf(sql, "SELECT BranchRoot,BranchHead FROM Branch WHERE ID='%d'", current_branch);
+    sprintf(sql, "SELECT BranchHead FROM Branch WHERE ID='%d'", current_branch);
     rc = sqlite3_exec(db, sql, get_node, NULL, &zErrMsg);
     if (rc != SQLITE_OK) {
         cerr << "[ERROR]节点信息获取失败：" << zErrMsg << endl;
@@ -102,7 +111,7 @@ detect_info module_detect_changes::detect_changes() {
 
     strcpy(node, head_node);
     //节点不断向根节点更新从而获得所有包含的object
-    while (strcmp(node, root_node)) {
+    while (strcmp(node, "000000")) {
 
         sprintf(sql, "SELECT File,Mode FROM Obj2Node WHERE Node='%s'", node);
 
@@ -137,30 +146,22 @@ detect_info module_detect_changes::detect_changes() {
         vector<string> tmp = walk_folder(current_dir);
         ignore_object.insert(ignore_object.end(), tmp.begin(), tmp.end());
     }
-    //获得本地所有文件路径
-    local_object = walk_folder(cwd);
 
-    for (auto &p:local_object) {
-        auto it = find(ignore_object.begin(), ignore_object.end(), p);
 
-        //在忽略列表中
-        if (it != ignore_object.end()) continue;
-
-        sprintf(sql, "SELECT OriginPath,UpdatedDateTime FROM Objects WHERE OriginPath='%s'", p.c_str());
-
-        rc = sqlite3_exec(db, sql, get_updated_time, nullptr, &zErrMsg);
+    //根据节点包含的文件CompressedSHA获得相应的路径
+    for (auto &p:object_sha) {
+        sprintf(sql, "SELECT OriginPath,CompressedSHA FROM Objects WHERE CompressedSHA ='%s'", p.c_str());
+        rc = sqlite3_exec(db, sql, get_object_path, nullptr, &zErrMsg);
 
         if (rc != SQLITE_OK) {
             cerr << "[ERROR]发生错误：" << zErrMsg << endl;
             exit(1);
         }
-
     }
 
-    detect_info sav;
-
-
-    for (auto &p:local_object) {
+    //遍历节点所包含文件的路径，获得检测信息
+    for (auto &p:object_path) {
+        clog << p << endl;
         auto it = find(ignore_object.begin(), ignore_object.end(), p);
 
         //在忽略列表中
@@ -173,14 +174,22 @@ detect_info module_detect_changes::detect_changes() {
             continue;
         }
 
-        char time1[500];
-        strcpy(time1,object_updated_time[p]);
-        if (strcmp(time1, database::getTimeChar(buf.st_mtime))) sav.change.emplace_back(p);//文件更新时间与表中不同
+        tmp_updated_time = "";//初始化
 
+        sprintf(sql, "SELECT UpdatedDateTime FROM Objects WHERE OriginPath='%s'", p.c_str());
+        rc = sqlite3_exec(db, sql, get_tmp_updated_time, nullptr, &zErrMsg);
+
+        if (rc != SQLITE_OK) {
+            cerr << "[ERROR]发生错误：" << zErrMsg << endl;
+            exit(1);
+        }
+
+        if (strcmp(tmp_updated_time.c_str(), database::getTimeChar(buf.st_mtime))) sav.change.emplace_back(p);
+        //比较文件更新时间判断文件是否发生更改
     }
 
     sqlite3_close(db);
-    clog<<"[INFO]检测完成"<<endl;
+    clog << "[INFO]检测完成" << endl;
 
     return sav;
 }

@@ -40,6 +40,13 @@ static int select_ignore_callback(void *NotUsed, int cnt, char **pValue, char **
 void module_add::add(char *path) {
     int cnt=0;
 
+    struct stat buf;
+    if (stat(path, &buf) == -1)//找不到该文件
+    {
+        clog<<"[ERROR]找不到该文件！"<<endl;
+        exit(1);
+    }
+
     if (is_file(path)) file.emplace_back(path);
     else if (is_dir(path)) file = walk_folder(path);
     else return;
