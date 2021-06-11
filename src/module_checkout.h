@@ -18,6 +18,7 @@ public:
 class module_checkout{
 public:
     void checkout_switch_branch(char[]);
+    void checkout_switch_node(char[]);
     void checkout_add_switch_branch(char[]);
     void checkout_discard_file_change(char[]);
 };
