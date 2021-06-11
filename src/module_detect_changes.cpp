@@ -68,7 +68,7 @@ static int get_object(void *NotUsed, int cnt, char **pValue, char **pName)//èŽ·å
         exit(1);
     }
 
-    sprintf(sql,"SELECT FROM Objects WHERE CompressedSHA='%s'",pValue[0]);
+    sprintf(sql,"SELECT OriginPath FROM Objects WHERE CompressedSHA='%s'",pValue[0]);
     rc = sqlite3_exec(db, sql, get_origin_path, NULL, &zErrMsg);
 
     if (rc != SQLITE_OK) {
