@@ -93,15 +93,25 @@ void module_commit::commit(char *Message) {
     vector<string> det;
     det.resize(info.change.size()+info.del.size()+add.size());
     det.insert(det.end(), info.change.begin(), info.change.end());
-    det.insert(det.end(), info.del.begin(), info.del.end());
+
     det.insert(det.end(), add.begin(), add.end());
 
     sort(det.begin(), det.end());
+
 
     for(auto &x:det)
     {
         tmp_SHA<<calculate_sha1(x);
     }
+    det.clear();
+    //防止del的被算文件哈希(无法读文件），改为算文件路径哈希
+    det.insert(det.end(), info.del.begin(), info.del.end());
+    sort(det.begin(), det.end());
+    for(auto &x:det)
+    {
+        tmp_SHA<<calculate_string_sha1(x);
+    }
+
 
     new_sha1 = calculate_string_sha1(tmp_SHA.str());
 

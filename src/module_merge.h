@@ -31,12 +31,13 @@ public:
      * @param node2 要被合并进来的节点的sha1
      * @param currentBranch 当前分支的编号
      */
-    void merge(const std::string &node1, const std::string &node2, const int &currentBranch);
+    void merge(const std::string &node2);
 
 private:
     sqlite3 *db;
     char *zErrMsg = 0;
     int rc;
+    int current_branch;
 
 
 };

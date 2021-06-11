@@ -5,6 +5,7 @@
 #include "module_merge.h"
 #include<iostream>
 #include<sqlite3.h>
+#include <fstream>
 #include"Database/database.h"
 #include"Database/file_system.h"
 
@@ -32,6 +33,13 @@ static int query_node_info_callback(void *NotUsed, int cnt, char **pValue, char 
 
 }
 
+//获取节点的分支
+static vector<int> branch_of_node;
+static int query_node_s_branch_info_callback(void *NotUsed, int cnt, char **pValue, char **pName) {
+    branch_of_node.emplace_back(atoi(pValue[0])) ;
+    return 0;
+}
+
 
 /**
      * 执行合并
@@ -39,7 +47,7 @@ static int query_node_info_callback(void *NotUsed, int cnt, char **pValue, char 
      * @param node2 要被合并进来的节点的sha1
      * @param currentBranch 当前分支的编号
      */
-void module_merge::merge(const std::string& node1, const std::string& node2,const int &currentBranch) {
+void module_merge::merge(const std::string& node2) {
 
     char sql[1000];
 
@@ -52,6 +60,14 @@ void module_merge::merge(const std::string& node1, const std::string& node2,cons
         //clog << "[INFO]根节点创建成功！" << endl;
     }
 
+    sprintf(sql, "SELECT (ID) FROM Branch WHERE ID=(SELECT Branch FROM Node2Branch WHERE Node='(SELECT SHA FROM Node WHERE SHA='%s')');", node1.c_str());
+    rc = sqlite3_exec(db, sql,query_node_s_branch_info_callback, 0, &zErrMsg);
+
+    if(rc != SQLITE_OK)
+    {
+        cerr << "[ERROR]查询Node1信息失败: " << zErrMsg << endl;
+    }
+
     sprintf(sql, "SELECT (SHA, Parent) FROM Node WHERE SHA='%s';", node2.c_str());
 
     rc = sqlite3_exec(db, sql, query_node_info_callback, 0, &zErrMsg);
@@ -60,6 +76,39 @@ void module_merge::merge(const std::string& node1, const std::string& node2,cons
     } else {
         //clog << "[INFO]根节点创建成功！" << endl;
     }
+
+    sprintf(sql, "SELECT (ID) FROM Branch WHERE ID=(SELECT Branch FROM Node2Branch WHERE Node='(SELECT SHA FROM Node WHERE SHA='%s')');", node2.c_str());
+    rc = sqlite3_exec(db, sql,query_node_s_branch_info_callback, 0, &zErrMsg);
+
+    if(rc != SQLITE_OK)
+    {
+        cerr << "[ERROR]查询Node2信息失败: " << zErrMsg << endl;
+    }
+
+
+
+    if(branch_of_node.size()!=2)
+    {
+        cerr<<"[ERROR]Internal error"<<endl;
+        throw "Internal error.";
+    }
+
+    if(branch_of_node[0]==branch_of_node[1])
+    {
+        cerr<<"Argument fault: 两个节点不能属于同一分支"<<endl;
+        throw "Argument fault: 两个节点不能属于同一分支";
+    }
+
+    if(branch_of_node[0]!=current_branch)
+    {
+        cerr<<"[ERROR]基础节点不属于当前分支"<<endl;
+        throw "[ERROR]基础节点不属于当前分支";
+    }
+
+
+
+
+
 
 
 
