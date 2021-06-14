@@ -107,10 +107,12 @@ void module_commit::commit(char *Message) {
 
     //对原始路径排序，算节点的sha1
     vector<string> det;
-    det.resize(info.change.size() + info.del.size() + add.size());
-    det.insert(det.end(), info.change.begin(), info.change.end());
+    for(const auto & x:info.change)
+        det.emplace_back(x);
 
-    det.insert(det.end(), add.begin(), add.end());
+    for(const auto & x:add)
+        det.emplace_back(x);
+
 
     sort(det.begin(), det.end());
 
@@ -120,18 +122,19 @@ void module_commit::commit(char *Message) {
     }
     det.clear();
     //防止del的被算文件哈希(无法读文件），改为算文件路径哈希
-    det.insert(det.end(), info.del.begin(), info.del.end());
+    for(const auto & x:info.del)
+        det.emplace_back(x);
+
     sort(det.begin(), det.end());
     for (auto &x:det) {
         tmp_SHA << calculate_string_sha1(x);
     }
 
-
-    new_sha1 = calculate_string_sha1(tmp_SHA.str());
-
-
     char tmp_time[500];
     auto tmpp = database::getCurrentTimeChar();
+    //为了保证节点sha的唯一性，引入当前时间
+    new_sha1 = calculate_string_sha1(tmp_SHA.str()+tmp_time);
+
 
     strcpy(tmp_time, tmpp);
     free(tmpp);
@@ -199,7 +202,6 @@ void module_commit::commit(char *Message) {
             exit(1);
         }
 
-
         sprintf(sql,
                 "INSERT INTO Obj2Node (ID,File,Mode,Node,CreatedDateTime) VALUES (NULL,(SELECT CompressedSHA FROM Objects WHERE CompressedSHA='%s'),1,(SELECT SHA FROM Node WHERE SHA='%s'),'%s')",
                 compress_info.sha1.c_str(), new_sha1.c_str(), tmp_time);
@@ -251,7 +253,10 @@ void module_commit::commit(char *Message) {
             exit(1);
         }
     }
-
+    //更新节点信息到新节点
+    ofstream fout(".simple-scm/HEAD");
+    fout<<new_sha1<<endl;
+    fout.close();
     clog << "[INFO]commit完成！" << endl;
     sqlite3_close(db);
 }

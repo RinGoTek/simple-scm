@@ -8,6 +8,7 @@
 #include<cstdlib>
 #include <cstring>
 #include"../headers/cache.h"
+#include "database.h"
 #include<sqlite3.h>
 #include<algorithm>
 #include<stack>
@@ -218,6 +219,11 @@ char *calculate_sha1(const string &path) {
     //cout<<calculate_string_sha1(original)<<endl;
     unsigned char opt[21];
     char *res = new char[41];
+
+    //为了防止冲突，故引入修改时间到sha中
+    struct stat buf;
+    stat(path.c_str(), &buf);
+    original+=database::getTimeChar(buf.st_mtime);
 
     SHA1((unsigned char *) original.c_str(), strlen(original.c_str()) * sizeof(unsigned char), opt);
 
