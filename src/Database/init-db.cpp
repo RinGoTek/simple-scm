@@ -126,7 +126,7 @@ void init_db::do_init() {
 
     sql = "CREATE TABLE Branch("\
         "ID INTEGER PRIMARY KEY AUTOINCREMENT,"\
-        "Name CHAR(40) NOT NULL,"\
+        "Name CHAR(40) NOT NULL UNIQUE,"\
         "BranchRoot CHAR(40) NOT NULL,"\
         "BranchHead CHAR(40) NOT NULL,"\
         "CreatedDateTime DATETIME NOT NULL,"\
