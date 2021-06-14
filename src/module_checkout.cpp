@@ -76,7 +76,7 @@ void module_checkout::checkout_switch_node(char *switch_node) {
     char sql[500];
 
     //检测switch_node
-    sprintf(sql,"SELECT FROM Node WHERE SHA='%s'",switch_node);
+    sprintf(sql,"SELECT * FROM Node WHERE SHA='%s'",switch_node);
     rc= sqlite3_exec(db,sql,node_is_exist,NULL,&zErrMsg);
     if(rc!=SQLITE_OK){
         cerr << "[ERROR]检测所切换的节点失败:" <<zErrMsg<< endl;
