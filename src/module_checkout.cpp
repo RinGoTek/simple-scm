@@ -150,11 +150,12 @@ void module_checkout::checkout_switch_branch(char *switch_branch)
         exit(0);
     }
     if(node_exist_judge==0){//分支不存在则新建该分支
-        cerr<<"[ERROR]所切换的分支不存在!新建该分支成功！"<<endl;
+        cerr<<"[ERROR]所切换的分支不存在!新建该新分支..."<<endl;
         module_new_branch rbq;
         rbq.create_branch(switch_branch);
         exit(0);
     }
     module_checkout op;
     op.checkout_switch_node(pNode);
+    cerr<<"[INFO]切换分支成功！"<<endl;
 }

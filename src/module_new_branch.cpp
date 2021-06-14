@@ -4,6 +4,7 @@
 
 #include "module_new_branch.h"
 #include"Database/database.h"
+#include "module_checkout.h"
 #include<fstream>
 #include<sqlite3.h>
 #include<iostream>
@@ -115,6 +116,8 @@ void module_new_branch::create_branch(char *branch_name) {
         clog << "[INFO]新分支与根节点连接成功！" << endl;
     }
 
+    module_checkout rbq;
+    rbq.checkout_switch_branch(branch_name);
 
     sqlite3_close(db);
 }
