@@ -88,7 +88,7 @@ void module_checkout::checkout_switch_node(char *switch_node) {
     }
 
     //获取工作目录的文件
-    old_file_list= walk_folder(cwd);
+    old_file_list= walk_folder(".");
 
     //获取不需要删除的文件
     sprintf(sql,"SELECT Path FROM IgnoreList");
