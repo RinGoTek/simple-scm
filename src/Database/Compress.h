@@ -49,17 +49,19 @@ public:
      * 解压单个文件到指定路径
      * @param compressed_path 压缩文件的路径
      * @param path 解压到哪里
+     * @param modifiedTime 文件的修改时间
      * @return decompress_return
      */
-    decompress_return decompress(const std::string &compressed_path,const std::string &path);
+    decompress_return decompress(const std::string &compressed_path,const std::string &path, const std::string& modifiedTime);
 
     /**
      * 批量解压文件到指定路径
      * @param compressed_path 压缩文件的路径
      * @param path 解压到哪里
+     * @param modifiedTime 文件修改的时间的数组
      * @return vector<decompress_return>
      */
-    std::vector<decompress_return> batch_decompress(const std::vector<std::string> &compressed_path, const std::vector<std::string>&path);
+    std::vector<decompress_return> batch_decompress(const std::vector<std::string> &compressed_path, const std::vector<std::string>&path, const std::vector<std::string>& modifiedTime);
 
 
 };

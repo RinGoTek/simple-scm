@@ -220,10 +220,10 @@ char *calculate_sha1(const string &path) {
     unsigned char opt[21];
     char *res = new char[41];
 
-    //为了防止冲突，故引入修改时间到sha中
+    //为了防止冲突，故引入修改时间和路径到sha中
     struct stat buf;
     stat(path.c_str(), &buf);
-    original+=database::getTimeChar(buf.st_mtime);
+    original+=database::getTimeChar(buf.st_mtime)+path;
 
     SHA1((unsigned char *) original.c_str(), strlen(original.c_str()) * sizeof(unsigned char), opt);
 

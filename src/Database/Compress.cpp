@@ -61,7 +61,7 @@ std::vector<compress_return> Compress::batch_compress(const std::vector<std::str
     return ret;
 }
 
-decompress_return Compress::decompress(const string &compressed_path, const string &path) {
+decompress_return Compress::decompress(const string &compressed_path, const string &path, const string& modifiedTime) {
 
     //不是文件就抛出异常
     if (!is_file(compressed_path))
@@ -84,6 +84,11 @@ decompress_return Compress::decompress(const string &compressed_path, const stri
     fout << unpacked << endl;
     fout.close();
 
+    //更改文件的更新时间
+    char cmd[1000];
+    sprintf(cmd, "touch -d \"%s\" %s", modifiedTime.c_str(), path.c_str());
+    system(cmd);
+
     decompress_return ret;
     ret.sha1 = calculate_string_sha1(unpacked);
     ret.decompressed_path = path;
@@ -97,11 +102,16 @@ decompress_return Compress::decompress(const string &compressed_path, const stri
      * @return vector<decompress_return>
      */
 std::vector<decompress_return>
-Compress::batch_decompress(const vector<std::string> &compressed_path, const vector<std::string> &path) {
+Compress::batch_decompress(const vector<std::string> &compressed_path, const vector<std::string> &path, const std::vector<std::string>& modifiedTime) {
     vector<decompress_return> ret;
     //两者的大小必须相同
     if (compressed_path.size() != path.size())
         throw string("The size of vector<compressed_path> must be equal with that of vector<path>");
+    if (compressed_path.size() != modifiedTime.size())
+        throw string("The size of vector<compressed_path> must be equal with that of vector<modifiedTime>");
+    if (path.size() != modifiedTime.size())
+        throw string("The size of vector<path> must be equal with that of vector<modifiedTime>");
+
 
     //提前分配空间，提升性能
     auto size = compressed_path.size();
@@ -110,10 +120,11 @@ Compress::batch_decompress(const vector<std::string> &compressed_path, const vec
     //顺序访问，提升性能
     auto compressed_path_iter = compressed_path.begin();
     auto path_iter = path.begin();
+    auto time_iter = modifiedTime.begin();
 
     //批量解压
     while (compressed_path_iter != compressed_path.end()) {
-        ret.emplace_back(decompress(*compressed_path_iter, *path_iter));
+        ret.emplace_back(decompress(*compressed_path_iter, *path_iter, *time_iter));
         compressed_path_iter++;
         path_iter++;
     }
