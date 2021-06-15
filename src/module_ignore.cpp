@@ -127,7 +127,7 @@ void module_ignore::do_ignore(string path) {
 
     } else if (is_dir(path)) {
         //不能把.simple-scm添加到ignore，这是保留路径
-        if (path == ".simple-scm") {
+        if (path == ".simple-scm"||path == "./.simple-scm") {
             cerr << "[ERROR]系统保留的路径" << endl;
             exit(0);
         }
@@ -137,6 +137,9 @@ void module_ignore::do_ignore(string path) {
             sqlite3_close(db);
             exit(0);
         }
+
+        if(path[path.length()-1]!='/')
+            path += '/';
 
 
         sprintf(sql, "INSERT INTO IGNORELIST (Path,CreatedDateTime) VALUES ('%s', '%s')", path.c_str(),
@@ -207,8 +210,8 @@ void module_ignore::deIgnore(std::string path) {
             cerr << "[ERROR]处理出错： " << zErrMsg << endl;
         }
 
-        if (path[path.length() - 1] == '/')
-            path = path.substr(0, path.length() - 1);
+        //if (path[path.length() - 1] == '/')
+            //path = path.substr(0, path.length() - 1);
 
 
         for (const string &x:ignorePathList) {

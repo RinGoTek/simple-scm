@@ -181,7 +181,6 @@ void init_db::do_init() {
         clog << "[INFO]数据表IgnoreList创建成功！" << endl;
     }
 
-    //创建根节点
     char tmp_time[100];
     auto tmpp = database::getCurrentTimeChar();
     strcpy(tmp_time, tmpp);
@@ -190,8 +189,31 @@ void init_db::do_init() {
 
     char tmp_sql[1000];
 
+    sprintf(tmp_sql, "INSERT INTO IgnoreList (Path, CreatedDateTime) VALUES ('./.simple-scm', '%s');",tmp_time);
+    rc = sqlite3_exec(db, tmp_sql, 0, 0, &zErrMsg);
+    if (rc != SQLITE_OK) {
+        cerr << "[ERROR]初始化IgnoreList错误:" << zErrMsg << endl;
+    }
+
+    /*tmpp = database::getCurrentTimeChar();
+    strcpy(tmp_time, tmpp);
+    free(tmpp);
+
+    sprintf(tmp_sql, "INSERT INTO IgnoreList (Path, CreatedDateTime) VALUES ('.simple-scm', '%s');",tmp_time);
+    rc = sqlite3_exec(db, tmp_sql, 0, 0, &zErrMsg);
+    if (rc != SQLITE_OK) {
+        cerr << "[ERROR]初始化IgnoreList错误:" << zErrMsg << endl;
+    }*/
+
+
+    //创建根节点
+    tmpp = database::getCurrentTimeChar();
+    strcpy(tmp_time, tmpp);
+    free(tmpp);
+
     sprintf(tmp_sql, "INSERT INTO Node (SHA, CreatedDateTime, Message) VALUES ('000000', '%s','Initialize');",
             tmp_time);
+
 
 
     rc = sqlite3_exec(db, tmp_sql, callback, 0, &zErrMsg);

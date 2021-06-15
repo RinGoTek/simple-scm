@@ -20,9 +20,11 @@ using namespace std;
 static vector<string> delete_list;
 static vector<string> new_file_list;
 static vector<string> old_file_list;
-static vector<string> ignore_list;
+static vector<string> ignore_file_list;
+static vector<string> ignore_dir_list;
 static int node_exist_judge=0;
 static char pNode[50];
+static char UPtime[100];
 static char root[]="000000";
 
 static int node_is_exist(void *NotUsed, int cnt, char **pValue, char **pName)//获得分支的头节点的回调函数
@@ -38,13 +40,26 @@ static int get_branch_headnode(void *NotUsed, int cnt, char **pValue, char **pNa
     return 0;
 }
 
-static int get_ignore_file(void *NotUsed, int cnt, char **pValue, char **pName)
+static int get_update_time(void *NotUsed, int cnt, char **pValue, char **pName)//获得分支的头节点
 {
-    for(int i=0;i<cnt;i++){
-        ignore_list.push_back(pValue[i]);
-    }
+    strcpy(UPtime,pValue[0]);
     return 0;
 }
+
+/*static int get_ignore_file(void *NotUsed, int cnt, char **pValue, char **pName)
+{
+    for(int i=0;i<cnt;i++){
+        int k= (int)strlen(pValue[i])-1;
+        if(pValue[i][k]=='/') {
+            ignore_dir_list.push_back(pValue[i]);
+            walk_return content= do_walk_folder(pValue[i]);
+
+        }
+            else ignore_file_list.push_back(pValue[i]);
+
+    }
+    return 0;
+}*/
 
 void module_checkout::checkout_switch_node(char *switch_node) {
 
@@ -88,9 +103,9 @@ void module_checkout::checkout_switch_node(char *switch_node) {
     }
 
     //获取工作目录的文件
-    old_file_list= walk_folder(cwd);
+    old_file_list= walk_folder(".");
 
-    //获取不需要删除的文件
+    /*//获取不需要删除的文件
     sprintf(sql,"SELECT Path FROM IgnoreList");
     rc= sqlite3_exec(db,sql,get_ignore_file,NULL,&zErrMsg);
     if(rc!=SQLITE_OK){
@@ -98,16 +113,16 @@ void module_checkout::checkout_switch_node(char *switch_node) {
         exit(0);
     }else{
         clog<<"获取不需删除的文件成功！"<<endl;
-    };
+    };*/
 
     //获取需要删除的文件
     for(auto every_file:old_file_list)
     {
-        auto it= find(ignore_list.begin(),ignore_list.end(),every_file);
-        if(it==ignore_list.end())//如果在ignore_list中找不到则加入删除列表
-        {
+        /*auto it= find(ignore_file_list.begin(),ignore_file_list.end(),every_file);
+        if(it==ignore_file_list.end())//如果在ignore_file_list中找不到则加入删除列表
+        {*/
             delete_list.push_back(every_file);
-        }
+       // }
     }
 
     //删除工作目录中的文件
@@ -119,9 +134,24 @@ void module_checkout::checkout_switch_node(char *switch_node) {
     //将该节点快照压缩文件解压到工作目录
     module_detect_changes rbq;
     vector<file_info> compressedSHA=rbq.get_node_files(switch_node);
+    rc = sqlite3_open(".simple-scm/simple-scm.db", &db);
+    if (rc != SQLITE_OK) {
+        cerr << "[ERROR]数据库打开失败：" << endl;
+        exit(1);
+    }
+
     for(auto x:compressedSHA){
         Compress rbq1;
-        rbq1.decompress(x.compressed_path,cwd);
+        sprintf(sql, "SELECT UpdatedDateTime FROM Objects WHERE CompressedSHA=(SELECT File FROM Obj2Node WHERE Node='%s'", switch_node);
+
+        rc = sqlite3_exec(db, sql, get_update_time ,NULL, &zErrMsg);
+
+        if (rc != SQLITE_OK) {
+            cerr << "[ERROR]发生错误：" << zErrMsg << endl;
+            exit(1);
+        }
+
+        rbq1.decompress(x.compressed_path,cwd,UPtime);
     }
     clog<<"[INFO]压缩文件解压到工作目录成功!"<<endl;
 
@@ -155,6 +185,11 @@ void module_checkout::checkout_switch_branch(char *switch_branch)
         rbq.create_branch(switch_branch);
         exit(0);
     }
+
+    ofstream cou(".simple-scm/current_branch.txt");
+    cou<<switch_branch;
+    cou.close();
+
     module_checkout op;
     op.checkout_switch_node(pNode);
     cerr<<"[INFO]切换分支成功！"<<endl;

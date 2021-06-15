@@ -106,7 +106,7 @@ int main(int count, char *parameters[]) {
     } else if (DEV_MODE && main_command == "walk-folder") {
         //walk folder
         //这仅仅是开发用的
-#include "Database/file_system.h"
+
 
         auto ans = walk_folder(".");
 
@@ -140,7 +140,7 @@ int main(int count, char *parameters[]) {
     }else if (DEV_MODE && main_command == "compress") {
 
         //这仅仅是开发用的
-
+        /*
         cout << "compress" << endl;
         Compress tmp;
 
@@ -162,7 +162,7 @@ int main(int count, char *parameters[]) {
 
         char *command2 = parameters[2];
         auto ans = calculate_sha1(string(command2));
-        //cout << ans << endl;
+        //cout << ans << endl;*/
     } else {
 
         tip_command_error();
