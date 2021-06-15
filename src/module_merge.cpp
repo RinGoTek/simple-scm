@@ -11,7 +11,7 @@
 #include <cstring>
 #include"Database/database.h"
 #include"Database/file_system.h"
-
+#include"module_checkout.h"
 using namespace std;
 
 //按照originpath升序排列
@@ -245,6 +245,11 @@ void module_merge::merge(const std::string &node2) {
     }
 
     clog << "[INFO]" + ("Merge " + branch_name[0] + " into " + branch_name[1]) << endl;
+
+    //切换到新节点
+    module_checkout tmp_checkout;
+
+    tmp_checkout.checkout_switch_node(const_cast<char *>(new_node_sha1.c_str()));
     sqlite3_close(db);
 
 
