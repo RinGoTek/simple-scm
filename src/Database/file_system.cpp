@@ -57,8 +57,8 @@ vector<string> walk_folder(const string& base_dir) {
     }
 
     //获取ignore列表
-    char *sql = "SELECT Path From IgnoreList";
-    rc = sqlite3_exec(db, sql, select_ignore_callback, nullptr, &zErrMsg);
+    char *sql = "SELECT Path From IgnoreList;";
+    rc = sqlite3_exec(db, sql, select_ignore_callback, NULL, &zErrMsg);
 
     if (rc != SQLITE_OK) {
         cerr << "[ERROR]发生错误：" << zErrMsg << endl;

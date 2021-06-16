@@ -142,7 +142,7 @@ void module_checkout::checkout_switch_node(char *switch_node) {
 
     for(auto x:compressedSHA){
         Compress rbq1;
-        sprintf(sql, "SELECT UpdatedDateTime FROM Objects WHERE CompressedSHA=(SELECT File FROM Obj2Node WHERE Node='%s'", switch_node);
+        sprintf(sql, "SELECT UpdatedDateTime FROM Objects WHERE CompressedSHA='(SELECT File FROM Obj2Node WHERE Node='%s')'", switch_node);
 
         rc = sqlite3_exec(db, sql, get_update_time ,NULL, &zErrMsg);
 
