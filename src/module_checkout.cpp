@@ -35,6 +35,7 @@ static int node_is_exist(void *NotUsed, int cnt, char **pValue, char **pName)//�
 
 static int get_branch_headnode(void *NotUsed, int cnt, char **pValue, char **pName)//获得分支的头节点
 {
+    cout<<"xxxxx:"<<pValue[0]<<endl;
     strcpy(pNode,pValue[0]);
     if(cnt>0) node_exist_judge=1;
     return 0;
@@ -67,6 +68,7 @@ void module_checkout::checkout_switch_node(char *switch_node) {
     ifstream fin(".simple-scm/HEAD");
     string HEAD;
     fin>>HEAD;
+    fin.close();
     module_detect_changes op;
     detect_info x=op.detect_changes(HEAD);
     //puts("tess_line");
@@ -134,15 +136,12 @@ void module_checkout::checkout_switch_node(char *switch_node) {
     //将该节点快照压缩文件解压到工作目录
     module_detect_changes rbq;
     vector<file_info> compressedSHA=rbq.get_node_files(switch_node);
-    rc = sqlite3_open(".simple-scm/simple-scm.db", &db);
-    if (rc != SQLITE_OK) {
-        cerr << "[ERROR]数据库打开失败：" << endl;
-        exit(1);
-    }
+
 
     for(auto x:compressedSHA){
         Compress rbq1;
-        sprintf(sql, "SELECT UpdatedDateTime FROM Objects WHERE CompressedSHA='(SELECT File FROM Obj2Node WHERE Node='%s')'", switch_node);
+        cout<<x.compressed_sha<<endl;
+        sprintf(sql, "SELECT UpdatedDateTime FROM Objects WHERE CompressedSHA='%s'", x.compressed_sha.c_str());
 
         rc = sqlite3_exec(db, sql, get_update_time ,NULL, &zErrMsg);
 
@@ -156,6 +155,10 @@ void module_checkout::checkout_switch_node(char *switch_node) {
     clog<<"[INFO]压缩文件解压到工作目录成功!"<<endl;
 
     sqlite3_close(db);
+
+    ofstream fout(".simple-scm/HEAD");
+    fout<<switch_node;
+    fout.close();
 }
 
 void module_checkout::checkout_switch_branch(char *switch_branch)
@@ -173,24 +176,29 @@ void module_checkout::checkout_switch_branch(char *switch_branch)
     char sql[500];
 
     //获取所切换分支的头节点
-    sprintf(sql,"SELECT BranchHead FROM Branch WHERE NAME='%s'",switch_branch);
+    cout<<switch_branch<<endl;
+    sprintf(sql,"SELECT BranchHead FROM Branch WHERE NAME='%s';",switch_branch);
+    cout<<sql<<endl;
     rc= sqlite3_exec(db,sql,get_branch_headnode,NULL,&zErrMsg);
     if(rc!=SQLITE_OK){
         cerr<<"[ERROR]获取所切换分支的头节点失败:"<<zErrMsg<<endl;
         exit(0);
     }
-    if(node_exist_judge==0){//分支不存在则新建该分支
-        cerr<<"[ERROR]所切换的分支不存在!新建该新分支..."<<endl;
+    if(node_exist_judge==0){//分支不存在
+        cerr<<"[ERROR]所切换的分支不存在!"<<endl;
+        /*
         module_new_branch rbq;
         rbq.create_branch(switch_branch);
+         */
         exit(0);
     }
 
+    /*
     ofstream cou(".simple-scm/current_branch.txt");
     cou<<switch_branch;
     cou.close();
-
-    module_checkout op;
-    op.checkout_switch_node(pNode);
+     */
+    cout<<pNode<<endl;
+    this->checkout_switch_node(pNode);
     cerr<<"[INFO]切换分支成功！"<<endl;
 }

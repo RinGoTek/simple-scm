@@ -133,7 +133,7 @@ void module_commit::commit(char *Message) {
     char tmp_time[500];
     auto tmpp = database::getCurrentTimeChar();
     //为了保证节点sha的唯一性，引入当前时间
-    new_sha1 = calculate_string_sha1(tmp_SHA.str()+tmp_time);
+    new_sha1 = calculate_string_sha1(tmp_SHA.str()+tmpp);
 
 
     strcpy(tmp_time, tmpp);

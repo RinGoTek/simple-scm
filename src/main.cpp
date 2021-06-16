@@ -129,9 +129,21 @@ int main(int count, char *parameters[]) {
         auto ans = calculate_sha1(string(command2));
         cout << ans << endl;
     } else if (main_command == "checkout") {
-        char *command2 = parameters[2];
+        string command2 = parameters[2];
         module_checkout rbq;
-        rbq.checkout_switch_branch(command2);
+
+        if(command2 == "-n")
+        {
+            //切换到节点
+            rbq.checkout_switch_node(parameters[3]);
+        }
+        else
+        {
+            //切换分支
+            rbq.checkout_switch_branch(const_cast<char *>(command2.c_str()));
+        }
+
+
     }
     else if(main_command=="reset"){
         char *command2 = parameters[2];

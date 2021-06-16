@@ -7,6 +7,7 @@
 #include<fstream>
 #include"../libs/bundle/bundle.h"
 #include"file_system.h"
+#include "database.h"
 #include<stdexcept>
 
 using namespace std;
@@ -36,13 +37,20 @@ compress_return Compress::compress(const std::string &path) {
 
     compress_return ret;
     //sha1计算的是读入文件以后的string的sha1
-    ret.sha1 = calculate_string_sha1(packed);
+
+    //为了防止冲突，故引入修改时间和路径到sha中
+    struct stat buf;
+    stat(path.c_str(), &buf);
+
+    string tmp = packed;
+    tmp += database::getTimeChar(buf.st_mtime) + path;
+
+    ret.sha1 = calculate_string_sha1(tmp);
 
     ret.compressed_path = ".simple-scm/objects/" + ret.sha1;
     ofstream fout(ret.compressed_path, ios::binary);
     fout << packed;
     fout.close();
-
     return ret;
 }
 
@@ -53,15 +61,22 @@ compress_return Compress::compress(const std::string &path) {
      */
 std::vector<compress_return> Compress::batch_compress(const std::vector<std::string> &path) {
     vector<compress_return> ret;
+
+
     //提前分配空间，提升性能
     ret.reserve(path.size());
+
+    auto path_it = path.begin();
     //逐一进行压缩
-    for (const auto &x:path)
-        ret.emplace_back(compress(x));
+    while (path_it != path.end()) {
+        ret.emplace_back(compress(*path_it));
+        ++path_it;
+    }
+
     return ret;
 }
 
-decompress_return Compress::decompress(const string &compressed_path, const string &path, const string& modifiedTime) {
+decompress_return Compress::decompress(const string &compressed_path, const string &path, const string &modifiedTime) {
 
     //不是文件就抛出异常
     if (!is_file(compressed_path))
@@ -102,7 +117,8 @@ decompress_return Compress::decompress(const string &compressed_path, const stri
      * @return vector<decompress_return>
      */
 std::vector<decompress_return>
-Compress::batch_decompress(const vector<std::string> &compressed_path, const vector<std::string> &path, const std::vector<std::string>& modifiedTime) {
+Compress::batch_decompress(const vector<std::string> &compressed_path, const vector<std::string> &path,
+                           const std::vector<std::string> &modifiedTime) {
     vector<decompress_return> ret;
     //两者的大小必须相同
     if (compressed_path.size() != path.size())
