@@ -38,7 +38,7 @@ static int select_ignore_callback(void *NotUsed, int cnt, char **pValue, char **
 
 //对外开放的，获取文件夹下所有文件的函数
 //返回一个数组，包含所有的文件的（除了ignore以外的）路径信息
-vector<string> walk_folder(string base_dir) {
+vector<string> walk_folder(const string& base_dir) {
     vector<string> ans;
 
     ignore.emplace_back(".simple-scm");
