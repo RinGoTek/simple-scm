@@ -140,7 +140,7 @@ void module_checkout::checkout_switch_node(char *switch_node) {
 
     for(auto x:compressedSHA){
         Compress rbq1;
-        cout<<x.compressed_sha<<endl;
+        //cout<<x.origin_path<<endl;
         sprintf(sql, "SELECT UpdatedDateTime FROM Objects WHERE CompressedSHA='%s'", x.compressed_sha.c_str());
 
         rc = sqlite3_exec(db, sql, get_update_time ,NULL, &zErrMsg);
@@ -150,7 +150,7 @@ void module_checkout::checkout_switch_node(char *switch_node) {
             exit(1);
         }
 
-        rbq1.decompress(x.compressed_path,cwd,UPtime);
+        rbq1.decompress(x.compressed_path,x.origin_path,UPtime);
     }
     clog<<"[INFO]压缩文件解压到工作目录成功!"<<endl;
 

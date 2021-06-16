@@ -85,6 +85,7 @@ void module_new_branch::create_branch(char *branch_name) {
     rc = sqlite3_exec(db, sql, callback, 0, &zErrMsg);
     if (rc != SQLITE_OK) {
         cerr << "[ERROR]新分支创建失败: " << zErrMsg << endl;
+        exit(1);
     } else {
         clog << "[INFO]新分支创建成功！" << endl;
     }
@@ -95,6 +96,7 @@ void module_new_branch::create_branch(char *branch_name) {
 
     if (rc != SQLITE_OK) {
         cerr << "[ERROR]新分支id获取失败 " << zErrMsg << endl;
+        exit(1);
     } else {
         clog << "[INFO]新分支id获取成功！" << endl;
     }
@@ -112,6 +114,7 @@ void module_new_branch::create_branch(char *branch_name) {
     rc = sqlite3_exec(db, sql, callback, 0, &zErrMsg);
     if (rc != SQLITE_OK) {
         cerr << "[ERROR]新分支与根节点连接失败: " << zErrMsg << endl;
+        exit(1);
     } else {
         clog << "[INFO]新分支与根节点连接成功！" << endl;
     }
