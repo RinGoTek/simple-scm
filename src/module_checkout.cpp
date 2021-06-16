@@ -35,7 +35,7 @@ static int node_is_exist(void *NotUsed, int cnt, char **pValue, char **pName)//�
 
 static int get_branch_headnode(void *NotUsed, int cnt, char **pValue, char **pName)//获得分支的头节点
 {
-    cout<<"xxxxx:"<<pValue[0]<<endl;
+    //cout<<"xxxxx:"<<pValue[0]<<endl;
     strcpy(pNode,pValue[0]);
     if(cnt>0) node_exist_judge=1;
     return 0;
@@ -176,9 +176,9 @@ void module_checkout::checkout_switch_branch(char *switch_branch)
     char sql[500];
 
     //获取所切换分支的头节点
-    cout<<switch_branch<<endl;
+    //cout<<switch_branch<<endl;
     sprintf(sql,"SELECT BranchHead FROM Branch WHERE NAME='%s';",switch_branch);
-    cout<<sql<<endl;
+    //cout<<sql<<endl;
     rc= sqlite3_exec(db,sql,get_branch_headnode,NULL,&zErrMsg);
     if(rc!=SQLITE_OK){
         cerr<<"[ERROR]获取所切换分支的头节点失败:"<<zErrMsg<<endl;
@@ -198,7 +198,7 @@ void module_checkout::checkout_switch_branch(char *switch_branch)
     cou<<switch_branch;
     cou.close();
      */
-    cout<<pNode<<endl;
+    //cout<<pNode<<endl;
     this->checkout_switch_node(pNode);
     cerr<<"[INFO]切换分支成功！"<<endl;
 }
