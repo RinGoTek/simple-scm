@@ -13,6 +13,7 @@
 #include "Database/file_system.h"
 #include "module_detect_changes.h"
 #include "Database/Compress.h"
+#include "module_commit.h"
 #include "module_new_branch.h"
 
 using namespace std;
@@ -23,6 +24,7 @@ static vector<string> old_file_list;
 static vector<string> ignore_file_list;
 static vector<string> ignore_dir_list;
 static int node_exist_judge=0;
+static int add_list_judge=0;
 static char pNode[50];
 static char UPtime[100];
 static char root[]="000000";
@@ -30,6 +32,12 @@ static char root[]="000000";
 static int node_is_exist(void *NotUsed, int cnt, char **pValue, char **pName)//获得分支的头节点的回调函数
 {
     if(cnt>0) node_exist_judge=1;
+    return 0;
+}
+
+static int add_list_is(void *NotUsed, int cnt, char **pValue, char **pName)//判断add_list是否为空
+{
+    if(cnt>0) add_list_judge=1;
     return 0;
 }
 
@@ -92,6 +100,38 @@ void module_checkout::checkout_switch_node(char *switch_node) {
     }
 
     char sql[500];
+    //检测add_list是否为空
+    sprintf(sql, "SELECT ID FROM AddList");
+    rc = sqlite3_exec(db, sql, add_list_is ,NULL, &zErrMsg);
+    if (rc != SQLITE_OK) {
+        cerr << "[ERROR]检测AddList表失败：" << zErrMsg << endl;
+        exit(1);
+    }
+    if(add_list_judge==1){
+        clog<<"AddList表存在未提交的文件！"<<endl;
+        cout<<"若选择提交AddList表的文件后再切换分支请输入'YES'"<<endl<<"若选择清除AddList表后切换分支请输入'NO'"<<endl<<"若选择取消切换分支请输入'NOCK'..."<<endl;
+        string s;
+        cin>>s;
+        transform(s.begin(),s.end(),s.begin(),::tolower);
+        if(s=="nock"){
+            clog<<"已取消切换分支!"<<endl;
+            exit(1);
+        }
+        else if(s!=string("yes")){
+                module_commit rbq;
+                rbq.commit("提交-->切换分支");
+        }else{
+            //清空AddList表
+            sprintf(sql, "DELETE FROM AddList");
+            rc = sqlite3_exec(db, sql, NULL ,NULL, &zErrMsg);
+            if (rc != SQLITE_OK) {
+                cerr << "[ERROR]清空AddList表失败：" << zErrMsg << endl;
+                exit(1);
+            }
+        }
+
+    }
+
 
     //检测switch_node
     sprintf(sql,"SELECT * FROM Node WHERE SHA='%s'",switch_node);
