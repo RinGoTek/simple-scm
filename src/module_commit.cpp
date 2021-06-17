@@ -96,7 +96,8 @@ void module_commit::commit(char *Message) {
         cerr << "[ERROR]清空AddList表失败：" << zErrMsg << endl;
         exit(1);
     } else {
-        clog << "[INFO]AddList表清空成功！" << endl;
+        if(DEV_MODE)
+            clog << "[INFO]AddList表清空成功！" << endl;
     }
 
     //获得新节点的sha1
@@ -149,7 +150,8 @@ void module_commit::commit(char *Message) {
         cerr << "[ERROR]新节点创建失败：" << zErrMsg << endl;
         exit(1);
     } else {
-        clog << "[INFO]新节点创建成功！" << endl;
+        if(DEV_MODE)
+            clog << "[INFO]新节点创建成功！" << endl;
     }
 
     //连接新节点和分支
@@ -162,7 +164,8 @@ void module_commit::commit(char *Message) {
         cerr << "[ERROR]新节点与分支连接失败：" << zErrMsg << endl;
         exit(1);
     } else {
-        clog << "[INFO]新节点与分支连接成功！" << endl;
+        if(DEV_MODE)
+            clog << "[INFO]新节点与分支连接成功！" << endl;
     }
 
     //将当前分支头节点改为新节点
@@ -173,7 +176,8 @@ void module_commit::commit(char *Message) {
         cerr << "[ERROR]当前分支头节点更改失败：" << zErrMsg << endl;
         exit(1);
     } else {
-        clog << "[INFO]当前分支头节点更改成功！" << endl;
+        if(DEV_MODE)
+            clog << "[INFO]当前分支头节点更改成功！" << endl;
     }
 
     tmpp = database::getCurrentTimeChar();

@@ -6,6 +6,7 @@
 #define SIMPLE_SCM_MODULE_NEW_BRANCH_H
 
 #include<string>
+#include"headers/global.h"
 
 using namespace std;
 

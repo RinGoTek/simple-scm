@@ -8,6 +8,7 @@
 #include<vector>
 #include<cstring>
 #include "Database/database.h"
+#include"headers/global.h"
 
 using namespace std;
 
@@ -57,7 +58,8 @@ void module_list::list() {
         cerr << "[ERROR]数据库打开失败：" << zErrMsg << endl;
         exit(1);
     } else {
-        clog << "[INFO]数据库打开成功！" << endl;
+        if(DEV_MODE)
+            clog << "[INFO]数据库打开成功！" << endl;
     }
 
     //获得branch表中所有信息

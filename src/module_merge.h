@@ -11,6 +11,7 @@
 #include<vector>
 #include <fstream>
 #include"module_detect_changes.h"
+#include "headers/global.h"
 
 class module_merge {
 public:
@@ -21,7 +22,8 @@ public:
             std::cerr << "[ERROR]数据库加载失败！" << std::endl;
             exit(1);
         } else {
-            std::clog << "[INFO]数据库加载成功！" << std::endl;
+            if(DEV_MODE)
+                std::clog << "[INFO]数据库加载成功！" << std::endl;
         }
 
         std::ifstream fin(".simple-scm/current_branch.txt");

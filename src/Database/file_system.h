@@ -10,7 +10,7 @@
 #include<vector>
 #include<sys/stat.h>
 using namespace std;
-#include "../headers/cache.h"
+#include "../headers/global.h"
 
 /**
  * 遍历目录下的所有文件

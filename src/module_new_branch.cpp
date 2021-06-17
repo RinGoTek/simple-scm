@@ -55,7 +55,8 @@ void module_new_branch::create_branch(char *branch_name) {
         clog << "[ERROR]数据库加载失败：" << endl;
         exit(1);
     } else {
-        clog << "[INFO]数据库加载成功！" << endl;
+        if(DEV_MODE)
+            clog << "[INFO]数据库加载成功！" << endl;
     }
 
     //获取当前节点
@@ -67,7 +68,8 @@ void module_new_branch::create_branch(char *branch_name) {
         cerr << "[ERROR]节点信息获取失败：" << zErrMsg << endl;
         exit(1);
     } else {
-        clog << "[INFO]节点信息获取成功！" << endl;
+        if(DEV_MODE)
+            clog << "[INFO]节点信息获取成功！" << endl;
     }
 
     //cout<<"head_node="<<head_node<<endl;
@@ -87,7 +89,8 @@ void module_new_branch::create_branch(char *branch_name) {
         cerr << "[ERROR]新分支创建失败: " << zErrMsg << endl;
         exit(1);
     } else {
-        clog << "[INFO]新分支创建成功！" << endl;
+        if(DEV_MODE)
+            clog << "[INFO]新分支创建成功！" << endl;
     }
 
     //获取最后插入branch表的数据行的id
@@ -98,7 +101,8 @@ void module_new_branch::create_branch(char *branch_name) {
         cerr << "[ERROR]新分支id获取失败 " << zErrMsg << endl;
         exit(1);
     } else {
-        clog << "[INFO]新分支id获取成功！" << endl;
+        if(DEV_MODE)
+            clog << "[INFO]新分支id获取成功！" << endl;
     }
     //cout<<"id="<<id<<endl;
     tmpp = database::getCurrentTimeChar();
@@ -116,7 +120,8 @@ void module_new_branch::create_branch(char *branch_name) {
         cerr << "[ERROR]新分支与根节点连接失败: " << zErrMsg << endl;
         exit(1);
     } else {
-        clog << "[INFO]新分支与根节点连接成功！" << endl;
+        if(DEV_MODE)
+            clog << "[INFO]新分支与根节点连接成功！" << endl;
     }
 
     module_checkout rbq;

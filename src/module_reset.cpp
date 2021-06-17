@@ -6,6 +6,7 @@
 #include <iostream>
 #include <sqlite3.h>
 #include "fstream"
+#include "headers/global.h"
 using namespace  std;
 
 void module_reset::reset(char *To_Node)

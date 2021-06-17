@@ -7,7 +7,7 @@
 #include<iostream>
 #include<cstdlib>
 #include <cstring>
-#include"../headers/cache.h"
+#include"../headers/global.h"
 #include "database.h"
 #include<sqlite3.h>
 #include<algorithm>

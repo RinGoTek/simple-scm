@@ -4,7 +4,7 @@
 //
 
 #include<memory>
-#include"../headers/cache.h"
+#include"../headers/global.h"
 #include "init-db.h"
 #include<string>
 #include<stdlib.h>

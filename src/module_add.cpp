@@ -175,7 +175,8 @@ void module_add::add(char *path) {
         auto it2 = find(origin_path_of_node.begin(), origin_path_of_node.end(), p);
 
         if (it2 != origin_path_of_node.end()) {
-            cerr << "[ERROR]" << p << "路径已存在！" << endl;
+            if(DEV_MODE)
+                cerr << "[ERROR]" << p << "路径已存在！" << endl;
             continue;
         }
 

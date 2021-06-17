@@ -2,8 +2,8 @@
 // Created by login on 2021/5/16.
 //
 
-#ifndef SIMPLE_SCM_CACHE_H
-#define SIMPLE_SCM_CACHE_H
+#ifndef SIMPLE_SCM_GLOBAL_H
+#define SIMPLE_SCM_GLOBAL_H
 
 #include<iostream>
 
@@ -36,6 +36,7 @@ const std::string DEFAULT_DB_ENVIRONMENT = ".simple-scm/objects";
 static std::string cwd = get_current_dir_name();
 
 
+//是否是开发模式
+static bool DEV_MODE = true;
 
-
-#endif //SIMPLE_SCM_CACHE_H
+#endif //SIMPLE_SCM_GLOBAL_H

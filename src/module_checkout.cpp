@@ -8,7 +8,7 @@
 #include <sqlite3.h>
 #include <algorithm>
 #include <fstream>
-#include "headers/cache.h"
+#include "headers/global.h"
 #include "module_checkout.h"
 #include "Database/file_system.h"
 #include "module_detect_changes.h"
@@ -87,7 +87,8 @@ void module_checkout::checkout_switch_node(char *switch_node) {
         cerr << "[ERROR]数据库加载失败！" << endl;
         exit(1);
     } else {
-        clog << "[INFO]数据库加载成功！" << endl;
+        if(DEV_MODE)
+            clog << "[INFO]数据库加载成功！" << endl;
     }
 
     char sql[500];

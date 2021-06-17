@@ -83,7 +83,8 @@ void module_ignore::do_ignore(string path) {
         cerr << "[ERROR]数据库加载失败！" << endl;
         exit(1);
     } else {
-        clog << "[INFO]数据库加载成功！" << endl;
+        if(DEV_MODE)
+            clog << "[INFO]数据库加载成功！" << endl;
     }
 
     char sql[500];
@@ -173,7 +174,8 @@ void module_ignore::deIgnore(std::string path) {
         cerr << "[ERROR]数据库加载失败！" << endl;
         exit(1);
     } else {
-        clog << "[INFO]数据库加载成功！" << endl;
+        if(DEV_MODE)
+            clog << "[INFO]数据库加载成功！" << endl;
     }
 
     char sql[500];

@@ -1,6 +1,6 @@
 #include <iostream>
 #include<string>
-#include"headers/cache.h"
+#include"headers/global.h"
 
 #include"Database/database.h"
 #include"module_commit.h"
@@ -20,8 +20,6 @@ using namespace std;
 
 void usage();//输出用法的函数
 
-//是否是开发模式
-bool DEV_MODE = true;
 
 //用来提示命令错误的函数
 void tip_command_error() {
