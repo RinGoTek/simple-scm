@@ -9,30 +9,31 @@
 #include<vector>
 
 
-
 struct detect_info//用来保存检测结果
 {
     std::vector<std::string> del;//保存删除的文件哈希值
     std::vector<std::string> change;//保存更改的文件哈希值
-    std::map<std::string,std::string> path2SHA;//保存文件路径到CompressedSHA的映射，用于del和change
+    std::vector<std::string> not_add;//保存未被加入addlist表的新增文件的路径
+    std::map<std::string, std::string> path2SHA;//保存文件路径到CompressedSHA的映射，用于del和change
 
     detect_info() {
         del.clear();
         change.clear();
         path2SHA.clear();
+        not_add.clear();
     }
 
     detect_info &operator=(const detect_info &tmp) {
-        path2SHA=tmp.path2SHA;
+        path2SHA = tmp.path2SHA;
         del = tmp.del;
         change = tmp.change;
+        not_add = tmp.not_add;
         return *this;
     }
 
 };
 
-struct file_info
-{
+struct file_info {
     std::string compressed_sha;
     std::string origin_path;
     std::string compressed_path;
@@ -40,14 +41,13 @@ struct file_info
     std::string created_datetime;
     std::string origin_sha;
 
-    file_info()
-    {
-        compressed_path="";
-        compressed_sha="";
-        origin_path="";
-        updated_datetime="";
-        created_datetime="";
-        origin_sha="";
+    file_info() {
+        compressed_path = "";
+        compressed_sha = "";
+        origin_path = "";
+        updated_datetime = "";
+        created_datetime = "";
+        origin_sha = "";
     }
 };
 

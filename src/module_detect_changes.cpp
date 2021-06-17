@@ -24,16 +24,23 @@ static vector<string> object_path;
 static stack<string> walk_list;
 static vector<string> ignore_object;
 static vector<file_info> node_info_sav;
+static vector<string> add;
 
 void init() {
     object_sha.clear();
     object_path.clear();
     vis.clear();
+    add.clear();
     ignore_object.clear();
     node_info_sav.clear();
 }
 
 static detect_info sav;
+
+static int get_add_path(void *NotUsed, int cnt, char **pValue, char **pName) {
+    add.emplace_back(pValue[0]);
+    return 0;
+}
 
 static int get_node(void *NotUsed, int cnt, char **pValue, char **pName)//用来获得当前分支头节点的回调函数
 {
@@ -47,11 +54,10 @@ static int update_node(void *NotUsed, int cnt, char **pValue, char **pName)//将
     return 0;
 }
 
-string origin_path_tmp;
+static string origin_path_tmp;
 
-static int get_origin_path(void *NotUsed, int cnt, char **pValue, char **pName)
-{
-    origin_path_tmp=pValue[0];
+static int get_origin_path(void *NotUsed, int cnt, char **pValue, char **pName) {
+    origin_path_tmp = pValue[0];
     return 0;
 }
 
@@ -68,7 +74,7 @@ static int get_object(void *NotUsed, int cnt, char **pValue, char **pName)//获�
         exit(1);
     }
 
-    sprintf(sql,"SELECT OriginPath FROM Objects WHERE CompressedSHA='%s'",pValue[0]);
+    sprintf(sql, "SELECT OriginPath FROM Objects WHERE CompressedSHA='%s'", pValue[0]);
     rc = sqlite3_exec(db, sql, get_origin_path, NULL, &zErrMsg);
 
     if (rc != SQLITE_OK) {
@@ -140,8 +146,6 @@ detect_info module_detect_changes::detect_changes(string NodeSHA) {
     if (rc != SQLITE_OK) {
         cerr << "[ERROR]数据库打开失败：" << endl;
         exit(1);
-    } else {
-        clog << "[INFO]数据库打开成功！" << endl;
     }
 
     /*
@@ -158,7 +162,7 @@ detect_info module_detect_changes::detect_changes(string NodeSHA) {
     strcpy(head_node, NodeSHA.c_str());
     strcpy(node, head_node);
 
-    //节点不断向根节点更新从而获得所有包含的object
+    //节点不断向根节点更新从而获得所有包含的object(CompressedSHA)
     while (strcmp(node, "000000")) {
 
         sprintf(sql, "SELECT File,Mode FROM Obj2Node WHERE Node='%s'", node);
@@ -178,7 +182,7 @@ detect_info module_detect_changes::detect_changes(string NodeSHA) {
         }
     }
 
-    //找到所有ignore的文件或文件夹
+    //找到所有ignore的文件或文件夹(origin路径)
     sprintf(sql, "SELECT Path From IgnoreList");
     rc = sqlite3_exec(db, sql, select_ignore_callback, nullptr, &zErrMsg);
     if (rc != SQLITE_OK) {
@@ -186,7 +190,7 @@ detect_info module_detect_changes::detect_changes(string NodeSHA) {
         exit(1);
     }
 
-    //获得所有ignore文件夹下的文件
+    //获得所有ignore文件夹下的文件(origin路径)
     while (!walk_list.empty()) {
         string current_dir = walk_list.top();
         walk_list.pop();
@@ -195,6 +199,13 @@ detect_info module_detect_changes::detect_changes(string NodeSHA) {
         ignore_object.insert(ignore_object.end(), tmp.begin(), tmp.end());
     }
 
+    //获得add表中的信息
+    sprintf(sql, "SELECT OriginPath FROM AddList");
+    rc = sqlite3_exec(db, sql, get_add_path, NULL, &zErrMsg);
+    if (rc != SQLITE_OK) {
+        cerr << "[ERROR]发生错误：" << zErrMsg << endl;
+        exit(1);
+    }
 
     //根据节点包含的文件CompressedSHA获得相应的路径
     for (auto &p:object_sha) {
@@ -207,7 +218,10 @@ detect_info module_detect_changes::detect_changes(string NodeSHA) {
         }
     }
 
-    //遍历节点所包含文件的路径，获得检测信息
+    auto local_object = walk_folder(".");
+    //先获得本地所有文件路径，通过排除法得到还没有add的文件路径
+
+    //遍历节点所包含文件的路径，获得检测信息(origin路径)
     for (auto &p:object_path) {
         //clog << p << endl;
         auto it = find(ignore_object.begin(), ignore_object.end(), p);
@@ -220,6 +234,14 @@ detect_info module_detect_changes::detect_changes(string NodeSHA) {
         {
             sav.del.emplace_back(p);
             continue;
+        }
+
+        //已经存在于节点中的文件，从notadd移除
+        for (auto it = local_object.begin(); it < local_object.end(); it++) {
+            if (*it == p) {
+                local_object.erase(it);
+                break;
+            }
         }
 
         tmp_updated_time = "";//初始化
@@ -235,6 +257,17 @@ detect_info module_detect_changes::detect_changes(string NodeSHA) {
         if (strcmp(tmp_updated_time.c_str(), database::getTimeChar(buf.st_mtime))) sav.change.emplace_back(p);
         //比较文件更新时间判断文件是否发生更改
     }
+
+    for (auto it = local_object.begin(); it < local_object.end();) {
+        auto p = find(add.begin(), add.end(), *it);
+
+        //已经存在AddList表的也从notadd移除
+        if (p != add.end()) local_object.erase(it);//erase后原迭代器失效，it自动后移
+        else it++;
+    }
+
+    sav.not_add = local_object;
+    //for (auto &p:sav.not_add) clog << "notadd " << p << endl;
 
     sqlite3_close(db);
     clog << "[INFO]检测完成" << endl;
