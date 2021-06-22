@@ -24,8 +24,12 @@ void test::start_test() {
 
     switch (sw) {
         case 1:
-            test_compress tmp;
-            tmp.test_compress_one_file();
+            test_compress tmp_1;
+            tmp_1.test_compress_one_file();
+            break;
+        case 2:
+            test_compress tmp_2;
+            tmp_2.test_compress_files();
             break;
         default:
             cout<<"请输入正确的序号"<<endl;

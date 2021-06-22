@@ -42,10 +42,11 @@ compress_return Compress::compress(const std::string &path) {
     struct stat buf;
     stat(path.c_str(), &buf);
 
-    string tmp = packed;
-    tmp += database::getTimeChar(buf.st_mtime) + path;
 
-    ret.sha1 = calculate_string_sha1(tmp);
+
+    ret.sha1 = calculate_string_sha1(calculate_string_sha1(packed) + string(database::getTimeChar(buf.st_mtime) + path));
+    //cout<<ret.sha1<<endl;
+
 
     ret.compressed_path = ".simple-scm/objects/" + ret.sha1;
     ofstream fout(ret.compressed_path, ios::binary);
@@ -69,6 +70,7 @@ std::vector<compress_return> Compress::batch_compress(const std::vector<std::str
     auto path_it = path.begin();
     //逐一进行压缩
     while (path_it != path.end()) {
+        //cout<<*path_it<<endl;
         ret.emplace_back(compress(*path_it));
         ++path_it;
     }
