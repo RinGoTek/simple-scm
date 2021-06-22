@@ -25,6 +25,7 @@ static vector<string> ignore_file_list;
 static vector<string> ignore_dir_list;
 static int node_exist_judge=0;
 static int add_list_judge=0;
+static int pID=0;
 static char pNode[50];
 static char UPtime[100];
 static char root[]="000000";
@@ -46,6 +47,12 @@ static int get_branch_headnode(void *NotUsed, int cnt, char **pValue, char **pNa
     //cout<<"xxxxx:"<<pValue[0]<<endl;
     strcpy(pNode,pValue[0]);
     if(cnt>0) node_exist_judge=1;
+    return 0;
+}
+
+static int get_branch_id(void *NotUsed, int cnt, char **pValue, char **pName)//获得分支的头节点
+{
+    pID= atoi(pValue[0]);
     return 0;
 }
 
@@ -117,9 +124,19 @@ void module_checkout::checkout_switch_node(char *switch_node) {
             clog<<"已取消切换分支!"<<endl;
             exit(1);
         }
-        else if(s!=string("yes")){
-                module_commit rbq;
-                rbq.commit("提交-->切换分支");
+        else if(s!=string("no")){
+            sqlite3_close(db);
+            cout<<"请输入提交的信息"<<endl;
+            char* rbq_m;
+            cin>>rbq_m;
+            module_commit rbq;
+            rbq.commit(rbq_m);
+            rc = sqlite3_open(".simple-scm/simple-scm.db", &db);
+
+            if (rc) {
+                cerr << "[ERROR]数据库加载失败！" << endl;
+                exit(1);
+            }
         }else{
             //清空AddList表
             sprintf(sql, "DELETE FROM AddList");
@@ -234,11 +251,20 @@ void module_checkout::checkout_switch_branch(char *switch_branch)
         exit(0);
     }
 
-    /*
+    sprintf(sql,"SELECT ID FROM Branch WHERE NAME='%s';",switch_branch);
+    //cout<<sql<<endl;
+    rc= sqlite3_exec(db,sql,get_branch_id,NULL,&zErrMsg);
+    if(rc!=SQLITE_OK){
+        cerr<<"[ERROR]获取所切换分支的ID失败:"<<zErrMsg<<endl;
+        exit(0);
+    }
+
     ofstream cou(".simple-scm/current_branch.txt");
-    cou<<switch_branch;
+    cou<<pID;
     cou.close();
-     */
+
+    sqlite3_close(db);
+
     //cout<<pNode<<endl;
     this->checkout_switch_node(pNode);
     cerr<<"[INFO]切换分支成功！"<<endl;
