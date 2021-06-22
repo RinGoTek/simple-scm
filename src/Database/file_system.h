@@ -17,7 +17,7 @@ using namespace std;
  * @param: base_dir 基础目录，默认是cwd
  * @return
  */
-std::vector<std::string> walk_folder(const std::string& base_dir);
+std::vector<std::string> walk_folder(const std::string& base_dir=".");
 
 /**
  *将路径src的文件在路径dst处复制一份
