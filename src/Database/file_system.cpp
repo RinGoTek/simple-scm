@@ -52,8 +52,6 @@ vector<string> walk_folder(const string& base_dir) {
     if (rc) {
         cerr << "[ERROR]数据库加载失败！" << endl;
         exit(1);
-    } else {
-        clog << "[INFO]数据库加载成功！" << endl;
     }
 
     //获取ignore列表

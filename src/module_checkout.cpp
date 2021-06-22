@@ -101,9 +101,6 @@ void module_checkout::checkout_switch_node(char *switch_node) {
     if (rc) {
         cerr << "[ERROR]数据库加载失败！" << endl;
         exit(1);
-    } else {
-        if(DEV_MODE)
-            clog << "[INFO]数据库加载成功！" << endl;
     }
 
     char sql[500];
@@ -259,13 +256,14 @@ void module_checkout::checkout_switch_branch(char *switch_branch)
         exit(0);
     }
 
-    ofstream cou(".simple-scm/current_branch.txt");
-    cou<<pID;
-    cou.close();
 
     sqlite3_close(db);
 
     //cout<<pNode<<endl;
     this->checkout_switch_node(pNode);
     cerr<<"[INFO]切换分支成功！"<<endl;
+
+    ofstream cou(".simple-scm/current_branch.txt");
+    cou<<pID;
+    cou.close();
 }
