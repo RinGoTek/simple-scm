@@ -83,12 +83,23 @@ void module_ignore::do_ignore(string path) {
         cerr << "[ERROR]数据库加载失败！" << endl;
         exit(1);
     } else {
-        if(DEV_MODE)
+        if (DEV_MODE)
             clog << "[INFO]数据库加载成功！" << endl;
     }
 
     char sql[500];
 
+    if(path[0] == '/')
+    {
+        cout<<"[ERROR]请使用相对路径！"<<endl;
+        exit(1);
+    }
+
+    //为了保证walk_folder能正常运行，加入此段代码
+    if (!((path[0] == '.' )&& (path[1] == '/'))) {
+        path = "./" + path;
+
+    }
 
     if (is_file(path)) {
         //不能把.simple-scm添加到ignore，这是保留路径
@@ -107,11 +118,15 @@ void module_ignore::do_ignore(string path) {
             cerr << "[ERROR]系统保留的路径" << endl;
             exit(0);
         }
+
         if (is_in_repository(db, path)) {
             clog << "[INFO] " << path << " 已经存在于存储库中，不可被忽略！" << endl;
             sqlite3_close(db);
             exit(0);
         }
+
+
+
 
 
         sprintf(sql, "INSERT INTO IGNORELIST (Path,CreatedDateTime) VALUES ('%s', '%s')", path.c_str(),
@@ -128,7 +143,7 @@ void module_ignore::do_ignore(string path) {
 
     } else if (is_dir(path)) {
         //不能把.simple-scm添加到ignore，这是保留路径
-        if (path == ".simple-scm"||path == "./.simple-scm") {
+        if (path == ".simple-scm" || path == "./.simple-scm") {
             cerr << "[ERROR]系统保留的路径" << endl;
             exit(0);
         }
@@ -139,7 +154,7 @@ void module_ignore::do_ignore(string path) {
             exit(0);
         }
 
-        if(path[path.length()-1]!='/')
+        if (path[path.length() - 1] != '/')
             path += '/';
 
 
@@ -174,8 +189,14 @@ void module_ignore::deIgnore(std::string path) {
         cerr << "[ERROR]数据库加载失败！" << endl;
         exit(1);
     } else {
-        if(DEV_MODE)
+        if (DEV_MODE)
             clog << "[INFO]数据库加载成功！" << endl;
+    }
+
+    //为了保证walk_folder能正常运行，加入此段代码
+    if (!((path[0] == '.' )&& (path[1] == '/'))) {
+        path = "./" + path;
+
     }
 
     char sql[500];
@@ -205,6 +226,9 @@ void module_ignore::deIgnore(std::string path) {
         }
 
     } else if (is_dir(path)) {
+        if(path[path.length()-1]!='/')
+            path+='/';
+
         sprintf(sql, "SELECT Path FROM IgnoreList");
         rc = sqlite3_exec(db, sql, select_all_from_ignore_list_callback, nullptr, &zErrMsg);
 
@@ -213,35 +237,35 @@ void module_ignore::deIgnore(std::string path) {
         }
 
         //if (path[path.length() - 1] == '/')
-            //path = path.substr(0, path.length() - 1);
+        //path = path.substr(0, path.length() - 1);
 
 
         for (const string &x:ignorePathList) {
 
             bool found = false;
-            if (x.length()<path.length())
+            if (x.length() < path.length())
                 continue;
 
-            if(path == x.substr(0, path.length()))
+            if (path == x.substr(0, path.length()))
                 found = true;
 
             if (found) {
 
-                    sprintf(sql, "DELETE FROM IgnoreList WHERE Path = '%s'", x.c_str());
-                    rc = sqlite3_exec(db, sql, 0, nullptr, &zErrMsg);
-                    if (rc != SQLITE_OK) {
-                        cerr << "[ERROR]处理出错： " << zErrMsg << endl;
-                        cerr << "[ERROR]文件：" << x << endl;
-                    } else {
-                        clog << "[INFO]将 " << x << " 移出Ignore列表" << endl;
+                sprintf(sql, "DELETE FROM IgnoreList WHERE Path = '%s'", x.c_str());
+                rc = sqlite3_exec(db, sql, 0, nullptr, &zErrMsg);
+                if (rc != SQLITE_OK) {
+                    cerr << "[ERROR]处理出错： " << zErrMsg << endl;
+                    cerr << "[ERROR]文件：" << x << endl;
+                } else {
+                    clog << "[INFO]将 " << x << " 移出Ignore列表" << endl;
 
-                    }
+                }
 
 
             }
 
         }
-        cout<<"[INFO]处理完成"<<endl;
+        cout << "[INFO]处理完成" << endl;
 
 
     } else {

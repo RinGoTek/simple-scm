@@ -41,8 +41,8 @@ static int select_ignore_callback(void *NotUsed, int cnt, char **pValue, char **
 vector<string> walk_folder(const string& base_dir) {
     vector<string> ans;
 
-    ignore.emplace_back(".simple-scm");
-    ignore.emplace_back("./.simple-scm");
+    ignore.emplace_back(".simple-scm/");
+    ignore.emplace_back("./.simple-scm/");
 
     sqlite3 *db;
     char *zErrMsg = 0;
@@ -79,14 +79,15 @@ vector<string> walk_folder(const string& base_dir) {
 
         //判断文件夹是否在忽略列表中
         for (const auto &x:wk.dirs) {
-            auto it = find(ignore.begin(), ignore.end(), x);
+
+            auto it = find(ignore.begin(), ignore.end(), x+'/');
 
             //不在忽略列表中
             if (it == ignore.end())
                 walk_list.push(x);
         }
 
-        //判断文件夹是否在忽略列表中
+        //判断文件是否在忽略列表中
         for (const auto &x:wk.files) {
             auto it = find(ignore.begin(), ignore.end(), x);
 

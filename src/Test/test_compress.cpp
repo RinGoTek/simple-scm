@@ -21,7 +21,6 @@ void test_compress::test_compress_one_file() {
 
     cout << "压缩完成！耗时：" << 1.0 * (clock() - start_time) / 1000.0 << "ms" << endl;
 
-
 }
 
 //测试压缩目录下的所有文件

@@ -7,6 +7,7 @@
 #include"../headers/global.h"
 #include"test_compress.h"
 #include "test_database.h"
+#include"test_file_system.h"
 using namespace std;
 
 //测试入口
@@ -20,7 +21,8 @@ void test::start_test() {
         <<"1、压缩单个文件\n"
         <<"2、压缩目录下的所有文件\n"
         <<"3、测试get_current_time_char\n"
-        <<"4、测试getTimeChar\n";
+        <<"4、测试getTimeChar\n"
+        <<"5、测试walk_folder\n";
 
     int sw;
     cin>>sw;
@@ -41,6 +43,10 @@ void test::start_test() {
         case 4:
             test_database tmp_4;
             tmp_4.test_get_time_char();
+            break;
+        case 5:
+            test_file_system tmp_5;
+            tmp_5.test_walk_folder();
             break;
         default:
             cout<<"请输入正确的序号"<<endl;
