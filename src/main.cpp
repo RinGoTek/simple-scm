@@ -14,6 +14,7 @@
 #include "Database/file_system.h"
 #include "Database/Compress.h"
 #include"module_merge.h"
+#include"Test/test.h"
 
 using namespace std;
 
@@ -101,7 +102,13 @@ int main(int count, char *parameters[]) {
             tip_command_error();
         module_merge tmp;
         tmp.merge(parameters[2]);
-    } else if (DEV_MODE && main_command == "walk-folder") {
+    }
+    else if(DEV_MODE && main_command == "test")
+    {
+        test tmp;
+        tmp.start_test();
+    }
+    else if (DEV_MODE && main_command == "walk-folder") {
         //walk folder
         //这仅仅是开发用的
 

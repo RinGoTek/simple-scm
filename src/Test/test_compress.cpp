@@ -3,3 +3,11 @@
 //
 
 #include "test_compress.h"
+
+void test_compress::test_compress_one_file() {
+
+}
+
+void test_compress::test_compress_files() {
+
+}
