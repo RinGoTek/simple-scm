@@ -31,9 +31,11 @@ void test_compress::test_compress_files() {
     cin >> path;
 
     auto file_list = walk_folder(path);
-    cout<<file_list.size();
+    cout<<"文件数量： "<<file_list.size()<<endl;
+    /*
     for(const auto& x:file_list)
         cout<<x<<endl;
+        */
     Compress tmp;
     clock_t start_time = clock();
     tmp.batch_compress(file_list);
