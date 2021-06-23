@@ -12,6 +12,7 @@
 #include<algorithm>
 #include<fstream>
 #include<cstring>
+#include<sstream>
 
 using namespace std;
 
@@ -160,6 +161,7 @@ void module_add::add(char *path) {
 
         file_exit = 0;
 
+        memset(sql, 0, sizeof(char)*500);
         sprintf(sql, "SELECT * FROM AddList WHERE OriginPath='%s'", p.c_str());
         rc = sqlite3_exec(db, sql, check_exit, 0, &zErrMsg);
         if (rc != SQLITE_OK) {
@@ -183,16 +185,19 @@ void module_add::add(char *path) {
         struct stat buf;
         stat(p.c_str(), &buf);
 
-        sprintf(sql,
-                "INSERT INTO AddList (OriginSHA,OriginPath,CreatedDateTime,UpdatedDateTime) VALUES ('%s','%s','%s','%s')",
-                calculate_sha1(p), p.c_str(), database::getTimeChar(buf.st_ctime), database::getTimeChar(buf.st_mtime));
+        //memset(sql, 0, sizeof(char)*500);
+
+        sprintf(sql,"INSERT INTO AddList (OriginSHA,OriginPath,CreatedDateTime,UpdatedDateTime) VALUES ('%s','%s','%s','%s')",calculate_sha1(p),p.c_str(),database::getTimeChar(buf.st_ctime),database::getTimeChar(buf.st_mtime));
         rc = sqlite3_exec(db, sql, callback, 0, &zErrMsg);
 
         if (rc != SQLITE_OK) {
+            //cout<<"sha"<<calculate_sha1(p)<<endl;
+            //cout<<sql_<<endl;
             cerr << "发生错误: " << zErrMsg << endl;
             exit(1);
         }
         cnt++;
+
     }
 
     clog << "[INFO]添加成功，共有" << cnt << "条添加记录" << endl;

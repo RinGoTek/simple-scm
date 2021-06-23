@@ -5,6 +5,7 @@
 #include "module_detect_changes.h"
 #include"Database/file_system.h"
 #include"Database/database.h"
+#include"headers/global.h"
 #include<sqlite3.h>
 #include<iostream>
 #include<cstdlib>
@@ -13,6 +14,7 @@
 #include<stack>
 #include<vector>
 #include<algorithm>
+#include<time.h>
 
 using namespace std;
 
@@ -132,6 +134,9 @@ detect_info module_detect_changes::detect_changes(string NodeSHA) {
     int rc;
     char sql[500];
     init();
+
+    clock_t start_time;
+    if(DEV_MODE) start_time = clock();
 
     /*
     //从文件中读取当前分支
@@ -271,7 +276,7 @@ detect_info module_detect_changes::detect_changes(string NodeSHA) {
 
     sqlite3_close(db);
     clog << "[INFO]检测完成" << endl;
-
+    cout << "detect changes完成！耗时：" << 1.0 * (clock() - start_time) / 1000.0 << "ms" << endl;
     return sav;
 }
 
