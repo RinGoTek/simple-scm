@@ -28,6 +28,7 @@ struct module_merge_node_info {
 vector<module_merge_node_info> nd;
 
 static int query_node_info_callback(void *NotUsed, int cnt, char **pValue, char **pName) {
+    //cout<<pValue[0]<<endl;
     if (cnt == 2) {
         module_merge_node_info tmp;
         tmp.SHA = pValue[0];
@@ -35,7 +36,7 @@ static int query_node_info_callback(void *NotUsed, int cnt, char **pValue, char 
         nd.emplace_back(tmp);
         return 0;
     }
-    return 1;
+    return 0;
 
 }
 
@@ -61,50 +62,58 @@ void module_merge::merge(const std::string &node2) {
 
     char sql[1000];
 
-    sprintf(sql, "SELECT (SHA, Parent) FROM Node WHERE SHA='(SELECT BranchHead From Branch WHERE ID=%d)';",
-            current_branch);
+    sprintf(sql, "SELECT SHA, Parent FROM Node WHERE SHA=(SELECT BranchHead From Branch WHERE ID=%d);",
+    current_branch);
+    //sprintf(sql, "SELECT BranchHead From Branch WHERE ID=%d",current_branch);
+    //cout<<sql<<endl;
 
     rc = sqlite3_exec(db, sql, query_node_info_callback, 0, &zErrMsg);
     if (rc != SQLITE_OK) {
         cerr << "[ERROR]查询Node1信息失败: " << zErrMsg << endl;
+        exit(1);
     }
     else if(nd.size()!=1)
     {
         cerr << "[ERROR]查询Node1信息失败, 找不到节点" << endl;
+        exit(1);
     }
 
 
 
     sprintf(sql,
-            "SELECT (ID, Name) FROM Branch WHERE ID=(SELECT Branch FROM Node2Branch WHERE Node='(SELECT BranchHead From Branch WHERE ID=%d)');",
+            "SELECT ID, Name FROM Branch WHERE ID=(SELECT Branch FROM Node2Branch WHERE Node='(SELECT BranchHead From Branch WHERE ID=%d)');",
             current_branch);
     rc = sqlite3_exec(db, sql, query_node_s_branch_info_callback, 0, &zErrMsg);
 
     if (rc != SQLITE_OK) {
         cerr << "[ERROR]查询当前分支HEAD节点信息失败: " << zErrMsg << endl;
+        exit(1);
     }
 
-    sprintf(sql, "SELECT (SHA, Parent) FROM Node WHERE SHA='%s';", node2.c_str());
+    sprintf(sql, "SELECT SHA, Parent FROM Node WHERE SHA='%s';", node2.c_str());
 
     rc = sqlite3_exec(db, sql, query_node_info_callback, 0, &zErrMsg);
     if (rc != SQLITE_OK) {
         cerr << "[ERROR]查询Node信息失败: " << zErrMsg << endl;
+        exit(1);
     } else if(nd.size()!=2)
     {
         cerr << "[ERROR]查询Node信息失败, 找不到节点" << endl;
+        exit(1);
     }
 
     sprintf(sql,
-            "SELECT (ID, Name) FROM Branch WHERE ID=(SELECT Branch FROM Node2Branch WHERE Node='(SELECT SHA FROM Node WHERE SHA='%s')');",
+            "SELECT ID, Name FROM Branch WHERE ID=(SELECT Branch FROM Node2Branch WHERE Node='%s');",
             node2.c_str());
     rc = sqlite3_exec(db, sql, query_node_s_branch_info_callback, 0, &zErrMsg);
 
     if (rc != SQLITE_OK) {
         cerr << "[ERROR]查询Node信息失败: " << zErrMsg << endl;
+        exit(1);
     }
 
 
-    if (branch_of_node.size() != 2) {
+    if (branch_of_node.size() != 1) {
         cerr << "[ERROR]Internal error" << endl;
         throw "Internal error.";
     }
@@ -247,7 +256,7 @@ void module_merge::merge(const std::string &node2) {
         }
     }
 
-    clog << "[INFO]" + ("Merge " + branch_name[0] + " into " + branch_name[1]) << endl;
+    clog << "[INFO]" + ("Merge " + node2 + " into " + branch_name[0]) << endl;
 
     //切换到新节点
     module_checkout tmp_checkout;

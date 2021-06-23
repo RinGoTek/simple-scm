@@ -7,7 +7,9 @@
 
 
 class test_merge {
-
+public:
+    test_merge()=default;
+    void test();
 };
 
 

@@ -12,6 +12,7 @@
 #include"test_add.h"
 #include "test_checkout.h"
 #include "test_reset.h"
+#include"test_merge.h"
 
 using namespace std;
 
@@ -31,7 +32,8 @@ void test::start_test() {
          << "7、测试add\n"
          << "8、测试切换节点\n"
          << "9、测试切换分支\n"
-         <<"10、测试reset\n";
+         <<"10、测试reset\n"
+         <<"11、测试merge\n";
 
     int sw;
     cout << ">> ";
@@ -77,6 +79,10 @@ void test::start_test() {
         case 10:
             test_reset tmp_10;
             tmp_10.test();
+            break;
+        case 11:
+            test_merge tmp_11;
+            tmp_11.test();
             break;
         default:
             cout << "请输入正确的序号" << endl;
