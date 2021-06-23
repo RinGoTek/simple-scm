@@ -11,6 +11,7 @@
 #include"test_commit.h"
 #include"test_add.h"
 #include "test_checkout.h"
+#include "test_reset.h"
 
 using namespace std;
 
@@ -29,7 +30,8 @@ void test::start_test() {
          << "6、测试commit\n"
          << "7、测试add\n"
          << "8、测试切换节点\n"
-         << "9、测试切换分支\n";
+         << "9、测试切换分支\n"
+         <<"10、测试reset\n";
 
     int sw;
     cout << ">> ";
@@ -71,6 +73,10 @@ void test::start_test() {
         case 9:
             test_checkout tmp_9;
             tmp_9.test_switch_branch();
+            break;
+        case 10:
+            test_reset tmp_10;
+            tmp_10.test();
             break;
         default:
             cout << "请输入正确的序号" << endl;
