@@ -8,11 +8,16 @@
 #include "fstream"
 #include "headers/global.h"
 using namespace  std;
+static int to_node_branch_id;
+static int callback(void *NotUsed, int cnt, char **pValue, char **pName)//用于获得branch表所有信息的回调函数
+{
+    to_node_branch_id = atoi(pValue[0]);
+    return 0;
+}
 
 void module_reset::reset(char *To_Node)
 {
-    module_checkout rbq;
-    rbq.checkout_switch_node(To_Node);
+
 
     ofstream cou(".simple-scm/HEAD");
     cou<<To_Node;
@@ -33,6 +38,18 @@ void module_reset::reset(char *To_Node)
     file.close();
 
     char sql[500];
+    sprintf(sql,"SELECT Branch FROM Node2Branch WHERE Node='%s'",To_Node);
+    rc= sqlite3_exec(db,sql,callback,NULL,&zErrMsg);
+    if(rc!=SQLITE_OK){
+        cerr << "[ERROR]查询节点信息失败:" <<zErrMsg<< endl;
+        exit(1);
+    }
+
+    if(to_node_branch_id!=current_branch)
+    {
+        cerr<<"[ERROR]目标节点不属于当前分支！"<<endl;
+        exit(1);
+    }
 
     sprintf(sql,"UPDATE Branch SET BranchHead ='%s' WHERE ID =%d",To_Node,current_branch);
     rc= sqlite3_exec(db,sql,NULL,NULL,&zErrMsg);
@@ -41,5 +58,7 @@ void module_reset::reset(char *To_Node)
         exit(0);
     }
 
+    module_checkout rbq;
+    rbq.checkout_switch_node(To_Node);
     clog<<"[INFO]回退版本成功！"<<endl;
 }
