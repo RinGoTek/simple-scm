@@ -88,8 +88,16 @@ void module_checkout::checkout_switch_node(char *switch_node) {
     detect_info x=op.detect_changes(HEAD);
     //puts("tess_line");
     if(x.change.size()>0||x.del.size()>0){
-        cerr<<"[ERROR]请将做出的修改进行提交或删除后再切换节点"<<endl;
-        exit(0);
+        cerr<<"[ERROR]您有更改尚未提交，是否切换分支?(y/n)"<<endl;
+        cout<<">> ";
+        char c;
+        cin>>c;
+        if(!(c=='y'||c=='Y')){
+            cout<<"[INFO]操作已取消"<<endl;
+            exit(0);
+        }
+
+
     }
 
 
@@ -115,6 +123,7 @@ void module_checkout::checkout_switch_node(char *switch_node) {
         clog<<"AddList表存在未提交的文件！"<<endl;
         cout<<"若选择提交AddList表的文件后再切换分支请输入'YES'"<<endl<<"若选择清除AddList表后切换分支请输入'NO'"<<endl<<"若选择取消切换分支请输入'NOCK'..."<<endl;
         string s;
+        cout<<">> ";
         cin>>s;
         transform(s.begin(),s.end(),s.begin(),::tolower);
         if(s=="nock"){
