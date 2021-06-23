@@ -81,7 +81,7 @@ void module_merge::merge(const std::string &node2) {
 
 
     sprintf(sql,
-            "SELECT ID, Name FROM Branch WHERE ID=(SELECT Branch FROM Node2Branch WHERE Node=(SELECT BranchHead From Branch WHERE ID=%d));",
+            "SELECT ID, Name FROM Branch WHERE ID=%d;",
             current_branch);
     rc = sqlite3_exec(db, sql, query_node_s_branch_info_callback, 0, &zErrMsg);
 
@@ -96,7 +96,7 @@ void module_merge::merge(const std::string &node2) {
     if (rc != SQLITE_OK) {
         cerr << "[ERROR]查询Node信息失败: " << zErrMsg << endl;
         exit(1);
-    } else if(nd.size()!=2)
+    } else if(nd.size()<2)
     {
         cerr << "[ERROR]查询Node信息失败, 找不到节点" << endl;
         exit(1);
@@ -113,15 +113,18 @@ void module_merge::merge(const std::string &node2) {
     }
 
 
-    if (branch_of_node.size() != 2) {
+    if (branch_of_node.size() < 2) {
         cerr << "[ERROR]Internal error" << endl;
         throw "Internal error.";
     }
 
-    if (branch_of_node[0] == branch_of_node[1]) {
-        cerr << "Argument fault: 两个节点不能属于同一分支" << endl;
-        throw "Argument fault: 两个节点不能属于同一分支";
+    for(int i=1;i<branch_of_node.size();i++){
+        if (branch_of_node[0] == branch_of_node[i]) {
+            cerr << "Argument fault: 两个节点不能属于同一分支" << endl;
+            throw "Argument fault: 两个节点不能属于同一分支";
+        }
     }
+
 
     if (branch_of_node[0] != current_branch) {
         cerr << "[ERROR]基础节点不属于当前分支" << endl;
