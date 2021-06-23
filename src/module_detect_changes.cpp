@@ -86,7 +86,7 @@ static int get_object(void *NotUsed, int cnt, char **pValue, char **pName)//èŽ·å
 
     if (vis[origin_path_tmp]) return 0;
     vis[origin_path_tmp] = 1;
-    if (atoi(pValue[1]) != -1) object_sha.push_back(pValue[0]);
+    if (atoi(pValue[1]) != -1) object_sha.push_back(string (pValue[0]));
     return 0;
 }
 
