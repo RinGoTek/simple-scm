@@ -102,13 +102,10 @@ int main(int count, char *parameters[]) {
             tip_command_error();
         module_merge tmp;
         tmp.merge(parameters[2]);
-    }
-    else if(DEV_MODE && main_command == "test")
-    {
+    } else if (DEV_MODE && main_command == "test") {
         test tmp;
         tmp.start_test();
-    }
-    else if (DEV_MODE && main_command == "walk-folder") {
+    } else if (DEV_MODE && main_command == "walk-folder") {
         //walk folder
         //这仅仅是开发用的
 
@@ -137,24 +134,20 @@ int main(int count, char *parameters[]) {
         string command2 = parameters[2];
         module_checkout rbq;
 
-        if(command2 == "-n")
-        {
+        if (command2 == "-n") {
             //切换到节点
             rbq.checkout_switch_node(parameters[3]);
-        }
-        else
-        {
+        } else {
             //切换分支
             rbq.checkout_switch_branch(const_cast<char *>(command2.c_str()));
         }
 
 
-    }
-    else if(main_command=="reset"){
+    } else if (main_command == "reset") {
         char *command2 = parameters[2];
         module_reset rbq;
         rbq.reset(command2);
-    }else if (DEV_MODE && main_command == "compress") {
+    } else if (DEV_MODE && main_command == "compress") {
 
         //这仅仅是开发用的
         /*
@@ -192,13 +185,15 @@ int main(int count, char *parameters[]) {
 
 void usage() {
     cout << "Usage:\n"
-         << "init      初始化存储仓库\n"
-         << "new-branch <BranchName>      从当前节点新建分支\n"
-         << "list      展示当前所有分支\n"
-         << "ignore <path>      添加路径到ignore\n"
-         << "commit <Message>      提交代码到存储库\n"
+         << "init                       初始化存储仓库\n"
+         << "add <path>                 添加路径到AddList\n"
+         << "new-branch <BranchName>    从当前节点新建分支\n"
+         << "commit <Message>           提交代码到存储库\n"
+         << "list                       展示当前所有分支\n"
+         << "ignore <path>              添加路径到ignore\n"
+         << "ignore -d <path>           取消ignore\n"
          << "checkout <BranchName>      切换分支\n"
-         << "reset <NodeName>      回退当前分支的版本\n"
-         << "add <path>      添加路径到AddList\n"
+         << "checkout -n <sha1>         切换到指定节点\n"
+         << "reset <SHA1>               回退当前分支的版本\n"
          << endl;
 }
