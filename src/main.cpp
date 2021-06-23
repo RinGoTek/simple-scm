@@ -167,7 +167,8 @@ void usage() {
          << "ignore <path>              添加路径到ignore\n"
          << "ignore -d <path>           取消ignore\n"
          << "checkout <BranchName>      切换分支\n"
-         << "checkout -n <sha1>         切换到指定节点\n"
+         << "checkout -n <SHA1>         切换到指定节点\n"
          << "reset <SHA1>               回退当前分支的版本\n"
+         << "merge <SHA1>               将另一个节点合并入当前分支的头节点\n"
          << endl;
 }
