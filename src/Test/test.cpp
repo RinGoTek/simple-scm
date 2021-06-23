@@ -10,6 +10,7 @@
 #include"test_file_system.h"
 #include"test_commit.h"
 #include"test_add.h"
+#include "test_checkout.h"
 
 using namespace std;
 
@@ -26,9 +27,12 @@ void test::start_test() {
          << "4、测试getTimeChar\n"
          << "5、测试walk_folder\n"
          << "6、测试commit\n"
-         << "7、测试add\n";
+         << "7、测试add\n"
+         << "8、测试切换节点\n"
+         << "9、测试切换分支\n";
 
     int sw;
+    cout << ">> ";
     cin >> sw;
 
     switch (sw) {
@@ -59,6 +63,14 @@ void test::start_test() {
         case 7:
             test_add tmp_7;
             tmp_7.test_module_add();
+            break;
+        case 8:
+            test_checkout tmp_8;
+            tmp_8.test_switch_node();
+            break;
+        case 9:
+            test_checkout tmp_9;
+            tmp_9.test_switch_branch();
             break;
         default:
             cout << "请输入正确的序号" << endl;
