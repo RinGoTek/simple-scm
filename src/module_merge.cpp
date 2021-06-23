@@ -81,7 +81,7 @@ void module_merge::merge(const std::string &node2) {
 
 
     sprintf(sql,
-            "SELECT ID, Name FROM Branch WHERE ID=(SELECT Branch FROM Node2Branch WHERE Node='(SELECT BranchHead From Branch WHERE ID=%d)');",
+            "SELECT ID, Name FROM Branch WHERE ID=(SELECT Branch FROM Node2Branch WHERE Node=(SELECT BranchHead From Branch WHERE ID=%d));",
             current_branch);
     rc = sqlite3_exec(db, sql, query_node_s_branch_info_callback, 0, &zErrMsg);
 
@@ -113,7 +113,7 @@ void module_merge::merge(const std::string &node2) {
     }
 
 
-    if (branch_of_node.size() != 1) {
+    if (branch_of_node.size() != 2) {
         cerr << "[ERROR]Internal error" << endl;
         throw "Internal error.";
     }
