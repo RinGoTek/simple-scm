@@ -218,7 +218,7 @@ void module_add::add(char *path) {
 
     clog << "[INFO]add完成，共有" << cnt << "条添加记录" << endl;
 
-    if (fail_add.size()) {
+    if (!fail_add.empty()) {
         clog << "[ERROR]共有" << fail_add.size() << "条失败记录，添加失败路径：" << endl;
         for (auto p:fail_add) cout << p << endl;
     }
