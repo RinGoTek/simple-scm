@@ -98,7 +98,7 @@ int main(int count, char *parameters[]) {
 
     } else if (main_command == "merge") {
         //将另一个节点并入当前分支
-        if (count != 2)
+        if (count != 3)
             tip_command_error();
         module_merge tmp;
         tmp.merge(parameters[2]);
@@ -151,6 +151,7 @@ int main(int count, char *parameters[]) {
 
         tip_command_error();
     }
+
 
     return 0;
 
