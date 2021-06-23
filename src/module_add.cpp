@@ -13,6 +13,7 @@
 #include<fstream>
 #include<cstring>
 #include<sstream>
+#include<queue>
 
 using namespace std;
 
@@ -31,7 +32,7 @@ static int check_exit(void *NotUsed, int cnt, char **pValue, char **pName) {
 
 static vector<string> ignore;
 static stack<string> walk_list;
-static vector<string> file;
+static queue<pair<string, int> > file;
 static vector<string> origin_path_of_node;
 static char head_node[500], node[500];
 static string origin_path_tmp;
@@ -98,9 +99,14 @@ void module_add::add(char *path) {
         exit(1);
     }
 
-    if (is_file(path)) file.emplace_back(path);
-    else if (is_dir(path)) file = walk_folder(path);
+    vector<string> file_path;
+    file_path.clear();
+
+    if (is_file(path)) file.push(make_pair(path, 0));
+    else if (is_dir(path)) file_path = walk_folder(path);
     else return;
+
+    for (auto p:file_path) file.push(make_pair(p, 0));
 
     sqlite3 *db;
     char *zErrMsg = 0;
@@ -152,17 +158,22 @@ void module_add::add(char *path) {
         }
     }
 
+    vector<string> fail_add;
+    fail_add.clear();
+
     //把不在ignore中的所有文件信息加入AddList中
-    for (auto &p:file) {
-        auto it = find(ignore.begin(), ignore.end(), p);
+    while (!file.empty()) {
+        auto p = file.front();
+        file.pop();
+        auto it = find(ignore.begin(), ignore.end(), p.first);
 
         //在忽略列表中
         if (it != ignore.end()) continue;
 
         file_exit = 0;
 
-        memset(sql, 0, sizeof(char)*500);
-        sprintf(sql, "SELECT * FROM AddList WHERE OriginPath='%s'", p.c_str());
+        memset(sql, 0, sizeof(char) * 500);
+        sprintf(sql, "SELECT * FROM AddList WHERE OriginPath='%s'", p.first.c_str());
         rc = sqlite3_exec(db, sql, check_exit, 0, &zErrMsg);
         if (rc != SQLITE_OK) {
             cerr << "发生错误: " << zErrMsg << endl;
@@ -170,37 +181,48 @@ void module_add::add(char *path) {
         }
 
         if (file_exit) {
-            clog << "[ERROR]请勿重复添加文件" << p << endl;
+            clog << "[ERROR]请勿重复添加文件" << p.first << endl;
             continue;
         }
 
-        auto it2 = find(origin_path_of_node.begin(), origin_path_of_node.end(), p);
+        auto it2 = find(origin_path_of_node.begin(), origin_path_of_node.end(), p.first);
 
         if (it2 != origin_path_of_node.end()) {
-            if(DEV_MODE)
-                cerr << "[ERROR]" << p << "路径已存在！" << endl;
+            cerr << "[ERROR]" << p.first << "路径已存在！" << endl;
             continue;
         }
 
         struct stat buf;
-        stat(p.c_str(), &buf);
+        stat(p.first.c_str(), &buf);
 
         //memset(sql, 0, sizeof(char)*500);
 
-        sprintf(sql,"INSERT INTO AddList (OriginSHA,OriginPath,CreatedDateTime,UpdatedDateTime) VALUES ('%s','%s','%s','%s')",calculate_sha1(p),p.c_str(),database::getTimeChar(buf.st_ctime),database::getTimeChar(buf.st_mtime));
+        sprintf(sql,
+                "INSERT INTO AddList (OriginSHA,OriginPath,CreatedDateTime,UpdatedDateTime) VALUES ('%s','%s','%s','%s')",
+                calculate_sha1(p.first), p.first.c_str(), database::getTimeChar(buf.st_ctime),
+                database::getTimeChar(buf.st_mtime));
+
         rc = sqlite3_exec(db, sql, callback, 0, &zErrMsg);
 
         if (rc != SQLITE_OK) {
-            //cout<<"sha"<<calculate_sha1(p)<<endl;
-            //cout<<sql_<<endl;
-            cerr << "发生错误: " << zErrMsg << endl;
-            exit(1);
+            if (p.second < 3) file.push(make_pair(p.first, p.second + 1));
+            else fail_add.emplace_back(p.first);
+
+            continue;
+            //cerr << "发生错误: " << zErrMsg << endl;
+            //exit(1);
         }
         cnt++;
 
     }
 
-    clog << "[INFO]添加成功，共有" << cnt << "条添加记录" << endl;
+    clog << "[INFO]add完成，共有" << cnt << "条添加记录" << endl;
+
+    if (fail_add.size()) {
+        clog << "[ERROR]共有" << fail_add.size() << "条失败记录，添加失败路径：" << endl;
+        for (auto p:fail_add) cout << p << endl;
+    }
+
     sqlite3_close(db);
 
 }
