@@ -19,7 +19,6 @@
 using namespace std;
 
 static char head_node[500], node[500];
-static string tmp_updated_time;
 static map<string, bool> vis;
 static vector<string> object_sha;
 static vector<string> object_path;
@@ -37,7 +36,6 @@ void init() {
     node_info_sav.clear();
 }
 
-static detect_info sav;
 
 static int get_add_path(void *NotUsed, int cnt, char **pValue, char **pName) {
     add.emplace_back(pValue[0]);
@@ -100,20 +98,6 @@ static int select_ignore_callback(void *NotUsed, int cnt, char **pValue, char **
     return 0;
 }
 
-static int get_object_path(void *NotUsed, int cnt, char **pValue, char **pName)//获得当前节点包含的object的回调函数
-{
-    sav.path2SHA[pValue[0]] = pValue[1];
-    object_path.emplace_back(pValue[0]);
-    return 0;
-}
-
-static int get_tmp_updated_time(void *NotUsed, int cnt, char **pValue, char **pName)//获得该文件最后的更新时间
-{
-    if (strcmp(pValue[0], tmp_updated_time.c_str()) > 0)//查询到的更新时间晚于当前时间则更新
-        tmp_updated_time = pValue[0];
-    return 0;
-}
-
 static int get_object_info(void *NotUsed, int cnt, char **pValue, char **pName)//获得文件所有信息
 {
     file_info tmp;
@@ -163,9 +147,10 @@ detect_info module_detect_changes::detect_changes(string NodeSHA) {
     } else {
         clog << "[INFO]节点信息获取成功！" << endl;
     }
-    */
+
     strcpy(head_node, NodeSHA.c_str());
     strcpy(node, head_node);
+
 
     //节点不断向根节点更新从而获得所有包含的object(CompressedSHA)
     while (strcmp(node, "000000")) {
@@ -186,6 +171,13 @@ detect_info module_detect_changes::detect_changes(string NodeSHA) {
             exit(1);
         }
     }
+     */
+
+    detect_info sav;
+
+    vector<file_info>node_info= get_node_files(NodeSHA);
+
+    for(auto p:node_info) sav.path2SHA[p.origin_path]=p.compressed_sha;
 
     //找到所有ignore的文件或文件夹(origin路径)
     sprintf(sql, "SELECT Path From IgnoreList");
@@ -212,6 +204,7 @@ detect_info module_detect_changes::detect_changes(string NodeSHA) {
         exit(1);
     }
 
+    /*
     //根据节点包含的文件CompressedSHA获得相应的路径
     for (auto &p:object_sha) {
         sprintf(sql, "SELECT OriginPath,CompressedSHA FROM Objects WHERE CompressedSHA ='%s'", p.c_str());
@@ -222,57 +215,48 @@ detect_info module_detect_changes::detect_changes(string NodeSHA) {
             exit(1);
         }
     }
+     */
 
     auto local_object = walk_folder(".");
     //先获得本地所有文件路径，通过排除法得到还没有add的文件路径
 
     //遍历节点所包含文件的路径，获得检测信息(origin路径)
-    for (auto &p:object_path) {
-        //clog << p << endl;
-        auto it = find(ignore_object.begin(), ignore_object.end(), p);
+    for (auto &p:node_info) {
+
+        auto it = find(ignore_object.begin(), ignore_object.end(), p.origin_path);
 
         //在忽略列表中
         if (it != ignore_object.end()) continue;
 
         struct stat buf;
-        if (stat(p.c_str(), &buf) == -1)//找不到该文件
+        if (stat(p.origin_path.c_str(), &buf) == -1)//找不到该文件
         {
-            sav.del.emplace_back(p);
+            sav.del.emplace_back(p.origin_path);
             continue;
         }
 
-        //已经存在于节点中的文件，从notadd移除
+        //已经存在于节点中的文件，从not add移除
         for (auto it = local_object.begin(); it < local_object.end(); it++) {
-            if (*it == p) {
+            if (*it == p.origin_path) {
                 local_object.erase(it);
                 break;
             }
         }
 
-        tmp_updated_time = "";//初始化
-
-        sprintf(sql, "SELECT UpdatedDateTime FROM Objects WHERE OriginPath='%s'", p.c_str());
-        rc = sqlite3_exec(db, sql, get_tmp_updated_time, nullptr, &zErrMsg);
-
-        if (rc != SQLITE_OK) {
-            cerr << "[ERROR]发生错误：" << zErrMsg << endl;
-            exit(1);
-        }
-
-        if (strcmp(tmp_updated_time.c_str(), database::getTimeChar(buf.st_mtime))) sav.change.emplace_back(p);
+        if (strcmp(p.updated_datetime.c_str(), database::getTimeChar(buf.st_mtime))) sav.change.emplace_back(p.origin_path);
         //比较文件更新时间判断文件是否发生更改
     }
 
     for (auto it = local_object.begin(); it < local_object.end();) {
-        auto p = find(add.begin(), add.end(), *it);
+        auto q = find(add.begin(), add.end(), *it);
 
-        //已经存在AddList表的也从notadd移除
-        if (p != add.end()) local_object.erase(it);//erase后原迭代器失效，it自动后移
+        //已经存在AddList表的也从not add移除
+        if (q != add.end()) it=local_object.erase(it);//erase后原迭代器失效，it自动后移
         else it++;
     }
 
     sav.not_add = local_object;
-    //for (auto &p:sav.not_add) clog << "notadd " << p << endl;
+    //for (auto &p:sav.not_add) clog << "not add " << p << endl;
 
     sqlite3_close(db);
     clog << "[INFO]检测完成" << endl;

@@ -14,7 +14,7 @@ struct detect_info//用来保存检测结果
     std::vector<std::string> del;//保存删除的文件哈希值
     std::vector<std::string> change;//保存更改的文件哈希值
     std::vector<std::string> not_add;//保存未被加入addlist表的新增文件的路径
-    std::map<std::string, std::string> path2SHA;//保存文件路径到CompressedSHA的映射，用于del和change
+    std::map<std::string, std::string> path2SHA;//保存文件路径到CompressedSHA的映射，用于del
 
     detect_info() {
         del.clear();

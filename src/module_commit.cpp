@@ -218,7 +218,7 @@ void module_commit::commit(char *Message) {
 
     //把del信息加入连接表中
     for (auto &p:info.del) {
-        clog << "compress sha  " << info.path2SHA[p] << endl;
+        //clog << "compress sha  " << info.path2SHA[p] << endl;
 
         sprintf(sql,
                 "INSERT INTO Obj2Node (ID,File,Mode,Node,CreatedDateTime) VALUES (NULL,(SELECT CompressedSHA FROM Objects WHERE CompressedSHA='%s' ),-1,(SELECT SHA FROM Node WHERE SHA='%s'),'%s')",
@@ -250,7 +250,7 @@ void module_commit::commit(char *Message) {
 
         sprintf(sql,
                 "INSERT INTO Obj2Node (ID,File,Mode,Node,CreatedDateTime) VALUES (NULL,(SELECT CompressedSHA FROM Objects WHERE CompressedSHA='%s' ),0,(SELECT SHA FROM Node WHERE SHA='%s'),'%s')",
-                info.path2SHA[p].c_str(), new_sha1.c_str(), tmp_time);
+                compress_info.sha1.c_str(), new_sha1.c_str(), tmp_time);
         rc = sqlite3_exec(db, sql, callback, NULL, &zErrMsg);
         if (rc != SQLITE_OK) {
             cerr << "[ERROR]发生错误：" << zErrMsg << endl;
