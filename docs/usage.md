@@ -96,3 +96,9 @@ simple-scm checkout -n <sha1>
 simple-scm reset <sha1>
 ```
 
+将另一个节点合并入当前分支的头节点
+
+```
+simple-scm merge <sha1>
+```
+

@@ -147,32 +147,6 @@ int main(int count, char *parameters[]) {
         char *command2 = parameters[2];
         module_reset rbq;
         rbq.reset(command2);
-    } else if (DEV_MODE && main_command == "compress") {
-
-        //这仅仅是开发用的
-        /*
-        cout << "compress" << endl;
-        Compress tmp;
-
-        auto res = tmp.compress(string(parameters[2]));
-        cout << res.sha1 << endl;
-        cout << res.compressed_path << endl;
-
-        cout << calculate_sha1(res.compressed_path) << endl;
-        cout << "decompressing..." << endl;
-        cout << "aaa/" + string(parameters[2]) << endl;
-        auto decompress_info = tmp.decompress(res.compressed_path, "aaa/" + string(parameters[2]));
-        cout << decompress_info.decompressed_path << endl;
-        cout << decompress_info.sha1 << endl;
-
-        if (count != 3) {
-            cerr << "请输入正确的命令！" << endl;
-            exit(0);
-        }
-
-        char *command2 = parameters[2];
-        auto ans = calculate_sha1(string(command2));
-        //cout << ans << endl;*/
     } else {
 
         tip_command_error();
