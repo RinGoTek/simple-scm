@@ -27,3 +27,4 @@
 
 您可以通过以下方式赞赏本项目！我们非常感谢您的支持！
 
+<img src="https://lj-pic-bed-1251967225.cos.ap-guangzhou.myqcloud.com/20210623172954.jpg" style="zoom: 40%;" />
