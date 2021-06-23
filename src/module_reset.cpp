@@ -9,9 +9,14 @@
 #include "headers/global.h"
 using namespace  std;
 static int to_node_branch_id;
+
+static int current_branch;
+static bool is_current_branch_flag = false;
 static int callback(void *NotUsed, int cnt, char **pValue, char **pName)//用于获得branch表所有信息的回调函数
 {
     to_node_branch_id = atoi(pValue[0]);
+    if(atoi(pValue[0]) == current_branch)
+        is_current_branch_flag=true;
     return 0;
 }
 
@@ -33,7 +38,7 @@ void module_reset::reset(char *To_Node)
     }
 
     ifstream file(".simple-scm/current_branch.txt");
-    int current_branch;
+
     file >> current_branch;
     file.close();
 
@@ -45,7 +50,7 @@ void module_reset::reset(char *To_Node)
         exit(1);
     }
 
-    if(to_node_branch_id!=current_branch)
+    if(!is_current_branch_flag)
     {
         cerr<<"[ERROR]目标节点不属于当前分支！"<<endl;
         exit(1);

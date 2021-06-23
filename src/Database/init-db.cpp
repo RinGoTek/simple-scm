@@ -61,8 +61,8 @@ void init_db::do_init() {
         }
     }
 
-
-    clog << "[INFO]创建数据目录成功！" << endl;
+    if (DEV_MODE)
+        clog << "[INFO]创建数据目录成功！" << endl;
 
 
     sqlite3 *db;
@@ -76,7 +76,8 @@ void init_db::do_init() {
         cerr << "[ERROR]数据库创建失败！" << endl;
         exit(1);
     } else {
-        clog << "[INFO]数据库创建成功！" << endl;
+        if (DEV_MODE)
+            clog << "[INFO]数据库创建成功！" << endl;
     }
 
     sql = "CREATE TABLE Objects("\
@@ -91,7 +92,8 @@ void init_db::do_init() {
     if (rc != SQLITE_OK) {
         cerr << "[ERROR]数据表Object创建失败: " << zErrMsg << endl;
     } else {
-        clog << "[INFO]数据表Object创建成功！" << endl;
+        if (DEV_MODE)
+            clog << "[INFO]数据表Object创建成功！" << endl;
     }
 
     sql = "CREATE TABLE Node("\
@@ -105,7 +107,8 @@ void init_db::do_init() {
     if (rc != SQLITE_OK) {
         cerr << "[ERROR]数据表Node创建失败: " << zErrMsg << endl;
     } else {
-        clog << "[INFO]数据表Node创建成功！" << endl;
+        if (DEV_MODE)
+            clog << "[INFO]数据表Node创建成功！" << endl;
     }
 
     sql = "CREATE TABLE Obj2Node("\
@@ -121,7 +124,8 @@ void init_db::do_init() {
     if (rc != SQLITE_OK) {
         cerr << "[ERROR]数据表Obj2Node创建失败: " << zErrMsg << endl;
     } else {
-        clog << "[INFO]数据表Obj2Node创建成功！" << endl;
+        if (DEV_MODE)
+            clog << "[INFO]数据表Obj2Node创建成功！" << endl;
     }
 
     sql = "CREATE TABLE Branch("\
@@ -138,7 +142,8 @@ void init_db::do_init() {
     if (rc != SQLITE_OK) {
         cerr << "[ERROR]数据表Branch创建失败：" << zErrMsg << endl;
     } else {
-        clog << "[INFO]数据表Branch创建成功！" << endl;
+        if (DEV_MODE)
+            clog << "[INFO]数据表Branch创建成功！" << endl;
     }
 
     sql = "CREATE TABLE Node2Branch("\
@@ -153,7 +158,8 @@ void init_db::do_init() {
     if (rc != SQLITE_OK) {
         cerr << "[ERROR]数据表Node2Branch创建失败: " << zErrMsg << endl;
     } else {
-        clog << "[INFO]数据表Node2Branch创建成功！" << endl;
+        if (DEV_MODE)
+            clog << "[INFO]数据表Node2Branch创建成功！" << endl;
     }
 
     sql = "CREATE TABLE AddList("\
@@ -167,7 +173,8 @@ void init_db::do_init() {
     if (rc != SQLITE_OK) {
         cerr << "[ERROR]数据表AddList创建失败: " << zErrMsg << endl;
     } else {
-        clog << "[INFO]数据表AddList创建成功！" << endl;
+        if (DEV_MODE)
+            clog << "[INFO]数据表AddList创建成功！" << endl;
     }
 
     sql = "CREATE TABLE IgnoreList("\
@@ -178,7 +185,8 @@ void init_db::do_init() {
     if (rc != SQLITE_OK) {
         cerr << "[ERROR]数据表IgnoreList创建失败: " << zErrMsg << endl;
     } else {
-        clog << "[INFO]数据表IgnoreList创建成功！" << endl;
+        if (DEV_MODE)
+            clog << "[INFO]数据表IgnoreList创建成功！" << endl;
     }
 
     char tmp_time[100];
@@ -189,7 +197,7 @@ void init_db::do_init() {
 
     char tmp_sql[1000];
 
-    sprintf(tmp_sql, "INSERT INTO IgnoreList (Path, CreatedDateTime) VALUES ('./.simple-scm', '%s');",tmp_time);
+    sprintf(tmp_sql, "INSERT INTO IgnoreList (Path, CreatedDateTime) VALUES ('./.simple-scm', '%s');", tmp_time);
     rc = sqlite3_exec(db, tmp_sql, 0, 0, &zErrMsg);
     if (rc != SQLITE_OK) {
         cerr << "[ERROR]初始化IgnoreList错误:" << zErrMsg << endl;
@@ -215,12 +223,12 @@ void init_db::do_init() {
             tmp_time);
 
 
-
     rc = sqlite3_exec(db, tmp_sql, callback, 0, &zErrMsg);
     if (rc != SQLITE_OK) {
         cerr << "[ERROR]根节点创建失败: " << zErrMsg << endl;
     } else {
-        clog << "[INFO]根节点创建成功！" << endl;
+        if (DEV_MODE)
+            clog << "[INFO]根节点创建成功！" << endl;
     }
 
     //创建主分支
@@ -234,7 +242,8 @@ void init_db::do_init() {
     if (rc != SQLITE_OK) {
         cerr << "[ERROR]main分支创建失败: " << zErrMsg << endl;
     } else {
-        clog << "[INFO]main分支创建成功！" << endl;
+        if (DEV_MODE)
+            clog << "[INFO]main分支创建成功！" << endl;
     }
 
 
@@ -264,7 +273,7 @@ void init_db::do_init() {
 
     //当前节点的指针
     ofstream fout(".simple-scm/HEAD");
-    fout<<"000000";
+    fout << "000000";
     fout.close();
 }
 
