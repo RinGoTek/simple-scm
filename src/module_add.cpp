@@ -30,7 +30,7 @@ static int check_exit(void *NotUsed, int cnt, char **pValue, char **pName) {
 }
 
 
-static vector<string> ignore;
+static vector<string> ignoreList;
 static stack<string> walk_list;
 static queue<pair<string, int> > file;
 static vector<string> origin_path_of_node;
@@ -77,8 +77,8 @@ static int get_object(void *NotUsed, int cnt, char **pValue, char **pName)//获�
 
 static int select_ignore_callback(void *NotUsed, int cnt, char **pValue, char **pName)//获取ignore信息的函数
 {
-    //把信息添加到ignore数组或者等待遍历的目录stack
-    if (is_file(pValue[0])) ignore.emplace_back(pValue[0]);
+    //把信息添加到ignoreList数组或者等待遍历的目录stack
+    if (is_file(pValue[0])) ignoreList.emplace_back(pValue[0]);
     else if (is_dir(pValue[0])) walk_list.push(pValue[0]);
     return 0;
 }
@@ -135,7 +135,7 @@ void module_add::add(char *path) {
         walk_list.pop();
 
         vector<string> tmp = walk_folder(current_dir);
-        ignore.insert(ignore.end(), tmp.begin(), tmp.end());
+        ignoreList.insert(ignoreList.end(), tmp.begin(), tmp.end());
     }
 
     strcpy(node, head_node);
@@ -165,10 +165,10 @@ void module_add::add(char *path) {
     while (!file.empty()) {
         auto p = file.front();
         file.pop();
-        auto it = find(ignore.begin(), ignore.end(), p.first);
+        auto it = find(ignoreList.begin(), ignoreList.end(), p.first);
 
         //在忽略列表中
-        if (it != ignore.end()) continue;
+        if (it != ignoreList.end()) continue;
 
         file_exit = 0;
 
