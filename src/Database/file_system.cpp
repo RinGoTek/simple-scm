@@ -20,7 +20,7 @@
 using namespace std;
 
 //将要被忽略的文件、路径
-static vector<string> ignore;
+static vector<string> ignoreList;
 
 struct walk_return {
     std::vector<std::string> files;
@@ -32,17 +32,17 @@ walk_return do_walk_folder(const string &base_dir);
 static int select_ignore_callback(void *NotUsed, int cnt, char **pValue, char **pName)//获取ignore信息的函数
 {
     //把信息添加到ignore数组
-    ignore.emplace_back(pValue[0]);
+    ignoreList.emplace_back(pValue[0]);
     return 0;
 }
 
 //对外开放的，获取文件夹下所有文件的函数
-//返回一个数组，包含所有的文件的（除了ignore以外的）路径信息
+//返回一个数组，包含所有的文件的（除了ignoreList以外的）路径信息
 vector<string> walk_folder(const string& base_dir) {
     vector<string> ans;
 
-    ignore.emplace_back(".simple-scm/");
-    ignore.emplace_back("./.simple-scm/");
+    ignoreList.emplace_back(".simple-scm/");
+    ignoreList.emplace_back("./.simple-scm/");
 
     sqlite3 *db;
     char *zErrMsg = 0;
@@ -78,19 +78,19 @@ vector<string> walk_folder(const string& base_dir) {
         //判断文件夹是否在忽略列表中
         for (const auto &x:wk.dirs) {
 
-            auto it = find(ignore.begin(), ignore.end(), x+'/');
+            auto it = find(ignoreList.begin(), ignoreList.end(), x+'/');
 
             //不在忽略列表中
-            if (it == ignore.end())
+            if (it == ignoreList.end())
                 walk_list.push(x);
         }
 
         //判断文件是否在忽略列表中
         for (const auto &x:wk.files) {
-            auto it = find(ignore.begin(), ignore.end(), x);
+            auto it = find(ignoreList.begin(), ignoreList.end(), x);
 
             //不在忽略列表中
-            if (it == ignore.end())
+            if (it == ignoreList.end())
                 ans.emplace_back(x);
         }
     }
