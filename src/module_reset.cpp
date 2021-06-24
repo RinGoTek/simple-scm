@@ -62,7 +62,11 @@ void module_reset::reset(char *To_Node)
         cerr << "[ERROR]更新Branch表失败:" <<zErrMsg<< endl;
         exit(0);
     }
-
+    /*
+    ofstream fout(".simple-scm/HEAD");
+    fout<<To_Node;
+    fout.close();
+     */
     module_checkout rbq;
     rbq.checkout_switch_node(To_Node);
     clog<<"[INFO]回退版本成功！"<<endl;

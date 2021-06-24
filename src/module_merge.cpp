@@ -81,7 +81,7 @@ void module_merge::merge(const std::string &node2) {
 
 
     sprintf(sql,
-            "SELECT ID, Name FROM Branch WHERE ID=(SELECT Branch FROM Node2Branch WHERE Node=(SELECT BranchHead From Branch WHERE ID=%d));",
+            "SELECT ID, Name FROM Branch WHERE ID=%d;",
             current_branch);
     rc = sqlite3_exec(db, sql, query_node_s_branch_info_callback, 0, &zErrMsg);
 
@@ -96,7 +96,7 @@ void module_merge::merge(const std::string &node2) {
     if (rc != SQLITE_OK) {
         cerr << "[ERROR]查询Node信息失败: " << zErrMsg << endl;
         exit(1);
-    } else if(nd.size()!=2)
+    } else if(nd.size()<2)
     {
         cerr << "[ERROR]查询Node信息失败, 找不到节点" << endl;
         exit(1);
@@ -113,15 +113,18 @@ void module_merge::merge(const std::string &node2) {
     }
 
 
-    if (branch_of_node.size() != 2) {
+    if (branch_of_node.size() < 2) {
         cerr << "[ERROR]Internal error" << endl;
         throw "Internal error.";
     }
 
-    if (branch_of_node[0] == branch_of_node[1]) {
-        cerr << "Argument fault: 两个节点不能属于同一分支" << endl;
-        throw "Argument fault: 两个节点不能属于同一分支";
+    for(int i=1;i<branch_of_node.size();i++){
+        if (branch_of_node[0] == branch_of_node[i]) {
+            cerr << "Argument fault: 两个节点不能属于同一分支" << endl;
+            throw "Argument fault: 两个节点不能属于同一分支";
+        }
     }
+
 
     if (branch_of_node[0] != current_branch) {
         cerr << "[ERROR]基础节点不属于当前分支" << endl;
@@ -131,7 +134,13 @@ void module_merge::merge(const std::string &node2) {
     module_detect_changes tmp_det;
     auto node_1_file_list = tmp_det.get_node_files(nd[0].SHA);
 
+    cout<<"node1:"<<endl;
+    for(auto p:node_1_file_list) cout<<p.origin_path<<endl;
+
     auto node_2_file_list = tmp_det.get_node_files(nd[1].SHA);
+
+    cout<<"node2:"<<endl;
+    for(auto p:node_2_file_list) cout<<p.origin_path<<endl;
 
     map<string, file_info> node1_file_list;
 
@@ -179,12 +188,14 @@ void module_merge::merge(const std::string &node2) {
         tmp_SHA << x.origin_sha;
     }
     det.clear();
+    char tmp_time[500];
 
     //获取节点的sha1
-    string new_node_sha1 = calculate_string_sha1(tmp_SHA.str());
-
-    char tmp_time[500];
     auto tmpp = database::getCurrentTimeChar();
+    //为了保证节点sha的唯一性，引入当前时间
+    string new_node_sha1 = calculate_string_sha1(tmp_SHA.str()+tmpp);
+
+
 
     strcpy(tmp_time, tmpp);
     free(tmpp);
@@ -192,7 +203,7 @@ void module_merge::merge(const std::string &node2) {
     //创建新节点
     sprintf(sql,
             "INSERT INTO Node (SHA,CreatedDateTime,Parent,Message) VALUES ('%s','%s',(SELECT SHA FROM Node WHERE SHA='%s'),'%s' )",
-            new_node_sha1.c_str(), tmp_time, nd[0].Parent.c_str(),
+            new_node_sha1.c_str(), tmp_time, nd[0].SHA.c_str(),
             ("Merge " + branch_name[0] + " into " + branch_name[1]).c_str());
 
     rc = sqlite3_exec(db, sql, 0, NULL, &zErrMsg);
