@@ -37,6 +37,6 @@ static std::string cwd = get_current_dir_name();
 
 
 //是否是开发模式
-static bool DEV_MODE = false;
+static bool DEV_MODE = true;
 
 #endif //SIMPLE_SCM_GLOBAL_H
