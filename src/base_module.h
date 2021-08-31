@@ -5,10 +5,21 @@
 #ifndef SIMPLE_SCM_BASE_MODULE_H
 #define SIMPLE_SCM_BASE_MODULE_H
 
+#include<fstream>
+#include<iostream>
+#include<string>
+#include <sstream>
+#include "headers//global.h"
 
 class base_module {
 public:
-    base_module() = default;
+    base_module() {
+        check_repository_version();
+
+    };
+
+    //检验存储库版本
+    void check_repository_version();
 
     ~base_module() = default;
 

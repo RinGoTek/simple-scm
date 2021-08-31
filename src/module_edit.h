@@ -9,6 +9,7 @@
 #include "base_module.h"
 
 class module_edit : public virtual base_module {
+public:
     module_edit() = default;
 
     void edit(char *parameters[], int size);
