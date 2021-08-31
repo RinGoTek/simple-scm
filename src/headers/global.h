@@ -37,6 +37,9 @@ static std::string cwd = get_current_dir_name();
 
 //是否是开发模式
 static bool DEV_MODE = true;
+
+//当前版本名和版本号
 static std::string SIMPLE_SCM_VERSION = "0.1.2-beta";
+static int SIMPLE_SCM_VERSION_NUMBER = 3;
 
 #endif //SIMPLE_SCM_GLOBAL_H
