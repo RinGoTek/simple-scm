@@ -101,6 +101,7 @@ void init_db::do_init() {
         "CreatedDateTime DATETIME NOT NULL,"\
         "Parent CHAR(500),"\
         "Message TEXT(1000) NOT NULL,"\
+        "Editable BOOLEAN NOT NULL DEFAULT TRUE,"\
         "FOREIGN KEY (Parent) REFERENCES Node(SHA) ON DELETE CASCADE);";
 
     rc = sqlite3_exec(db, sql, callback, 0, &zErrMsg);
@@ -203,23 +204,13 @@ void init_db::do_init() {
         cerr << "[ERROR]初始化IgnoreList错误:" << zErrMsg << endl;
     }
 
-    /*tmpp = database::getCurrentTimeChar();
-    strcpy(tmp_time, tmpp);
-    free(tmpp);
-
-    sprintf(tmp_sql, "INSERT INTO IgnoreList (Path, CreatedDateTime) VALUES ('.simple-scm', '%s');",tmp_time);
-    rc = sqlite3_exec(db, tmp_sql, 0, 0, &zErrMsg);
-    if (rc != SQLITE_OK) {
-        cerr << "[ERROR]初始化IgnoreList错误:" << zErrMsg << endl;
-    }*/
-
 
     //创建根节点
     tmpp = database::getCurrentTimeChar();
     strcpy(tmp_time, tmpp);
     free(tmpp);
 
-    sprintf(tmp_sql, "INSERT INTO Node (SHA, CreatedDateTime, Message) VALUES ('000000', '%s','Initialize');",
+    sprintf(tmp_sql, "INSERT INTO Node (SHA, CreatedDateTime, Message, Editable) VALUES ('000000', '%s','Initialize', FALSE);",
             tmp_time);
 
 
@@ -278,7 +269,7 @@ void init_db::do_init() {
     fout.close();
     //输出当前版本的版本号，便于程序在后续操作中正常运行
     ofstream fout_version(".simple-scm/VERSION");
-    fout_version<<SIMPLE_SCM_VERSION_NUMBER;
+    fout_version << SIMPLE_SCM_VERSION_NUMBER;
     fout_version.close();
 }
 

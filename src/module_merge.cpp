@@ -202,7 +202,7 @@ void module_merge::merge(const std::string &node2) {
 
     //创建新节点
     sprintf(sql,
-            "INSERT INTO Node (SHA,CreatedDateTime,Parent,Message) VALUES ('%s','%s',(SELECT SHA FROM Node WHERE SHA='%s'),'%s' )",
+            "INSERT INTO Node (SHA,CreatedDateTime,Parent,Message, Editable) VALUES ('%s','%s',(SELECT SHA FROM Node WHERE SHA='%s'),'%s', FALSE)",
             new_node_sha1.c_str(), tmp_time, nd[0].SHA.c_str(),
             ("Merge " + branch_name[0] + " into " + branch_name[1]).c_str());
 
