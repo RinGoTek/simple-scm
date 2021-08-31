@@ -274,6 +274,11 @@ void init_db::do_init() {
     //当前节点的指针
     ofstream fout(".simple-scm/HEAD");
     fout << "000000";
+
     fout.close();
+    //输出当前版本的版本号，便于程序在后续操作中正常运行
+    ofstream fout_version(".simple-scm/VERSION");
+    fout_version<<SIMPLE_SCM_VERSION_NUMBER;
+    fout_version.close();
 }
 

@@ -152,7 +152,8 @@ int main(int count, char *parameters[]) {
     }
     else if(main_command=="-v"||main_command=="-V")
     {
-        cout<<"当前版本号："<<SIMPLE_SCM_VERSION<<endl;
+        cout<<"当前版本名："<<SIMPLE_SCM_VERSION<<endl;
+        cout<<"当前版本号："<<SIMPLE_SCM_VERSION_NUMBER<<endl;
     }
     else {
 
