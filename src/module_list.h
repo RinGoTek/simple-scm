@@ -5,10 +5,13 @@
 #ifndef SIMPLE_SCM_MODULE_LIST_H
 #define SIMPLE_SCM_MODULE_LIST_H
 
+#include "base_module.h"
 
-class module_list {
+class module_list : public virtual base_module {
 public:
     void list();
+
+    void help() override;
 
 };
 

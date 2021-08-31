@@ -276,3 +276,7 @@ void module_checkout::checkout_switch_branch(char *switch_branch)
     cou<<pID;
     cou.close();
 }
+
+void module_checkout::help() {
+
+}

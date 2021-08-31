@@ -147,13 +147,16 @@ int main(int count, char *parameters[]) {
         char *command2 = parameters[2];
         module_reset rbq;
         rbq.reset(command2);
+    } else if (main_command == "edit") {
+        //编辑信息
     } else {
 
         tip_command_error();
     }
+}
 
 
-    return 0;
+return 0;
 
 }
 
@@ -171,5 +174,9 @@ void usage() {
          << "checkout -n <SHA1>         切换到指定节点\n"
          << "reset <SHA1>               回退当前分支的版本\n"
          << "merge <SHA1>               将另一个节点合并入当前分支的头节点\n"
+         << "edit -n <SHA1> <TEXT>      编辑提交文本\n"
+         << "migrate                    迁移存储库版本（当存储库版本过低时）\n"
+         << "-V                         查询当前版本号\n"
+         << "about                      显示软件信息\n"
          << endl;
 }

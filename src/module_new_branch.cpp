@@ -129,3 +129,7 @@ void module_new_branch::create_branch(char *branch_name) {
 
     sqlite3_close(db);
 }
+
+void module_new_branch::help() {
+
+}

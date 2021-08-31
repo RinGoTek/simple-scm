@@ -7,7 +7,7 @@
 
 #include<map>
 #include<vector>
-
+#include"base_module.h"
 
 struct detect_info//用来保存检测结果
 {
@@ -51,9 +51,9 @@ struct file_info {
     }
 };
 
-class module_detect_changes {
+class module_detect_changes :public virtual base_module{
 public:
-    module_detect_changes() {};
+    module_detect_changes() = default;
 
     /**
      * 检测指定节点与当前文件系统中文件的改变情况
@@ -68,6 +68,8 @@ public:
      * @return vector<node_info>
      */
     std::vector<file_info> get_node_files(std::string NodeSHA);
+
+    void help() override;
 };
 
 

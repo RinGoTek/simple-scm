@@ -264,3 +264,7 @@ void module_commit::commit(char *Message) {
     clog << "[INFO]commit完成！" << endl;
     sqlite3_close(db);
 }
+
+void module_commit::help() {
+
+}

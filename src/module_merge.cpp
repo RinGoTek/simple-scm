@@ -278,3 +278,7 @@ void module_merge::merge(const std::string &node2) {
 
 }
 
+void module_merge::help() {
+
+}
+

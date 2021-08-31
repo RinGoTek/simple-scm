@@ -71,3 +71,7 @@ void module_reset::reset(char *To_Node)
     rbq.checkout_switch_node(To_Node);
     clog<<"[INFO]回退版本成功！"<<endl;
 }
+
+void module_reset::help() {
+
+}

@@ -5,15 +5,21 @@
 
 #ifndef SIMPLE_SCM_MODULE_IGNORE_H
 #define SIMPLE_SCM_MODULE_IGNORE_H
-#include<string>
 
-class module_ignore {
+#include<string>
+#include"base_module.h"
+
+class module_ignore : public virtual base_module {
 public:
-    module_ignore()=default;
+    module_ignore() = default;
+
     //把路径加入到ignore列表
     void do_ignore(std::string path);
+
     //取消ignore
     void deIgnore(std::string path);
+
+    void help() override;
 
 };
 

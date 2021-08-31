@@ -7,13 +7,16 @@
 
 #include<string>
 #include"headers/global.h"
+#include"base_module.h"
 
 using namespace std;
 
 
-class module_new_branch {
+class module_new_branch : public virtual base_module {
 public:
     void create_branch(char[]);
+
+    void help() override;
 };
 
 

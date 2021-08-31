@@ -14,12 +14,12 @@ public:
 */
 #ifndef SIMPLE_SCM_MODULE_CHECKOUT_H
 #define SIMPLE_SCM_MODULE_CHECKOUT_H
-
-class module_checkout{
+#include"base_module.h"
+class module_checkout:public virtual base_module{
 public:
     void checkout_switch_branch(char[]);
     void checkout_switch_node(char[]);
-    void checkout_add_switch_branch(char[]);
-    void checkout_discard_file_change(char[]);
+    void help() override;
+
 };
 #endif //SIMPLE_SCM_MODULE_CHECKOUT_H

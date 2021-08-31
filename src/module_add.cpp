@@ -226,3 +226,8 @@ void module_add::add(char *path) {
     sqlite3_close(db);
 
 }
+
+//这是帮助函数，在输入命令不合法时应被调用
+void module_add::help() {
+
+}

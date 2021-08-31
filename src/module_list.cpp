@@ -103,3 +103,7 @@ void module_list::list() {
     sqlite3_close(db);
 }
 
+void module_list::help() {
+
+}
+

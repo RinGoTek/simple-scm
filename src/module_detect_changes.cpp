@@ -314,3 +314,7 @@ vector<file_info> module_detect_changes::get_node_files(string NodeSHA) {
 
     return node_info_sav;
 }
+
+void module_detect_changes::help() {
+
+}

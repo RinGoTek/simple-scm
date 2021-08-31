@@ -5,10 +5,11 @@
 #ifndef SIMPLE_SCM_MODULE_COMMIT_H
 #define SIMPLE_SCM_MODULE_COMMIT_H
 
-
-class module_commit {
+#include"base_module.h"
+class module_commit :public virtual base_module{
 public:
     void commit(char *);
+    void help() override;
 };
 
 
