@@ -149,15 +149,16 @@ int main(int count, char *parameters[]) {
         rbq.reset(command2);
     } else if (main_command == "edit") {
         //编辑信息
-    } else {
+    }
+    else if(main_command=="-v"||main_command=="-V")
+    {
+        cout<<"当前版本号："<<SIMPLE_SCM_VERSION<<endl;
+    }
+    else {
 
         tip_command_error();
     }
-}
-
-
-return 0;
-
+    return 0;
 }
 
 
