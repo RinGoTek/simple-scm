@@ -13,6 +13,7 @@
 #include "module_checkout.h"
 #include "Database/file_system.h"
 #include "Database/Compress.h"
+#include "module_edit.h"
 #include"module_merge.h"
 #include"Test/test.h"
 
@@ -149,6 +150,12 @@ int main(int count, char *parameters[]) {
         rbq.reset(command2);
     } else if (main_command == "edit") {
         //编辑信息
+        module_edit tmp;
+        char *tmp_para[100];
+        for(int i=2;i<count;++i)
+            tmp_para[i-2] = parameters[i];
+        tmp.edit(tmp_para, count-2);
+
     }
     else if(main_command=="-v"||main_command=="-V")
     {
@@ -180,5 +187,6 @@ void usage() {
          << "migrate                    迁移存储库版本（当存储库版本过低时）\n"
          << "-V                         查询当前版本号\n"
          << "about                      显示软件信息\n"
+         << "update                     检查软件更新\n"
          << endl;
 }
