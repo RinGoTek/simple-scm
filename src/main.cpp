@@ -17,6 +17,7 @@
 #include"module_merge.h"
 
 #include "migrate/migrate.h"
+#include "about.h"
 
 #include"Test/test.h"
 
@@ -172,6 +173,10 @@ int main(int count, char *parameters[]) {
         migrate tmp;
         tmp.action();
 
+    }
+    else if (main_command == "about") {
+        //关于界面
+        about();
     }
     else {
 

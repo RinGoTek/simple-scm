@@ -101,7 +101,7 @@ void migrate::action() {
     if (flag) {
         cout << "正在升级..." << endl;
         migrate_to_3();
-        cout << "数据库升级成功！" << endl;
+        cout << "存储库升级成功！" << endl;
     } else {
         cout << "已取消操作！" << endl;
         exit(0);
