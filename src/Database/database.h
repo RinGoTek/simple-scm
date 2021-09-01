@@ -11,6 +11,7 @@
 #include<time.h>
 #include"init-db.h"
 #include<string>
+#include "sqlite3.h"
 
 struct node_full_info
 {
@@ -39,6 +40,11 @@ public:
 
     //将time_h转化为char *类型的函数
     static char *getTimeChar(time_t);
+
+    //执行sql语句
+
+    static void exec(sqlite3 *db, char* sql, char *zErrMsg, int* callback);
+    static void exec_with_transaction(sqlite3 *db, char* sql, char *zErrMsg, int* callback);
 
 private:
 

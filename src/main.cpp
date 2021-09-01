@@ -15,7 +15,12 @@
 #include "Database/Compress.h"
 #include "module_edit.h"
 #include"module_merge.h"
+
+#include "migrate/migrate.h"
+
 #include"Test/test.h"
+
+
 
 using namespace std;
 
@@ -161,6 +166,12 @@ int main(int count, char *parameters[]) {
     {
         cout<<"当前版本名："<<SIMPLE_SCM_VERSION<<endl;
         cout<<"当前版本号："<<SIMPLE_SCM_VERSION_NUMBER<<endl;
+    }
+    else if (main_command == "migrate") {
+        //数据库迁移
+        migrate tmp;
+        tmp.action();
+
     }
     else {
 
