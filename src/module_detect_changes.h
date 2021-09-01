@@ -51,9 +51,11 @@ struct file_info {
     }
 };
 
-class module_detect_changes :public virtual base_module{
+class module_detect_changes : public virtual base_module {
 public:
-    module_detect_changes() = default;
+    module_detect_changes() {
+        check_repository_version();
+    }
 
     /**
      * 检测指定节点与当前文件系统中文件的改变情况

@@ -9,6 +9,10 @@
 
 class module_reset : public virtual base_module {
 public:
+    module_reset()
+    {
+        check_repository_version();
+    }
     void reset(char []);
 
     void help() override;

@@ -8,6 +8,10 @@
 #include"base_module.h"
 class module_commit :public virtual base_module{
 public:
+    module_commit()
+    {
+        check_repository_version();
+    }
     void commit(char *);
     void help() override;
 };

@@ -10,11 +10,12 @@
 #include<string>
 #include <sstream>
 #include "headers//global.h"
+#include<vector>
 
 class base_module {
 public:
     base_module() {
-        check_repository_version();
+        //check_repository_version();
 
     };
 
@@ -25,6 +26,9 @@ public:
 
     //每个继承的子类都必须重写这个help方法
     virtual void help() = 0;
+
+    //解析操作
+    std::vector<std::pair<std::string , std::string > >parse_ops(char *parameters[], int size);
 
 private:
 

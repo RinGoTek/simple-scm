@@ -14,6 +14,10 @@ using namespace std;
 
 class module_new_branch : public virtual base_module {
 public:
+    module_new_branch()
+    {
+        check_repository_version();
+    }
     void create_branch(char[]);
 
     void help() override;

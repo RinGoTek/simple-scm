@@ -17,6 +17,10 @@ public:
 #include"base_module.h"
 class module_checkout:public virtual base_module{
 public:
+    module_checkout()
+    {
+        check_repository_version();
+    }
     void checkout_switch_branch(char[]);
     void checkout_switch_node(char[]);
     void help() override;

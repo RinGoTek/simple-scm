@@ -183,7 +183,7 @@ void usage() {
          << "checkout -n <SHA1>         切换到指定节点\n"
          << "reset <SHA1>               回退当前分支的版本\n"
          << "merge <SHA1>               将另一个节点合并入当前分支的头节点\n"
-         << "edit -n <SHA1> <TEXT>      编辑提交文本\n"
+         << "edit -n <SHA1> -t <TEXT>   编辑提交文本\n"
          << "migrate                    迁移存储库版本（当存储库版本过低时）\n"
          << "-V                         查询当前版本号\n"
          << "about                      显示软件信息\n"

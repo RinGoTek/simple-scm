@@ -8,6 +8,10 @@
 #include"base_module.h"
 class module_add :public virtual base_module{
 public:
+    module_add()
+    {
+        check_repository_version();
+    }
     void add(char *);
     void help() override;
 };

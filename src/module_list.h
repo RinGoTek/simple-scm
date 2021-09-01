@@ -9,6 +9,10 @@
 
 class module_list : public virtual base_module {
 public:
+    module_list()
+    {
+        check_repository_version();
+    }
     void list();
 
     void help() override;

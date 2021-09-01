@@ -11,7 +11,10 @@
 
 class module_ignore : public virtual base_module {
 public:
-    module_ignore() = default;
+    module_ignore()
+    {
+        check_repository_version();
+    }
 
     //把路径加入到ignore列表
     void do_ignore(std::string path);

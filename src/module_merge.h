@@ -17,8 +17,10 @@
 class module_merge : public virtual base_module {
 public:
     module_merge() {
-        this->rc = sqlite3_open(".simple-scm/simple-scm.db", &this->db);
 
+        check_repository_version();
+
+        this->rc = sqlite3_open(".simple-scm/simple-scm.db", &this->db);
         if (this->rc) {
             std::cerr << "[ERROR]数据库加载失败！" << std::endl;
             exit(1);
