@@ -55,7 +55,7 @@ static std::string cwd = get_current_dir_name();
 static bool DEV_MODE = true;
 
 //当前版本名和版本号
-static std::string SIMPLE_SCM_VERSION = "0.1.2-beta";
+static std::string SIMPLE_SCM_VERSION = "0.1.2";
 static int SIMPLE_SCM_VERSION_NUMBER = 3;
 
 

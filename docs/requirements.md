@@ -7,3 +7,6 @@
 
 3、libsqlite3-dev
 
+4、python3
+
+5、requests

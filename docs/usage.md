@@ -102,3 +102,33 @@ simple-scm reset <sha1>
 simple-scm merge <sha1>
 ```
 
+编辑提交文本
+
+```
+simple-scm edit -n <SHA1> -t <TEXT>  
+```
+
+迁移存储库版本（当存储库版本过低时）
+
+```
+simple-scm migrate
+```
+
+查询当前版本号
+
+```
+simple-scm -V   
+```
+
+显示软件信息
+
+```
+simple-scm about
+```
+
+检查软件更新
+
+```
+simple-scm update
+```
+
