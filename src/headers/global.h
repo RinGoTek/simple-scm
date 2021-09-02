@@ -56,7 +56,7 @@ static bool DEV_MODE = true;
 
 //当前版本名和版本号
 static std::string SIMPLE_SCM_VERSION = "0.1.2-beta";
-static int SIMPLE_SCM_VERSION_NUMBER = 1;
+static int SIMPLE_SCM_VERSION_NUMBER = 3;
 
 
 

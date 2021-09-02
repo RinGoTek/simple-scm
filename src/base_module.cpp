@@ -24,7 +24,7 @@ void base_module::check_repository_version() {
         std::cerr << "[WARNING]当前存储库是旧版本的，您必须对其进行迁移，方能继续使用它.请输入simple-scm migrate以迁移存储库" << std::endl;
         exit(0);
     } else if (ver > SIMPLE_SCM_VERSION_NUMBER) {
-        std::cerr << "[WARNING]当前存储库是新版本的，若您要继续使用，请升级Simple-SCM。" << endl;
+        std::cerr << "[WARNING]当前存储库是新版本的，若您要继续使用，请输入simple-scm update以升级Simple-SCM。" << endl;
         exit(0);
     }
 
