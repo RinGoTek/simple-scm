@@ -18,6 +18,7 @@
 
 #include "migrate/migrate.h"
 #include "about.h"
+#include "update.h"
 
 #include"Test/test.h"
 
@@ -177,6 +178,10 @@ int main(int count, char *parameters[]) {
     else if (main_command == "about") {
         //关于界面
         about();
+    }
+    else if (main_command == "update") {
+        //升级软件
+        update();
     }
     else {
 

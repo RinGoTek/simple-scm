@@ -17,13 +17,15 @@ public:
 
     void edit(char *parameters[], int size);
 
-    void edit_node_text();
+
 
     void help() override;
 
 private:
     std::map<std::string, std::string> mp;
     std::vector<std::pair<std::string, std::string> > ops;
+
+    void edit_node_text();
 };
 
 

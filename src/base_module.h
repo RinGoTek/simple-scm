@@ -14,10 +14,7 @@
 
 class base_module {
 public:
-    base_module() {
-        //check_repository_version();
-
-    };
+    base_module()=default;
 
     //检验存储库版本
     void check_repository_version();
