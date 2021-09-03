@@ -4,8 +4,10 @@ import webbrowser as web
 import os
 url = "http://update-api.simple-scm.ringotek.cn"
 
+
+
 if __name__ == '__main__':
-    print('正在检查更新...')
+    print('正在检查更新...'.encode('utf8').decode())
 
     local_path = os.path.realpath(__file__)
     local_path = os.path.dirname(local_path)
@@ -26,7 +28,7 @@ if __name__ == '__main__':
     
     if version_number > local_version:
         # 存在可用更新
-        print("存在可用更新，正在获取更新信息...")
+        print("存在可用更新，正在获取更新信息...".encode('utf8').decode())
         data = {
             "version": local_version
         }
@@ -37,29 +39,29 @@ if __name__ == '__main__':
         
         sorted(response, key= lambda x:x.__getitem__("version_number"))
         response.reverse()
-        print("您将要升级到版本： "+response[0]['version_name']+"\n版本号： "+str(response[0]['version_number']))
+        print(("您将要升级到版本： "+response[0]['version_name']+"\n版本号： "+str(response[0]['version_number'])).encode('utf8').decode())
 
-        print("\n以下是更新日志：")
+        print("\n以下是更新日志：".encode('utf8').decode())
 
         for x in response:
-            print("版本：{}\t版本号：{}".format(x['version_name'], x['version_number']))
-            print("发布日期：{}".format(x['published_date']))
-            print("更新内容：\n")
-            print(x['detail'])
+            print(("版本：{}\t版本号：{}".format(x['version_name'], x['version_number'])).encode('utf8').decode())
+            print(("发布日期：{}".format(x['published_date'])).encode('utf8').decode())
+            print(("更新内容：\n").encode('utf8').decode())
+            print(x['detail'].encode('utf8').decode())
             print("\n")
         
 
-        cmd = input("是否更新？(Y/N) >>").lower()
+        cmd = input("是否更新？(Y/N) >>".encode('utf8').decode()).lower()
         if cmd != 'y':
-            print("操作已取消。")
+            print("操作已取消。".encode('utf8').decode())
             exit(0)
         else:
             # 打开更新界面
-            print("下载页面已打开，请进入页面下载！")
+            print("下载页面已打开，请进入页面下载！".encode('utf8').decode())
             web.open(response[0]['link'])
 
     else:
-        print("您的Simple-SCM已经是最新版！")
+        print("您的Simple-SCM已经是最新版！".encode('utf8').decode())
 
         
         
