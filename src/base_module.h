@@ -11,10 +11,12 @@
 #include <sstream>
 #include "headers//global.h"
 #include<vector>
+#include "notification.h"
 
 class base_module {
 public:
     base_module()=default;
+
 
     //检验存储库版本
     void check_repository_version();

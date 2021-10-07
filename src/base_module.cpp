@@ -8,11 +8,19 @@ using namespace std;
 
 void base_module::check_repository_version() {
     //检验存储库版本，旧版则需要更新版本
-    //todo:这里有bug，当存储库不存在时，应当提示存储库不存在
+
+    if(opendir(".simple-scm/")==NULL)
+    {
+        //存储库不存在
+        error("存储库不存在！");
+        exit(0);
+    }
+
+
     std::ifstream fin(".simple-scm/VERSION");
     if (!fin) {
         //旧版本的simple-scm没有这个文件，这个文件是版本号为3时加入的
-        std::cerr << "[WARNING]当前存储库是旧版本的，您必须对其进行迁移，方能继续使用它.请输入simple-scm migrate以迁移存储库" << std::endl;
+        warning("当前存储库是旧版本的，您必须对其进行迁移，方能继续使用它.请输入simple-scm migrate以迁移存储库");
         exit(0);
     }
     std::string str;
@@ -22,17 +30,17 @@ void base_module::check_repository_version() {
     int ver;
     ss >> ver;
     if (ver < SIMPLE_SCM_VERSION_NUMBER) {
-        std::cerr << "[WARNING]当前存储库是旧版本的，您必须对其进行迁移，方能继续使用它.请输入simple-scm migrate以迁移存储库" << std::endl;
+        warning("当前存储库是旧版本的，您必须对其进行迁移，方能继续使用它.请输入simple-scm migrate以迁移存储库");
         exit(0);
     } else if (ver > SIMPLE_SCM_VERSION_NUMBER) {
-        std::cerr << "[WARNING]当前存储库是新版本的，若您要继续使用，请输入simple-scm update以升级Simple-SCM。" << endl;
+        warning("[WARNING]当前存储库是新版本的，若您要继续使用，请输入simple-scm update以升级Simple-SCM。");
         exit(0);
     }
 
 }
 
 static void tip_cmd_error() {
-    cerr << "指令不合法！" << endl;
+    error("指令不合法！");
     exit(0);
 }
 
