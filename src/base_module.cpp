@@ -8,6 +8,7 @@ using namespace std;
 
 void base_module::check_repository_version() {
     //检验存储库版本，旧版则需要更新版本
+    //todo:这里有bug，当存储库不存在时，应当提示存储库不存在
     std::ifstream fin(".simple-scm/VERSION");
     if (!fin) {
         //旧版本的simple-scm没有这个文件，这个文件是版本号为3时加入的
