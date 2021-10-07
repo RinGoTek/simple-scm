@@ -14,7 +14,7 @@
 #include<cstring>
 #include<sstream>
 #include<queue>
-
+#include"sstream"
 using namespace std;
 
 static int callback(void *NotUsed, int cnt, char **pValue, char **pName) {
@@ -106,7 +106,7 @@ void module_add::add(char *path) {
     else if (is_dir(path)) file_path = walk_folder(path);
     else return;
 
-    for (auto p:file_path) file.push(make_pair(p, 0));
+    for (auto p: file_path) file.push(make_pair(p, 0));
 
     sqlite3 *db;
     char *zErrMsg = 0;
@@ -116,7 +116,8 @@ void module_add::add(char *path) {
     //打开数据库
     rc = sqlite3_open(".simple-scm/simple-scm.db", &db);
     if (rc != SQLITE_OK) {
-        cerr << "[ERROR]数据库打开失败：" << zErrMsg << endl;
+        string msg = zErrMsg;
+
         exit(1);
     }
 
@@ -125,7 +126,8 @@ void module_add::add(char *path) {
     rc = sqlite3_exec(db, sql, select_ignore_callback, nullptr, &zErrMsg);
 
     if (rc != SQLITE_OK) {
-        cerr << "[ERROR]发生错误：" << zErrMsg << endl;
+        string msg = zErrMsg;
+        error("发生错误：" + msg);
         exit(1);
     }
 
@@ -146,14 +148,16 @@ void module_add::add(char *path) {
         rc = sqlite3_exec(db, sql, get_object, NULL, &zErrMsg);
 
         if (rc != SQLITE_OK) {
-            cerr << "[ERROR]发生错误：" << zErrMsg << endl;
+            string msg = zErrMsg;
+            error("发生错误：" + msg);
             exit(1);
         }
 
         sprintf(sql, "SELECT Parent FROM Node WHERE SHA='%s'", node);
         rc = sqlite3_exec(db, sql, update_node, NULL, &zErrMsg);
         if (rc != SQLITE_OK) {
-            cerr << "[ERROR]发生错误：" << zErrMsg << endl;
+            string msg = zErrMsg;
+            error("发生错误：" + msg);
             exit(1);
         }
     }
@@ -177,7 +181,8 @@ void module_add::add(char *path) {
         sprintf(sql, "SELECT * FROM AddList WHERE OriginPath='%s'", p.first.c_str());
         rc = sqlite3_exec(db, sql, check_exit, 0, &zErrMsg);
         if (rc != SQLITE_OK) {
-            cerr << "发生错误: " << zErrMsg << endl;
+            string msg = zErrMsg;
+            error("发生错误：" + msg);
             exit(1);
         }
 
@@ -189,7 +194,7 @@ void module_add::add(char *path) {
         auto it2 = find(origin_path_of_node.begin(), origin_path_of_node.end(), p.first);
 
         if (it2 != origin_path_of_node.end()) {
-            cerr << "[ERROR]" << p.first << "路径已存在！" << endl;
+            error(p.first+" 路径已存在！");
             continue;
         }
 
@@ -210,8 +215,6 @@ void module_add::add(char *path) {
             else fail_add.emplace_back(p.first);
 
             continue;
-            //cerr << "发生错误: " << zErrMsg << endl;
-            //exit(1);
         }
         cnt++;
 
@@ -220,8 +223,10 @@ void module_add::add(char *path) {
     clog << "[INFO]add完成，共有" << cnt << "条添加记录" << endl;
 
     if (!fail_add.empty()) {
-        clog << "[ERROR]共有" << fail_add.size() << "条失败记录，添加失败路径：" << endl;
-        for (auto p:fail_add) cout << p << endl;
+        stringstream ss;
+        ss<<"共有" << fail_add.size() << "条失败记录，添加失败路径：";
+        warning(ss.str());
+        for (auto p: fail_add) cout << p << endl;
     }
 
     sqlite3_close(db);
