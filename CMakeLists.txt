@@ -17,6 +17,8 @@ target_link_libraries(${PROJECT_NAME} sqlite3)
 
 
 set(CMAKE_INSTALL_PREFIX ./install)
+set(CMAKE_CXX_FLAGS_RELEASE " -O3")
+
 install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION ${PROJECT_NAME}/bin)
 install(DIRECTORY src/PythonFiles DESTINATION ${PROJECT_NAME}/bin)
 install(DIRECTORY static_files/ DESTINATION ${PROJECT_NAME}/static)

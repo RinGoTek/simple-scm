@@ -32,7 +32,7 @@ compress_return Compress::compress(const std::string &path) {
     ss << ifs.rdbuf();
     string original = ss.str();
     ifs.close();
-    //采用LZ4F算法进行压缩
+    //采用LZ4算法进行压缩
     string packed = bundle::pack(BUNDLE_LZ4F, original);
 
     compress_return ret;

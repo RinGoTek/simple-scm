@@ -190,6 +190,7 @@ void module_commit::commit(char *Message) {
         struct stat buf;
         stat(p.c_str(), &buf);
 
+        //todo:这里应当先检查一下这个文件的sha1是否已经存在于数据库中，如果存在，则不压缩，直接在数据库中插入数据即可。
         Compress compress_tmp;
         compress_return compress_info = compress_tmp.compress(p);
 

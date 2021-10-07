@@ -173,6 +173,7 @@ void module_add::add(char *path) {
         file_exit = 0;
 
         memset(sql, 0, sizeof(char) * 500);
+        //@todo:这里可以进行优化，提前把所有的originpath读取到一个map里面，减少数据库请求次数
         sprintf(sql, "SELECT * FROM AddList WHERE OriginPath='%s'", p.first.c_str());
         rc = sqlite3_exec(db, sql, check_exit, 0, &zErrMsg);
         if (rc != SQLITE_OK) {
@@ -196,7 +197,7 @@ void module_add::add(char *path) {
         stat(p.first.c_str(), &buf);
 
         //memset(sql, 0, sizeof(char)*500);
-
+        //@todo:这里的insert可以改成批量插入，这样也可以减少数据库请求次数
         sprintf(sql,
                 "INSERT INTO AddList (OriginSHA,OriginPath,CreatedDateTime,UpdatedDateTime) VALUES ('%s','%s','%s','%s')",
                 calculate_sha1(p.first), p.first.c_str(), database::getTimeChar(buf.st_ctime),
