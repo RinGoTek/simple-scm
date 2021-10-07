@@ -219,8 +219,9 @@ void module_add::add(char *path) {
         cnt++;
 
     }
-
-    clog << "[INFO]add完成，共有" << cnt << "条添加记录" << endl;
+    stringstream ss;
+    ss << "add完成，共有" << cnt << "条添加记录" << endl;
+    info(ss.str());
 
     if (!fail_add.empty()) {
         stringstream ss;
