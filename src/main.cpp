@@ -100,7 +100,7 @@ int main(int count, char *parameters[]) {
 
             //取消ignore
             if (command2 == "-d") {
-                tmp.deIgnore(command3);
+                tmp.de_ignore(command3);
             }
         } else tip_command_error();
 

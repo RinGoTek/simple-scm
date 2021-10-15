@@ -79,31 +79,11 @@ static int get_update_time(void *NotUsed, int cnt, char **pValue, char **pName)/
 
 void module_checkout::checkout_switch_node(char *switch_node) {
 
-    //检测是否有修改未提交
-    ifstream fin(".simple-scm/HEAD");
-    string HEAD;
-    fin>>HEAD;
-    fin.close();
-    module_detect_changes op;
-    detect_info x=op.detect_changes(HEAD);
-    //puts("tess_line");
-    if(x.change.size()>0||x.del.size()>0){
-        cerr<<"[ERROR]您有更改尚未提交，是否切换分支?(y/n)"<<endl;
-        cout<<">> ";
-        char c;
-        cin>>c;
-        if(!(c=='y'||c=='Y')){
-            cout<<"[INFO]操作已取消"<<endl;
-            exit(0);
-        }
-
-
-    }
-
-
     sqlite3 *db;
     char *zErrMsg = 0;
     int rc;
+    char sql[500];
+
     rc = sqlite3_open(".simple-scm/simple-scm.db", &db);
 
     if (rc) {
@@ -111,7 +91,38 @@ void module_checkout::checkout_switch_node(char *switch_node) {
         exit(1);
     }
 
-    char sql[500];
+    //检测switch_node
+    sprintf(sql,"SELECT SHA FROM Node WHERE SHA='%s'",switch_node);
+    rc= sqlite3_exec(db,sql,node_is_exist,NULL,&zErrMsg);
+    if(rc!=SQLITE_OK){
+        cerr << "[ERROR]检测所切换的节点失败:" <<zErrMsg<< endl;
+        exit(0);
+    }
+    if(node_exist_judge==0){
+        cerr<<"[ERROR]所切换的节点不存在!"<<endl;
+        exit(0);
+    }
+
+    //检测是否有修改未提交
+    ifstream fin(".simple-scm/HEAD");
+    string HEAD;
+    fin>>HEAD;
+    fin.close();
+
+    module_detect_changes op;
+    detect_info x=op.detect_changes(HEAD);
+    //puts("tess_line");
+    if(x.change.size()>0||x.del.size()>0){
+        cerr<<"[ERROR]您有更改尚未提交，是否切换节点?(y/n)"<<endl;
+        cout<<">> ";
+        char c;
+        cin>>c;
+        if(c=='n'||c=='N'){
+            cout<<"[INFO]操作已取消"<<endl;
+            exit(0);
+        }
+    }
+
     //检测add_list是否为空
     sprintf(sql, "SELECT ID FROM AddList");
     rc = sqlite3_exec(db, sql, add_list_is ,NULL, &zErrMsg);
@@ -121,22 +132,22 @@ void module_checkout::checkout_switch_node(char *switch_node) {
     }
     if(add_list_judge==1){
         clog<<"AddList表存在未提交的文件！"<<endl;
-        cout<<"若选择提交AddList表的文件后再切换分支请输入'YES'"<<endl<<"若选择清除AddList表后切换分支请输入'NO'"<<endl<<"若选择取消切换分支请输入'NOCK'..."<<endl;
+        cout<<"若选择提交AddList表的文件后再切换节点请输入'YES'"<<endl<<"若选择清除AddList表后切换节点请输入'NO'"<<endl<<"若选择取消切换节点请输入'NOCK'..."<<endl;
         string s;
         cout<<">> ";
         cin>>s;
         transform(s.begin(),s.end(),s.begin(),::tolower);
         if(s=="nock"){
-            clog<<"已取消切换分支!"<<endl;
+            clog<<"已取消切换节点!"<<endl;
             exit(1);
         }
         else if(s!=string("no")){
             sqlite3_close(db);
-            cout<<"请输入提交的信息"<<endl;
-            char* rbq_m;
-            cin>>rbq_m;
-            module_commit rbq;
-            rbq.commit(rbq_m);
+            cout<<"请输入节点更改的信息"<<endl;
+            char* mes;
+            cin>>mes;
+            module_commit commit_tmp;
+            commit_tmp.commit(mes);
             rc = sqlite3_open(".simple-scm/simple-scm.db", &db);
 
             if (rc) {
@@ -153,19 +164,6 @@ void module_checkout::checkout_switch_node(char *switch_node) {
             }
         }
 
-    }
-
-
-    //检测switch_node
-    sprintf(sql,"SELECT * FROM Node WHERE SHA='%s'",switch_node);
-    rc= sqlite3_exec(db,sql,node_is_exist,NULL,&zErrMsg);
-    if(rc!=SQLITE_OK){
-        cerr << "[ERROR]检测所切换的节点失败:" <<zErrMsg<< endl;
-        exit(0);
-    }
-    if(node_exist_judge==0){
-        cerr<<"[ERROR]所切换的节点不存在!"<<endl;
-        exit(0);
     }
 
     //获取工作目录的文件
@@ -198,8 +196,8 @@ void module_checkout::checkout_switch_node(char *switch_node) {
     }
 
     //将该节点快照压缩文件解压到工作目录
-    module_detect_changes rbq;
-    vector<file_info> compressedSHA=rbq.get_node_files(switch_node);
+    module_detect_changes sav;
+    vector<file_info> compressedSHA=sav.get_node_files(switch_node);
 
 
     for(auto x:compressedSHA){

@@ -22,8 +22,6 @@ static int callback(void *NotUsed, int cnt, char **pValue, char **pName)//用于
 
 void module_reset::reset(char *To_Node)
 {
-
-
     ofstream cou(".simple-scm/HEAD");
     cou<<To_Node;
     cou.close();
