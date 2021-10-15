@@ -60,13 +60,16 @@ void module_reset::reset(char *To_Node)
         cerr << "[ERROR]更新Branch表失败:" <<zErrMsg<< endl;
         exit(0);
     }
+
+    sqlite3_close(db);
+
     /*
     ofstream fout(".simple-scm/HEAD");
     fout<<To_Node;
     fout.close();
      */
-    module_checkout rbq;
-    rbq.checkout_switch_node(To_Node);
+    module_checkout ck_tmp;
+    ck_tmp.checkout_switch_node(To_Node,false);
     clog<<"[INFO]回退版本成功！"<<endl;
 }
 

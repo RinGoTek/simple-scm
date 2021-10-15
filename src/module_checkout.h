@@ -22,7 +22,7 @@ public:
         check_repository_version();
     }
     void checkout_switch_branch(char[]);
-    void checkout_switch_node(char[]);
+    void checkout_switch_node(char[],bool);
     void help() override;
 
 };
