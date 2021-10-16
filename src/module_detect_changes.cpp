@@ -235,7 +235,7 @@ detect_info module_detect_changes::detect_changes(string NodeSHA) {
             continue;
         }
 
-        //已经存在于节点中的文件，从not add移除
+        //已经存在于本地的文件，从not add移除
         for (auto it = local_object.begin(); it < local_object.end(); it++) {
             if (*it == p.origin_path) {
                 local_object.erase(it);

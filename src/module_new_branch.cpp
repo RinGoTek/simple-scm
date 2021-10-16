@@ -40,6 +40,7 @@ void module_new_branch::create_branch(char *branch_name) {
     int rc;
     char sql[500];
 
+    /*
     //从文件中读取当前分支
     ifstream file(".simple-scm/current_branch.txt");
 
@@ -47,6 +48,13 @@ void module_new_branch::create_branch(char *branch_name) {
     file >> current_branch;
     file.close();
     //cout<<"current_branch="<<current_branch<<endl;
+     */
+
+    //当前节点作为新分支头节点
+    ofstream fout(".simple-scm/HEAD");
+    fout<<head_node;
+    fout.close();
+
 
     //打开数据库
     rc = sqlite3_open(".simple-scm/simple-scm.db", &db);
@@ -59,6 +67,7 @@ void module_new_branch::create_branch(char *branch_name) {
             clog << "[INFO]数据库加载成功！" << endl;
     }
 
+    /*
     //获取当前节点
     sprintf(sql, "SELECT BranchHead FROM Branch WHERE ID='%d'", current_branch);
 
@@ -73,6 +82,8 @@ void module_new_branch::create_branch(char *branch_name) {
     }
 
     //cout<<"head_node="<<head_node<<endl;
+    */
+
 
     //获取本地时间
     char tmp_time[100];
@@ -124,8 +135,8 @@ void module_new_branch::create_branch(char *branch_name) {
             clog << "[INFO]新分支与根节点连接成功！" << endl;
     }
 
-    module_checkout rbq;
-    rbq.checkout_switch_branch(branch_name);
+    module_checkout ck;
+    ck.checkout_switch_branch(branch_name);
 
     sqlite3_close(db);
 }

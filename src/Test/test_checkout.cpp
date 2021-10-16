@@ -14,7 +14,7 @@ void test_checkout::test_switch_node() {
     string s;
     cin>>s;
     clock_t start_time = clock();
-    tmp.checkout_switch_node(const_cast<char *>(s.c_str()));
+    tmp.checkout_switch_node(const_cast<char *>(s.c_str()),true);
 
     cout << "checkout完成！耗时：" << 1.0 * (clock() - start_time) / 1000.0 << "ms" << endl;
 }

@@ -20,7 +20,7 @@ public:
     void do_ignore(std::string path);
 
     //取消ignore
-    void deIgnore(std::string path);
+    void de_ignore(std::string path);
 
     void help() override;
 

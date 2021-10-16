@@ -272,7 +272,7 @@ void module_merge::merge(const std::string &node2) {
     //切换到新节点
     module_checkout tmp_checkout;
 
-    tmp_checkout.checkout_switch_node(const_cast<char *>(new_node_sha1.c_str()));
+    tmp_checkout.checkout_switch_node(const_cast<char *>(new_node_sha1.c_str()),true);
     sqlite3_close(db);
 
 

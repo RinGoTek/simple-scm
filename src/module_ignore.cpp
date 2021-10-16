@@ -179,7 +179,7 @@ void module_ignore::do_ignore(string path) {
 
 //取消ignore
 //要传入相对路径
-void module_ignore::deIgnore(std::string path) {
+void module_ignore::de_ignore(std::string path) {
     sqlite3 *db;
     char *zErrMsg = 0;
     int rc;

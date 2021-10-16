@@ -100,7 +100,7 @@ int main(int count, char *parameters[]) {
 
             //取消ignore
             if (command2 == "-d") {
-                tmp.deIgnore(command3);
+                tmp.de_ignore(command3);
             }
         } else tip_command_error();
 
@@ -140,14 +140,14 @@ int main(int count, char *parameters[]) {
         cout << ans << endl;
     } else if (main_command == "checkout") {
         string command2 = parameters[2];
-        module_checkout rbq;
+        module_checkout ck;
 
         if (command2 == "-n") {
             //切换到节点
-            rbq.checkout_switch_node(parameters[3]);
+            ck.checkout_switch_node(parameters[3],true);
         } else {
             //切换分支
-            rbq.checkout_switch_branch(const_cast<char *>(command2.c_str()));
+            ck.checkout_switch_branch(const_cast<char *>(command2.c_str()));
         }
 
 
